@@ -1,3 +1,9 @@
 [submodule "ActionBarSherlock"]
 	path = ActionBarSherlock
 	url = https://github.com/JakeWharton/ActionBarSherlock
+[submodule "StickyListHeaders"]
+	path = StickyListHeaders
+	url = https://github.com/emilsjolander/StickyListHeaders.git
+[submodule "AndroidSwitchBackport"]
+	path = AndroidSwitchBackport
+	url = https://github.com/BoD/android-switch-backport.git
