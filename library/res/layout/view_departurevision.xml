@@ -6,7 +6,7 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="66dp"
+        android:layout_height="80dp"
         android:layout_marginLeft="66dp" >
 
         <TextView
@@ -34,6 +34,26 @@
             android:text="N"
             android:textColor="#eaeaea"
             android:textSize="20dp" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/track_container"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:background="@drawable/circle"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true" >
+
+        <TextView
+            android:id="@+id/track"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:gravity="center"
+            android:text="11"
+            android:includeFontPadding="false"
+            android:textColor="#eaeaea"
+            android:textSize="25dp" />
     </RelativeLayout>
 
 </RelativeLayout>
