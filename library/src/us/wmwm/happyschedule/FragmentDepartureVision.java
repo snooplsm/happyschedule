@@ -13,7 +13,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import android.app.Activity;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -22,9 +21,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
+import com.emilsjolander.components.stickylistheaders.StickyListHeadersListView;
+
 public class FragmentDepartureVision extends Fragment {
 
-	ListView list;
+	StickyListHeadersListView list;
 
 	Future<?> poll;
 
@@ -39,7 +40,7 @@ public class FragmentDepartureVision extends Fragment {
 			Bundle savedInstanceState) {
 		View root = inflater.inflate(R.layout.fragment_departurevision,
 				container, false);
-		list = (ListView) root.findViewById(R.id.list);
+		list = (StickyListHeadersListView) root.findViewById(R.id.list);
 		return root;
 	}
 
@@ -96,7 +97,7 @@ public class FragmentDepartureVision extends Fragment {
 			@Override
 			public void run() {
 				try {
-					final List<TrainStatus> s = poller.getTrainStatuses("NY");
+					final List<TrainStatus> s = poller.getTrainStatuses("TR");
 					handler.post(new Runnable() {
 						public void run() {
 							adapter.setData(s);
