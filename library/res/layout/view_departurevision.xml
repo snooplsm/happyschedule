@@ -2,6 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_marginLeft="10dp"
+    android:layout_marginRight="10dp"
     android:minHeight="50dp" >
 
     <RelativeLayout
@@ -50,10 +52,20 @@
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:gravity="center"
-            android:text="11"
+            android:text=""
             android:includeFontPadding="false"
             android:textColor="#eaeaea"
             android:textSize="25dp" />
     </RelativeLayout>
+    
+    <TextView 
+        android:layout_toLeftOf="@id/track_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="18dp"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:id="@+id/time"
+        />
 
 </RelativeLayout>

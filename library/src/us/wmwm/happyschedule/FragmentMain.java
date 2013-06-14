@@ -20,6 +20,7 @@ public class FragmentMain extends Fragment {
 			Bundle savedInstanceState) {
 		View view =  inflater.inflate(R.layout.fragment_main, container, false);
 		pager = (ViewPager) view.findViewById(R.id.pager);
+		pager.setPageMargin((int)(getResources().getDimension(R.dimen.activity_horizontal_margin)));
 		return view;
 	}
 

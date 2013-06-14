@@ -28,6 +28,7 @@ public class DeparturePoller {
 	private static final String TRAIN = "TRAIN";
 	private static final String LINE = "LINE";
 	private static final String TO = "TO";
+	private static final String DEPARTS = "DEPARTS";
 	
 	public List<TrainStatus> getTrainStatuses(String station) throws IOException {
 		URL url = null;
@@ -83,6 +84,9 @@ public class DeparturePoller {
 				if(TO.equalsIgnoreCase(td.text())) {
 					typeToPosition.put(TO, i);
 				}
+				if(DEPARTS.equalsIgnoreCase(td.text())) {
+					typeToPosition.put(DEPARTS, i);
+				}
 			}
 			
 			for(int i = 3; i < trs.size(); i++) {
@@ -92,12 +96,14 @@ public class DeparturePoller {
 				Element status = tds.get(typeToPosition.get(STATUS));
 				Element lline = tds.get(typeToPosition.get(LINE));
 				Element to = tds.get(typeToPosition.get(TO));
+				Element departs = tds.get(typeToPosition.get(DEPARTS));
 					TrainStatus tstatus = new TrainStatus();
 					tstatus.setStatus(status.text());
 					tstatus.setTrack(track.text());
 					tstatus.setTrain(train.text());
 					tstatus.setLine(lline.text());
 					tstatus.setDest(to.text());
+					tstatus.setDeparts(departs.text());
 					statuses.add(tstatus);
 			}
 			

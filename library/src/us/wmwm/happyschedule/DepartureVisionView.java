@@ -3,6 +3,7 @@ package us.wmwm.happyschedule;
 import java.util.Map;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.RelativeLayout;
@@ -13,6 +14,9 @@ public class DepartureVisionView extends RelativeLayout {
 	View lineIndicator;
 	TextView destination;
 	TextView acronym;
+	TextView track;
+	View trackContainer;
+	TextView time;
 	
 	public DepartureVisionView(Context context) {
 		super(context);
@@ -20,6 +24,9 @@ public class DepartureVisionView extends RelativeLayout {
 		lineIndicator = findViewById(R.id.line_indicator);
 		destination = (TextView) findViewById(R.id.destination);
 		acronym = (TextView) findViewById(R.id.acronym);
+		track = (TextView) findViewById(R.id.track);
+		trackContainer = findViewById(R.id.track_container);
+		time = (TextView) findViewById(R.id.time);
 	}
 	
 	public void setData(TrainStatus status, Map<String,LineStyle> keyToColor) {
@@ -30,7 +37,13 @@ public class DepartureVisionView extends RelativeLayout {
 		}
 		
 		destination.setText(status.getDest());
-		
+		if(TextUtils.isEmpty(status.getTrack())) {
+			trackContainer.setVisibility(View.INVISIBLE);
+		} else {
+			trackContainer.setVisibility(View.VISIBLE);
+			track.setText(status.getTrack());
+		}
+		time.setText(status.getDeparts());
 		
 	};
 

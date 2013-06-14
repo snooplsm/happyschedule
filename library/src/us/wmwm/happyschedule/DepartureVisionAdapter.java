@@ -21,6 +21,8 @@ public class DepartureVisionAdapter extends BaseAdapter implements StickyListHea
 	Map<String, LineStyle> keyToColor = Collections.emptyMap();
 	Map<String,Long> headerToPos = new HashMap<String,Long>();
 	
+	
+	
 	@Override
 	public int getCount() {
 		if(statuses==null) {
