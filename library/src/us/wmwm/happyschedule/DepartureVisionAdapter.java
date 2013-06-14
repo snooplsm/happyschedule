@@ -30,7 +30,7 @@ public class DepartureVisionAdapter extends BaseAdapter implements StickyListHea
 		}
 		return statuses.size();
 	}
-
+	
 	@Override
 	public TrainStatus getItem(int arg0) {
 		return statuses.get(arg0);
