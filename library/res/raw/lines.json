@@ -1,0 +1,27 @@
+{
+	"lines": [{
+		"key": "njcl",
+		"color": "#59A2BE",
+		"acronym": "No"
+	}, {
+		"key": "amtk",
+		"color": "#E4C62E",
+		"acronym": "Am"
+	}, {
+		"key": "nec",
+		"color": "#F16364",
+		"acronym": "NEC"
+	}, {
+		"key": "mnbtn",
+		"color": "#F58559",
+		"acronym": "MB"
+	}, {
+		"key": "m&e",
+		"color": "#67BF74",
+		"acronym": "M&E"
+	}, {
+		"key": "acrl",
+		"color": "#6495ed",
+		"acronym": "AC"
+	}]
+}
