@@ -3,6 +3,7 @@ package us.wmwm.happyschedule;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +22,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -43,6 +45,12 @@ public class FragmentDepartureVision extends Fragment {
 	Handler handler = new Handler();
 
 	ConnectivityManager manager;
+	
+	List<TrainStatus> lastStatuses;
+	
+	String station = "NY";
+	
+	long lastStatusesReceived;
 
 	BroadcastReceiver connectionReceiver = new BroadcastReceiver() {
 		@Override
@@ -63,11 +71,25 @@ public class FragmentDepartureVision extends Fragment {
 		}
 	};
 
+	private String getKey() {
+		return "lastStatuses" + station;
+	}
+	
 	Runnable r = new Runnable() {
 		@Override
 		public void run() {
 			try {
-				final List<TrainStatus> s = poller.getTrainStatuses("TR");
+				final List<TrainStatus> s = poller.getTrainStatuses(station);
+				String key = getKey();				
+				if(s!=null && !s.isEmpty()) {
+					JSONArray a = new JSONArray();
+					if(lastStatuses!=null) {
+						for(int i = 0; i < lastStatuses.size(); i++) {
+							a.put(lastStatuses.get(i).toJSON());
+						}
+						PreferenceManager.getDefaultSharedPreferences(getActivity()).edit().putString("lastStation",station).putString(key , a.toString()).putLong(key+"Time", System.currentTimeMillis()).commit();
+					}
+				}
 				handler.post(new Runnable() {
 					public void run() {
 						adapter.setData(s);
@@ -91,17 +113,31 @@ public class FragmentDepartureVision extends Fragment {
 	}
 	
 	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		JSONArray a = new JSONArray();
+		if(lastStatuses!=null) {
+			for(int i = 0; i < lastStatuses.size(); i++) {
+				a.put(lastStatuses.get(i).toJSON());
+			}
+			String key = "lastStatuses" + station;
+			PreferenceManager.getDefaultSharedPreferences(getActivity()).edit().putString("lastStation",station).putString(key , a.toString()).putLong(key, lastStatusesReceived).commit();
+		}
+		
+	}
+	
+	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
+		
 		setHasOptionsMenu(true);
 	}
 	
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		inflater.inflate(R.menu.departurevision, menu);
-		super.onCreateOptionsMenu(menu, inflater);
-		
+		super.onCreateOptionsMenu(menu, inflater);		
 	}
 
 	@Override
@@ -110,8 +146,32 @@ public class FragmentDepartureVision extends Fragment {
 		list.setAdapter(adapter = new DepartureVisionAdapter());
 		manager = (ConnectivityManager) getActivity().getSystemService(
 				Context.CONNECTIVITY_SERVICE);
+		loadInitial();
 		loadColors();
 		super.onActivityCreated(savedInstanceState);
+	}
+
+	private void loadInitial() {
+		Long time = PreferenceManager.getDefaultSharedPreferences(getActivity()).getLong(getKey()+"Time", 0);
+		if(System.currentTimeMillis() - time > 40000) {
+			return;
+		}
+		String data = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString(getKey(), null);
+		if(data==null) {
+			return;
+		}
+		try {
+			JSONArray a = new JSONArray(data);
+			List<TrainStatus> statuses = new ArrayList<TrainStatus>(a.length());
+			for(int i = 0; i < a.length(); i++) {
+				statuses.add(new TrainStatus(a.optJSONObject(i)));
+			}
+			adapter.setData(statuses);
+			
+		} catch (Exception e) {
+			
+		}
+		
 	}
 
 	private void loadColors() {
