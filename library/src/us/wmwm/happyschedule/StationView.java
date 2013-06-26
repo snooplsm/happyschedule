@@ -9,7 +9,8 @@ public class StationView extends RelativeLayout {
 
 	TextView text;
 	
-	String data;
+	String name;
+	String id;
 	
 	public StationView(Context context) {
 		super(context);
@@ -17,13 +18,18 @@ public class StationView extends RelativeLayout {
 		text = (TextView) findViewById(R.id.text);
 	}
 	
-	public void setData(String k) {
-		data = k;
-		text.setText(data);
+	public void setData(String id, String name) {
+		this.name = name;
+		this.id = id;
+		text.setText(name);
 	}
 	
-	public String getData() {
-		return data;
+	public String getStationId() {
+		return id;
+	}
+	
+	public String getName() {
+		return name;
 	}
 
 }

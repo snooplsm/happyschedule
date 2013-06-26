@@ -31,7 +31,26 @@ public class FragmentMain extends Fragment {
 		handler.post(new Runnable() {
 			@Override
 			public void run() {
-				pager.setAdapter(new FragmentMainAdapter(getFragmentManager()));
+				final FragmentMainAdapter fma = new FragmentMainAdapter(getFragmentManager());
+				pager.setAdapter(fma);
+//				fma.setOnStationSelectedListener(new OnStationSelectedListener() {
+//					
+//					@Override
+//					public void onStation(Station station) {
+//						if(station==null) {
+//							pager.setCurrentItem(pager.getCurrentItem()-1);
+//							return;
+//						}
+//						for(int i = 1; i < fma.getCount(); i++) {
+//							Station s = fma.getDepartureVision(i);
+//							if(s.getId().equals(station.getId())) {
+//								pager.setCurrentItem(i);
+//								break;
+//							}
+//						}
+//						//pager.invalidate();
+//					}
+//				});
 			}
 		});
 		

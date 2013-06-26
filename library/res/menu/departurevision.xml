@@ -1,9 +1,21 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <item
-        android:id="@+id/action_settings"
+        android:id="@+id/menu_change_station"
         android:orderInCategory="100"
         android:showAsAction="never"
         android:title="Change Station"/>
+    <item
+        android:id="@+id/menu_add_station"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:title="Add Station"
+        android:visible="false"/>
+    <item
+        android:id="@+id/menu_remove_station"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:visible="false"
+        android:title="Remove"/>
 
 </menu>

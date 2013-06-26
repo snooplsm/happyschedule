@@ -28,7 +28,7 @@ public class DeparturePoller {
 	private static final String TRAIN = "TRAIN";
 	private static final String LINE = "LINE";
 	private static final String TO = "TO";
-	private static final String DEPARTS = "DEPARTS";
+	private static final String DEPARTS = "DEP";
 	
 	public List<TrainStatus> getTrainStatuses(String station) throws IOException {
 		URL url = null;

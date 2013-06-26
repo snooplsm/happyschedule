@@ -1,15 +1,35 @@
 package us.wmwm.happyschedule;
 
+import us.wmwm.happyschedule.FragmentLoad.OnLoadListener;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
 
 public class MainActivity extends FragmentActivity {
 
+	FragmentLoad fragmentLoad;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+
+		if (!FragmentLoad.isUpdated(getApplicationContext())) {
+			getSupportFragmentManager()
+					.beginTransaction()
+					.replace(
+							R.id.fragment_load,
+							fragmentLoad = new FragmentLoad()
+									.setListener(new OnLoadListener() {
+										@Override
+										public void onLoaded() {
+											getSupportFragmentManager()
+													.beginTransaction()
+													.remove(fragmentLoad)
+													.commit();
+										}
+									})).commit();
+		}
 	}
 
 	@Override

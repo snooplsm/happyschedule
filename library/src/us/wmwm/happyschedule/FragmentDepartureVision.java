@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +12,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
@@ -27,7 +29,9 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 
 import com.emilsjolander.components.stickylistheaders.StickyListHeadersListView;
@@ -35,6 +39,7 @@ import com.emilsjolander.components.stickylistheaders.StickyListHeadersListView;
 public class FragmentDepartureVision extends Fragment {
 
 	StickyListHeadersListView list;
+	View stationSelect;
 
 	Future<?> poll;
 
@@ -48,9 +53,15 @@ public class FragmentDepartureVision extends Fragment {
 	
 	List<TrainStatus> lastStatuses;
 	
-	String station = "NY";
+	Station station;
 	
 	long lastStatusesReceived;
+	
+	OnStationSelectedListener onStationSelected;
+	
+	public void setOnStationSelected(OnStationSelectedListener onStationSelected) {
+		this.onStationSelected = onStationSelected;
+	}
 
 	BroadcastReceiver connectionReceiver = new BroadcastReceiver() {
 		@Override
@@ -70,6 +81,14 @@ public class FragmentDepartureVision extends Fragment {
 
 		}
 	};
+	
+	public static FragmentDepartureVision newInstance(Station station) {
+		FragmentDepartureVision dv = new FragmentDepartureVision();
+		Bundle b = new Bundle();
+		b.putSerializable("station", station);
+		dv.setArguments(b);
+		return dv;
+	}
 
 	private String getKey() {
 		return "lastStatuses" + station;
@@ -79,15 +98,15 @@ public class FragmentDepartureVision extends Fragment {
 		@Override
 		public void run() {
 			try {
-				final List<TrainStatus> s = poller.getTrainStatuses(station);
+				final List<TrainStatus> s = poller.getTrainStatuses(station.getDepartureVision());
 				String key = getKey();				
 				if(s!=null && !s.isEmpty()) {
 					JSONArray a = new JSONArray();
 					if(lastStatuses!=null) {
 						for(int i = 0; i < lastStatuses.size(); i++) {
 							a.put(lastStatuses.get(i).toJSON());
-						}
-						PreferenceManager.getDefaultSharedPreferences(getActivity()).edit().putString("lastStation",station).putString(key , a.toString()).putLong(key+"Time", System.currentTimeMillis()).commit();
+						}						
+						PreferenceManager.getDefaultSharedPreferences(getActivity()).edit().putString("lastStation",station.getId()).putString(key , a.toString()).putLong(key+"Time", System.currentTimeMillis()).commit();
 					}
 				}
 				handler.post(new Runnable() {
@@ -109,6 +128,7 @@ public class FragmentDepartureVision extends Fragment {
 		View root = inflater.inflate(R.layout.fragment_departurevision,
 				container, false);
 		list = (StickyListHeadersListView) root.findViewById(R.id.list);
+		stationSelect = root.findViewById(R.id.departure);
 		return root;
 	}
 	
@@ -121,7 +141,7 @@ public class FragmentDepartureVision extends Fragment {
 				a.put(lastStatuses.get(i).toJSON());
 			}
 			String key = "lastStatuses" + station;
-			PreferenceManager.getDefaultSharedPreferences(getActivity()).edit().putString("lastStation",station).putString(key , a.toString()).putLong(key, lastStatusesReceived).commit();
+			PreferenceManager.getDefaultSharedPreferences(getActivity()).edit().putString("lastStation",station.getId()).putString(key , a.toString()).putLong(key, lastStatusesReceived).commit();
 		}
 		
 	}
@@ -135,6 +155,48 @@ public class FragmentDepartureVision extends Fragment {
 	}
 	
 	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		if(item.getItemId()==R.id.menu_change_station) {
+			startActivityForResult(new Intent(getActivity(),ActivityPickStation.class),100);
+		}
+		if(item.getItemId()==R.id.menu_add_station) {
+			startActivityForResult(new Intent(getActivity(),ActivityPickStation.class),200);
+		}
+		if(item.getItemId()==R.id.menu_remove_station) {
+			deleteCurrentStation();
+		}
+		return super.onOptionsItemSelected(item);
+	}
+	
+	@Override
+	public void onPrepareOptionsMenu(Menu menu) {
+		super.onPrepareOptionsMenu(menu);
+		if(station==null) {
+			menu.removeItem(R.id.menu_remove_station);
+		}
+	}
+	
+	private void deleteCurrentStation() {
+		String k = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("departure_visions", "[]");
+		JSONArray a = null;
+		try {
+			a = new JSONArray(k);
+		} catch (JSONException e) {
+			throw new RuntimeException(e);
+		}
+		JSONArray b = new JSONArray();
+		for(int i = a.length()-1; i >= 0; i--) {
+			String id = a.optString(i);
+			if(station.getId().equals(id)) {
+				continue;
+			}
+			b.put(id);
+		}
+		PreferenceManager.getDefaultSharedPreferences(getActivity()).edit().putString("departure_visions", b.toString()).commit();
+		onStationSelected.onStation(null);
+	}
+	
+	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		inflater.inflate(R.menu.departurevision, menu);
 		super.onCreateOptionsMenu(menu, inflater);		
@@ -143,7 +205,23 @@ public class FragmentDepartureVision extends Fragment {
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		poller = new DeparturePoller();
-		list.setAdapter(adapter = new DepartureVisionAdapter());
+		Bundle arguments = getArguments();
+		if(arguments!=null) {
+			station = (Station) arguments.getSerializable("station");
+		}
+		list.setAdapter(adapter = new DepartureVisionAdapter());		
+		if(station==null) {
+			stationSelect.setVisibility(View.VISIBLE);
+			stationSelect.setOnClickListener(new OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					startActivityForResult(new Intent(getActivity(),ActivityPickStation.class),100);
+				}
+			});			
+		} else {
+			stationSelect.setVisibility(View.GONE);
+		}
 		manager = (ConnectivityManager) getActivity().getSystemService(
 				Context.CONNECTIVITY_SERVICE);
 		loadInitial();
@@ -236,4 +314,44 @@ public class FragmentDepartureVision extends Fragment {
 		}
 	}
 
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if(resultCode==Activity.RESULT_OK) {
+			Station station = (Station) data.getSerializableExtra("station");			
+			if(requestCode==100 || requestCode==200) {
+				String k = PreferenceManager.getDefaultSharedPreferences(
+						HappyApplication.get()).getString("departure_visions", "[]");
+				JSONArray departureVisions = null;
+				try {
+					departureVisions = new JSONArray(k);
+				} catch (Exception e) {
+					departureVisions = new JSONArray();
+				}
+				if(requestCode==100) {				
+					if(departureVisions.length()!=0) {
+						departureVisions = new JSONArray();
+					} 
+					departureVisions.put(station.getId());
+				} else {
+					departureVisions.put(station.getId());
+				}
+				adapter.notifyDataSetInvalidated();
+				PreferenceManager.getDefaultSharedPreferences(HappyApplication.get()).edit().putString("departure_visions", departureVisions.toString()).commit();
+				this.station = station;
+				this.stationSelect.setVisibility(View.GONE);
+				if(poll!=null) {
+					poll.cancel(true);
+				}
+				poll = ThreadHelper.getScheduler().scheduleAtFixedRate(r,
+						100, 10000, TimeUnit.MILLISECONDS);
+				List<TrainStatus> ks = Collections.emptyList();
+				adapter.setData(ks);
+			}
+			if(onStationSelected!=null) {
+				onStationSelected.onStation(station);
+			}
+		}
+		super.onActivityResult(requestCode, resultCode, data);
+	}
+	
 }
