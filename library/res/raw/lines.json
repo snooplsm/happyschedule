@@ -1,26 +1,65 @@
 {
+	"departure_vision": {
+		"url": "http://dv.njtransit.com/mobile/tid-mobile.aspx?sid=$stop_id"
+	},
+
 	"lines": [{
-		"key": "njcl",
+		"keys": {
+			"njcl": "",
+			"no jersey coast": ""
+		},
 		"color": "#59A2BE",
 		"acronym": "No"
-	}, {
-		"key": "amtk",
+	}, 
+	{
+		"keys": {
+			"septa": ""
+		},
+		"color": "#59A2BE",
+		"acronym": "SEP"
+	},
+	{
+		"keys": {
+			"amtk": "",
+			"amtrak": "",
+			"carolinian": "",
+			"acela express": "",
+			"keystone": ""
+		},
 		"color": "#E4C62E",
 		"acronym": "Am"
 	}, {
-		"key": "nec",
+		"keys": {
+			"nec": "",
+			"northeast corrdr": ""
+		},
 		"color": "#F16364",
 		"acronym": "NEC"
 	}, {
-		"key": "mnbtn",
+		"keys": {
+			"raritan valley": ""
+		},
+		"color": "#F58559",
+		"acronym": "RAV"
+	}, {
+		"keys": {
+			"mnbtn": "",
+			"montclair-boonton": ""
+		},
 		"color": "#F58559",
 		"acronym": "MB"
 	}, {
-		"key": "m&e",
+		"keys": {
+			"m&e": "",
+			"morristown line": ""
+		},
 		"color": "#67BF74",
 		"acronym": "M&E"
 	}, {
-		"key": "acrl",
+		"keys": {
+			"acrl": "",
+			"atl. city line": ""
+		},
 		"color": "#6495ed",
 		"acronym": "AC"
 	}]

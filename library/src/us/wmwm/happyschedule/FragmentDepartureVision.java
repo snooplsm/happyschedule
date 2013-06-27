@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Future;
@@ -165,6 +166,16 @@ public class FragmentDepartureVision extends Fragment {
 		if(item.getItemId()==R.id.menu_remove_station) {
 			deleteCurrentStation();
 		}
+		if(item.getItemId()==R.id.menu_refresh) {
+			if (poll != null) {
+				poll.cancel(true);
+			}
+			NetworkInfo i = manager.getActiveNetworkInfo();
+			if (i != null && i.isConnected()) {
+				poll = ThreadHelper.getScheduler().scheduleAtFixedRate(r, 100,
+						10000, TimeUnit.MILLISECONDS);
+			}
+		}
 		return super.onOptionsItemSelected(item);
 	}
 	
@@ -274,7 +285,10 @@ public class FragmentDepartureVision extends Fragment {
 					for (int i = 0; i < k.length(); i++) {
 						JSONObject li = k.optJSONObject(i);
 						LineStyle l = new LineStyle(li);
-						keyToColor.put(l.key, l);
+						Iterator<String> keys = l.keys.keySet().iterator();
+						while(keys.hasNext()) {
+							keyToColor.put(keys.next(), l);
+						}
 					}
 					handler.post(new Runnable() {
 						@Override

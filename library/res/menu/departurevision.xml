@@ -15,7 +15,14 @@
         android:id="@+id/menu_remove_station"
         android:orderInCategory="100"
         android:showAsAction="never"
-        android:visible="false"
-        android:title="Remove"/>
+        android:title="Remove"
+        android:visible="false"/>
+    
+    <item
+        android:id="@+id/menu_refresh"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:title="Refresh"
+        android:visible="false"/>
 
 </menu>
