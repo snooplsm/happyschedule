@@ -1,6 +1,7 @@
 package us.wmwm.happyschedule.views;
 
 import us.wmwm.happyschedule.R;
+import us.wmwm.happyschedule.Station;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
@@ -11,7 +12,7 @@ public class StationButton extends RelativeLayout {
 
 	TextView text;
 	
-	String station;
+	Station station;
 	
 	public StationButton(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -19,10 +20,13 @@ public class StationButton extends RelativeLayout {
 		text = (TextView) findViewById(R.id.departure_id);
 	}
 	
-	public void setStation(String station) {
+	public void setStation(Station station) {
 		this.station = station;
-		text.setText(station);
+		text.setText(station.getName());
 	}
 	
+	public Station getStation() {
+		return station;
+	}
 
 }

@@ -14,8 +14,19 @@ public class FragmentPickStations extends Fragment {
 
 	StationButton departureButton;
 	StationButton arrivalButton;
+	View getScheduleButton;
 	FragmentStationPicker picker;
+	
+	public static interface OnGetSchedule {
+		void onGetSchedule(Station from, Station to);
+	}
 
+	OnGetSchedule onGetSchedule;
+	
+	public void setOnGetSchedule(OnGetSchedule onGetSchedule) {
+		this.onGetSchedule = onGetSchedule;
+	}
+	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -23,6 +34,7 @@ public class FragmentPickStations extends Fragment {
 				container, false);
 		departureButton = (StationButton) root.findViewById(R.id.depart_button);
 		arrivalButton = (StationButton) root.findViewById(R.id.arrive_button);
+		getScheduleButton = root.findViewById(R.id.get_schedule);
 		return root;
 	}
 
@@ -61,6 +73,17 @@ public class FragmentPickStations extends Fragment {
 		};
 		departureButton.setOnClickListener(onClick);
 		arrivalButton.setOnClickListener(onClick);
+		
+		OnClickListener onClickGetSchedule = new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Station depart = departureButton.getStation();
+				Station arrive = arrivalButton.getStation();
+				onGetSchedule.onGetSchedule(depart, arrive);
+			}
+		};
+		
+		getScheduleButton.setOnClickListener(onClickGetSchedule);
 	}
 	
 	@Override
@@ -69,9 +92,9 @@ public class FragmentPickStations extends Fragment {
 		if(resultCode==Activity.RESULT_OK) {
 			Station station = (Station) data.getSerializableExtra("station");
 			if(requestCode==200) {
-				arrivalButton.setStation(station.getName());
+				arrivalButton.setStation(station);
 			} else {
-				departureButton.setStation(station.getName());
+				departureButton.setStation(station);
 			}
 		}
 	}

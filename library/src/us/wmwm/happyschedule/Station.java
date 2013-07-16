@@ -28,6 +28,11 @@ public class Station implements Serializable {
 		departureVision = o.optString("dv");
 	}
 	
+	@Override
+	public String toString() {
+		return name;
+	}
+	
 	public Station() {
 		
 	}

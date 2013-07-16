@@ -15,7 +15,7 @@ public class Db {
 			INSTANCE.db = SQLiteDatabase.openDatabase(
 					FragmentLoad.getFile(HappyApplication.get())
 							.getAbsolutePath(), null,
-					SQLiteDatabase.OPEN_READONLY);
+					SQLiteDatabase.OPEN_READONLY|SQLiteDatabase.NO_LOCALIZED_COLLATORS);
 		}
 		return INSTANCE;
 	}
