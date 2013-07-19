@@ -3,7 +3,9 @@ package us.wmwm.happyschedule;
 import us.wmwm.happyschedule.views.StationButton;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,17 +18,17 @@ public class FragmentPickStations extends Fragment {
 	StationButton arrivalButton;
 	View getScheduleButton;
 	FragmentStationPicker picker;
-	
+
 	public static interface OnGetSchedule {
 		void onGetSchedule(Station from, Station to);
 	}
 
 	OnGetSchedule onGetSchedule;
-	
+
 	public void setOnGetSchedule(OnGetSchedule onGetSchedule) {
 		this.onGetSchedule = onGetSchedule;
 	}
-	
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -41,7 +43,24 @@ public class FragmentPickStations extends Fragment {
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-
+		SharedPreferences manager = PreferenceManager.getDefaultSharedPreferences(getActivity());
+		String lastDepartId = manager.getString("lastDepartId", null);
+		String lastArriveId = manager.getString("lastArriveId", null);
+		
+		if(lastDepartId!=null) {
+			Station station = Db.get().getStop(lastDepartId);
+			if(station!=null) {
+				departureButton.setStation(station);
+			}
+		}
+		
+		if(lastArriveId!=null) {
+			Station station = Db.get().getStop(lastArriveId);
+			if(station!=null) {
+				arrivalButton.setStation(station);
+			}
+		}
+		
 		OnClickListener onClick = new OnClickListener() {
 
 			@Override
@@ -79,19 +98,22 @@ public class FragmentPickStations extends Fragment {
 			public void onClick(View v) {
 				Station depart = departureButton.getStation();
 				Station arrive = arrivalButton.getStation();
+				PreferenceManager.getDefaultSharedPreferences(getActivity()).edit().
+				putString("lastDepartId", depart.id).
+				putString("lastArriveId", arrive.id).commit();
 				onGetSchedule.onGetSchedule(depart, arrive);
 			}
 		};
 		
 		getScheduleButton.setOnClickListener(onClickGetSchedule);
 	}
-	
+
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
-		if(resultCode==Activity.RESULT_OK) {
+		if (resultCode == Activity.RESULT_OK) {
 			Station station = (Station) data.getSerializableExtra("station");
-			if(requestCode==200) {
+			if (requestCode == 200) {
 				arrivalButton.setStation(station);
 			} else {
 				departureButton.setStation(station);

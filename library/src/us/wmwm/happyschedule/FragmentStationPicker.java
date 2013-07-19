@@ -58,7 +58,7 @@ public class FragmentStationPicker extends Fragment {
 				for(int i = 0; i < adapter.getCount(); i++) {
 					String name = adapter.getName(adapter.getItem(i));
 					if(name.startsWith(letter)) {
-						list.setSelectionFromTop(i,-25);
+						list.setSelectionFromTop(i,(int)-getResources().getDimension(R.dimen.header_height));
 						break;
 					}
 				}

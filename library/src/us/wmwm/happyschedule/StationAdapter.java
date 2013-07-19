@@ -64,7 +64,7 @@ public class StationAdapter extends CursorAdapter implements StickyListHeadersAd
 		TextView tv = new TextView(parent.getContext());
 		tv.setText(getName(getItem(position)).charAt(0)+"");
 		tv.setBackgroundColor(Color.GRAY);
-		tv.setLayoutParams(new ViewGroup.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+		tv.setLayoutParams(new ViewGroup.LayoutParams(LayoutParams.MATCH_PARENT, (int) parent.getContext().getResources().getDimension(R.dimen.header_height)));
 		return tv;
 	}
 

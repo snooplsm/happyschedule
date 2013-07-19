@@ -7,3 +7,6 @@
 [submodule "AndroidSwitchBackport"]
 	path = libraries/AndroidSwitchBackport
 	url = https://github.com/BoD/android-switch-backport.git
+[submodule "libraries/AndroidTimesSquare"]
+	path = libraries/AndroidTimesSquare
+	url = https://github.com/square/android-times-square.git
