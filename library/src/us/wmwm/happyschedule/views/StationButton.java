@@ -16,8 +16,16 @@ public class StationButton extends RelativeLayout {
 	
 	public StationButton(Context context, AttributeSet attrs) {
 		super(context, attrs);
-		LayoutInflater.from(context).inflate(R.layout.view_station_button,this);
+		try {
+			LayoutInflater.from(context).inflate(R.layout.view_station_button,this);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		text = (TextView) findViewById(R.id.departure_id);
+	}
+	
+	public void setHint(String txt) {
+		text.setText(txt);
 	}
 	
 	public void setStation(Station station) {

@@ -8,6 +8,8 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -18,6 +20,7 @@ public class FragmentPickStations extends Fragment {
 	StationButton arrivalButton;
 	View getScheduleButton;
 	FragmentStationPicker picker;
+	View reverseButton;
 
 	public static interface OnGetSchedule {
 		void onGetSchedule(Station from, Station to);
@@ -30,14 +33,29 @@ public class FragmentPickStations extends Fragment {
 	}
 
 	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setHasOptionsMenu(true);
+	}
+	
+	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		View root = inflater.inflate(R.layout.fragment_pick_stations,
 				container, false);
 		departureButton = (StationButton) root.findViewById(R.id.depart_button);
 		arrivalButton = (StationButton) root.findViewById(R.id.arrive_button);
+		departureButton.setHint("Departure Station");
+		arrivalButton.setHint("Arrival Station");
 		getScheduleButton = root.findViewById(R.id.get_schedule);
+		reverseButton = root.findViewById(R.id.reverse);
 		return root;
+	}
+	
+	@Override
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		super.onCreateOptionsMenu(menu, inflater);
+		inflater.inflate(R.menu.menu_pick_stations, menu);
 	}
 
 	@Override
@@ -90,6 +108,18 @@ public class FragmentPickStations extends Fragment {
 //				});
 			}
 		};
+		
+		OnClickListener reverse = new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				Station tmp = departureButton.getStation();
+				departureButton.setStation(arrivalButton.getStation());
+				arrivalButton.setStation(tmp);
+			}
+		};
+		
+		reverseButton.setOnClickListener(reverse);
 		departureButton.setOnClickListener(onClick);
 		arrivalButton.setOnClickListener(onClick);
 		

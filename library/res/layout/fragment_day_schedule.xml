@@ -3,10 +3,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
-    <ListView
+    <ExpandableListView
         android:id="@+id/list2"
         android:layout_width="match_parent"
+        android:divider="@null"
+        android:groupIndicator="@null"
+        android:childIndicator="@null"
+        android:dividerHeight="0dp"
         android:layout_height="match_parent" >
-    </ListView>
+    </ExpandableListView>
 
 </RelativeLayout>

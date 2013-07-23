@@ -73,6 +73,7 @@ public class FragmentSchedule extends Fragment {
 			ft.commit();
 			//picker.show(getFragmentManager(), "datePicker");
 		}
+		pager.setOffscreenPageLimit(0);
 		if(item.getItemId()==R.id.menu_go_to_today) {
 			pager.setCurrentItem(adapter.getTodaysPosition());
 		}

@@ -24,7 +24,15 @@
 			"amtrak": "",
 			"carolinian": "",
 			"acela express": "",
-			"keystone": ""
+			"keystone": "",
+			"miami":"",
+			"norfolk":"",
+			"silver meteor-r":"",
+			"regional-r":"",
+			"springfield":"",
+			"regional":"",
+			"silver star -r":"",
+			"silver star-r":""
 		},
 		"color": "#E4C62E",
 		"acronym": "Am"

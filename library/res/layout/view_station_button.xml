@@ -1,13 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="@android:drawable/list_selector_background"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
     <TextView
+        android:layout_marginLeft="6dp"
+        android:layout_marginRight="6dp"
         android:id="@+id/departure_id"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center_vertical"
+        android:textSize="27dp"
         android:text="Departure" />
 
 </RelativeLayout>

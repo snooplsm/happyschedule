@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+    <color name="windowBackground">#eee</color>
+    <color name="error_background">#99F16364</color>
+    <color name="error_text">#eee</color>
+    
+</resources>

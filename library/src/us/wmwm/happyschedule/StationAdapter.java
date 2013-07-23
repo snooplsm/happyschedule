@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.support.v4.widget.CursorAdapter;
@@ -61,10 +62,15 @@ public class StationAdapter extends CursorAdapter implements StickyListHeadersAd
 
 	@Override
 	public View getHeaderView(int position, View convertView, ViewGroup parent) {
-		TextView tv = new TextView(parent.getContext());
+		Context c = parent.getContext();
+		TextView tv = new TextView(c);
 		tv.setText(getName(getItem(position)).charAt(0)+"");
 		tv.setBackgroundColor(Color.GRAY);
-		tv.setLayoutParams(new ViewGroup.LayoutParams(LayoutParams.MATCH_PARENT, (int) parent.getContext().getResources().getDimension(R.dimen.header_height)));
+		Resources r = c.getResources();
+		tv.setTextSize(r.getDimension(R.dimen.header_text_size));
+		ViewGroup.LayoutParams lp;
+		tv.setLayoutParams(lp = new ViewGroup.LayoutParams(LayoutParams.MATCH_PARENT, (int) r.getDimension(R.dimen.header_height)));
+		tv.setPadding((int)r.getDimension(R.dimen.header_margin), tv.getPaddingTop(), tv.getPaddingRight(), tv.getPaddingBottom());
 		return tv;
 	}
 

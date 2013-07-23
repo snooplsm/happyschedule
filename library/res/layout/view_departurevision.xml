@@ -40,6 +40,8 @@
 
     <RelativeLayout
         android:id="@+id/track_container"
+        android:paddingTop="3dp"
+        android:paddingBottom="3dp"
         android:layout_width="50dp"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
@@ -47,25 +49,24 @@
 
         <TextView
             android:id="@+id/track"
-            android:background="@drawable/circle"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:layout_centerInParent="true"
+            android:background="@drawable/circle"
             android:gravity="center"
             android:includeFontPadding="false"
             android:text=""
             android:textColor="#eaeaea"
             android:textSize="25dp" />
-    </RelativeLayout>
 
-    <TextView
-        android:id="@+id/time"
-        android:layout_alignParentRight="true"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/track_container"
-        android:layout_width="50dp"
-        android:gravity="center"
-        android:text="3:33"
-        android:textSize="18dp" />
+        <TextView
+            android:id="@+id/time"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_below="@id/track"
+            android:gravity="center"
+            android:text="3:33"
+            android:textSize="18dp" />
+    </RelativeLayout>
 
 </RelativeLayout>

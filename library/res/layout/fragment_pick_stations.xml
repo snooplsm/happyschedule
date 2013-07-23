@@ -9,17 +9,65 @@
         android:layout_height="match_parent"
         android:orientation="vertical" >
 
-        <us.wmwm.happyschedule.views.StationButton
-            android:id="@+id/depart_button"
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1" />
+            android:layout_weight="2" >
 
-        <us.wmwm.happyschedule.views.StationButton
-            android:id="@+id/arrive_button"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical" >
+
+                <us.wmwm.happyschedule.views.StationButton
+                    android:id="@+id/depart_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
+
+                <us.wmwm.happyschedule.views.StationButton
+                    android:id="@+id/arrive_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
+            </LinearLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true" >
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1px"
+                    android:layout_centerVertical="true"
+                    android:background="#000" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:orientation="horizontal" >
+
+                    <RelativeLayout
+                        android:layout_width="60dp"
+                        android:layout_height="60dp" >
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1px"
+                            android:layout_centerVertical="true"
+                            android:background="?android:attr/windowBackground" />
+
+                        <ImageView
+                            android:id="@+id/reverse"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:src="@drawable/reverse" />
+                    </RelativeLayout>
+                </LinearLayout>
+            </RelativeLayout>
+        </RelativeLayout>
 
         <us.wmwm.happyschedule.views.GetScheduleButton
             android:id="@+id/get_schedule"

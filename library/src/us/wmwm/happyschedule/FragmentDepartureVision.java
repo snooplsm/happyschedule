@@ -55,6 +55,8 @@ public class FragmentDepartureVision extends Fragment {
 	List<TrainStatus> lastStatuses;
 
 	Station station;
+	
+	View erroText;
 
 	long lastStatusesReceived;
 
@@ -69,7 +71,11 @@ public class FragmentDepartureVision extends Fragment {
 		public void onReceive(Context context, Intent intent) {
 
 			NetworkInfo info = manager.getActiveNetworkInfo();
+			if(info==null || !info.isConnected()) {
+				erroText.setVisibility(View.VISIBLE);
+			}
 			if (info != null && info.isConnected()) {
+				erroText.setVisibility(View.GONE);
 				if (poll == null || poll.isCancelled()) {
 					poll = ThreadHelper.getScheduler().scheduleAtFixedRate(r,
 							100, 10000, TimeUnit.MILLISECONDS);
@@ -142,6 +148,7 @@ public class FragmentDepartureVision extends Fragment {
 				container, false);
 		list = (StickyListHeadersListView) root.findViewById(R.id.list);
 		stationSelect = root.findViewById(R.id.departure);
+		erroText = root.findViewById(R.id.no_internet);
 		return root;
 	}
 
