@@ -13,7 +13,10 @@ public class MainActivity extends FragmentActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-
+		getActionBar().setLogo(null);
+		getActionBar().setIcon(null);
+		getActionBar().setDisplayShowHomeEnabled(false);
+		getActionBar().setDisplayUseLogoEnabled(false);
 		if (!FragmentLoad.isUpdated(getApplicationContext())) {
 			getSupportFragmentManager()
 					.beginTransaction()

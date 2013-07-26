@@ -44,7 +44,7 @@ public class ScheduleView extends RelativeLayout {
 		long mins = diff / 60000;
 		if(mins>=0 && mins < 100) {
 			timeTillDepart.setVisibility(View.VISIBLE);
-			timeTillDepart.setText("departs in " + mins + " min");
+			timeTillDepart.setText("DEPARTS IN " + mins + " MIN");
 		} else {
 			timeTillDepart.setVisibility(View.GONE);
 			timeTillDepart.setText("");
@@ -61,6 +61,6 @@ public class ScheduleView extends RelativeLayout {
 	}
 	
 	private String shrink(Calendar cal) {
-		return TIME.format(cal.getTime()).toLowerCase().replace(" am", "a").replace(" pm", "p");
+		return TIME.format(cal.getTime()).toLowerCase();//.replace(" am", "a").replace(" pm", "p");
 	}
 }

@@ -4,110 +4,149 @@
     android:layout_height="wrap_content"
     android:layout_marginLeft="6dp"
     android:layout_marginRight="6dp"
-    android:layout_marginTop="6dp">
+    android:layout_marginTop="6dp"
+    android:paddingBottom="12dp" >
 
     <RelativeLayout
-        android:paddingTop="6dp"
-        android:paddingBottom="6dp"
+        android:id="@+id/time_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#eee" >
-
-        <TextView
-            android:id="@+id/time"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="6dp"
-            android:text="11:30p - 12:15a"
-            android:textColor="#2a2a2a"
-            android:textSize="16dp" />
+        android:background="#eee"
+        android:paddingBottom="6dp"
+        android:paddingTop="6dp" >
 
         <RelativeLayout
-            android:layout_width="wrap_content"
+            android:id="@+id/time_top"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:layout_marginRight="6dp" >
+            android:background="#ccc" >
 
             <RelativeLayout
-                android:id="@+id/line_indicator"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_alignParentRight="true"
-                android:background="#F16364" >
-
-                <TextView
-                    android:id="@+id/acronym"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:gravity="center"
-                    android:text="14"
-                    android:textColor="#eaeaea"
-                    android:textSize="24dp" />
-            </RelativeLayout>
-
-            <LinearLayout
-                android:id="@+id/status_container"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_below="@id/line_indicator"
-                android:orientation="horizontal" >
+                android:padding="1dp" >
 
                 <TextView
-                    android:id="@+id/status"
+                    android:id="@+id/time"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:layout_marginTop="3dp"
-                    android:background="#aaa"
-                    android:lines="1"
-                    android:paddingLeft="3dp"
-                    android:paddingRight="3dp"
-                    android:text="30 MIN LATE"
-                    android:textColor="#eaeaea"
-                    android:textSize="12dp" />
+                    android:layout_marginLeft="6dp"
+                    android:text="11:30p - 12:15a"
+                    android:textColor="#2a2a2a"
+                    android:textSize="16dp"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/departs_in"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
-                    android:layout_below="@id/status"
-                    android:layout_marginLeft="2dp"
-                    android:layout_marginTop="3dp"
-                    android:background="#F16364"
                     android:lines="1"
-                    android:paddingLeft="3dp"
-                    android:paddingRight="3dp"
                     android:text="DEPARTS IN 1 MIN"
-                    android:textColor="#eaeaea"
-                    android:textSize="12dp" />
-            </LinearLayout>
+                    android:textColor="#F16364"
+                    android:textSize="16dp" />
+            </RelativeLayout>
+        </RelativeLayout>
+    </RelativeLayout>
 
-            <RelativeLayout
+    <LinearLayout
+        android:id="@+id/train_info"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/time_container"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:id="@+id/depart"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:gravity="right"
+            android:singleLine="true"
+            android:text="New York Penn Station" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=">" />
+
+        <TextView
+            android:id="@+id/arrive"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:text="Trenton Transit Center" />
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/train_info" >
+
+        <RelativeLayout
+            android:id="@+id/line_indicator"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignParentRight="true"
+            android:background="#F16364"
+            android:visibility="gone" >
+
+            <TextView
+                android:id="@+id/acronym"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:gravity="center"
+                android:text="14"
+                android:textColor="#eaeaea"
+                android:textSize="24dp" />
+        </RelativeLayout>
+
+        <LinearLayout
+            android:id="@+id/status_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_below="@id/line_indicator"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:id="@+id/status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_marginTop="3dp"
+                android:background="#aaa"
+                android:lines="1"
+                android:paddingLeft="3dp"
+                android:paddingRight="3dp"
+                android:text="30 MIN LATE"
+                android:textColor="#eaeaea"
+                android:textSize="12dp" />
+        </LinearLayout>
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@id/line_indicator" >
+
+            <TextView
+                android:id="@+id/duration"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
-                android:layout_below="@id/line_indicator"
-                android:layout_marginLeft="@dimen/activity_horizontal_margin"
-                android:layout_toLeftOf="@id/status_container" >
-
-                <TextView
-                    android:id="@+id/duration"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
-                    android:layout_below="@id/status"
-                    android:layout_marginLeft="2dp"
-                    android:layout_marginTop="3dp"
-                    android:lines="1"
-                    android:paddingLeft="3dp"
-                    android:paddingRight="3dp"
-                    android:text="93 min"
-                    android:textSize="12dp" />
-            </RelativeLayout>
+                android:layout_marginLeft="2dp"
+                android:layout_marginTop="3dp"
+                android:lines="1"
+                android:paddingLeft="3dp"
+                android:paddingRight="3dp"
+                android:text="93 min"
+                android:textSize="12dp" />
         </RelativeLayout>
     </RelativeLayout>
 

@@ -58,6 +58,7 @@ public class FragmentDaySchedule extends Fragment {
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		super.onCreateOptionsMenu(menu, inflater);
 		inflater.inflate(R.menu.menu_schedule_day, menu);
+		getActivity().getActionBar().setSubtitle(from.name + " to " + to.name);
 	}
 
 	@Override
