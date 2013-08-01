@@ -2,12 +2,15 @@ package us.wmwm.happyschedule;
 
 import us.wmwm.happyschedule.FragmentPickStations.OnGetSchedule;
 import us.wmwm.happyschedule.views.FragmentMainAdapter;
+import android.app.ActionBar;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager.OnBackStackChangedListener;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -17,6 +20,30 @@ public class FragmentMain extends Fragment {
 	
 	Handler handler = new Handler();
 	
+	OnBackStackChangedListener onBackStackListener = new OnBackStackChangedListener() {
+		@Override
+		public void onBackStackChanged() {
+			int count = getFragmentManager().getBackStackEntryCount();
+			System.out.println("onBackStack " + count);
+			if(count==0) {
+				handler.post(new Runnable() {
+					public void run() {
+						ActionBar a = getActivity().getActionBar();
+						a.setSubtitle(null);
+						a.setDisplayHomeAsUpEnabled(false);
+						a.setHomeButtonEnabled(false);
+						getActivity().invalidateOptionsMenu();						
+					};
+				});
+				
+			}
+		}
+	};
+	
+	public void onCreateOptionsMenu(android.view.Menu menu, android.view.MenuInflater inflater) {
+		super.onCreateOptionsMenu(menu, inflater);
+	};
+	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -25,11 +52,16 @@ public class FragmentMain extends Fragment {
 		pager.setPageMargin((int)(getResources().getDimension(R.dimen.activity_horizontal_margin)));
 		return view;
 	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		return super.onOptionsItemSelected(item);
+	}
 
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		
+		getFragmentManager().addOnBackStackChangedListener(onBackStackListener);
 		handler.post(new Runnable() {
 			@Override
 			public void run() {
@@ -42,8 +74,11 @@ public class FragmentMain extends Fragment {
 						System.out.println(from + " to " + to);
 						FragmentTransaction t = getFragmentManager().beginTransaction();
 						FragmentSchedule fs = FragmentSchedule.newInstance(from,to);
-						
 						t.replace(R.id.fragment_schedule, fs).addToBackStack(null).commit();
+						ActionBar a = getActivity().getActionBar();
+						a.setDisplayHomeAsUpEnabled(true);
+						a.setHomeButtonEnabled(true);
+						getActivity().getActionBar().setSubtitle((from.name + " to " + to.name));
 					}
 				});
 //				fma.setOnStationSelectedListener(new OnStationSelectedListener() {
@@ -67,6 +102,12 @@ public class FragmentMain extends Fragment {
 			}
 		});
 		
+	}
+	
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		getFragmentManager().removeOnBackStackChangedListener(onBackStackListener);
 	}
 
 }

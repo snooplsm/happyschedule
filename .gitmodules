@@ -10,3 +10,6 @@
 [submodule "libraries/AndroidTimesSquare"]
 	path = libraries/AndroidTimesSquare
 	url = https://github.com/square/android-times-square.git
+[submodule "libraries/MicrowaveTimePicker"]
+	path = libraries/MicrowaveTimePicker
+	url = git@github.com:snooplsm/MicrowaveTimePicker.git

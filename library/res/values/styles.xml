@@ -14,10 +14,16 @@
 
     <!-- Application theme. -->
     <style name="AppTheme" parent="AppBaseTheme">
+
         <!-- <item name="android:windowBackground"></item> -->
         <item name="android:windowBackground">@color/windowBackground</item>
 
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
+    </style>
+
+    <style name="small_thin">
+        <item name="android:textSize">@dimen/small_font_size</item>
+        <item name="android:fontFamily">sans-serif-thin</item>
     </style>
 
 </resources>

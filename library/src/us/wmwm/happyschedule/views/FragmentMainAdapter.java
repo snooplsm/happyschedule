@@ -5,14 +5,16 @@ import org.json.JSONArray;
 import us.wmwm.happyschedule.Db;
 import us.wmwm.happyschedule.FragmentDepartureVision;
 import us.wmwm.happyschedule.FragmentPickStations;
+import us.wmwm.happyschedule.FragmentPickStations.OnGetSchedule;
 import us.wmwm.happyschedule.HappyApplication;
+import us.wmwm.happyschedule.IPrimary;
 import us.wmwm.happyschedule.OnStationSelectedListener;
 import us.wmwm.happyschedule.Station;
-import us.wmwm.happyschedule.FragmentPickStations.OnGetSchedule;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.view.ViewGroup;
 
 public class FragmentMainAdapter extends FragmentPagerAdapter {
 
@@ -57,6 +59,20 @@ public class FragmentMainAdapter extends FragmentPagerAdapter {
 		super(fm);
 	}
 
+	Object last;
+	
+	@Override
+	public void setPrimaryItem(ViewGroup container, int position, Object object) {
+		super.setPrimaryItem(container, position, object);
+		System.out.println(object.getClass());
+		if(object!=last) {
+			last = object;
+			if(object instanceof IPrimary) {
+				((IPrimary)object).setPrimaryItem();
+			}
+		}
+	}
+	
 	@Override
 	public Fragment getItem(int pos) {
 		int count = getCount();

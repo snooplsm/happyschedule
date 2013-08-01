@@ -4,14 +4,13 @@
     android:layout_height="wrap_content"
     android:layout_marginLeft="6dp"
     android:layout_marginRight="6dp"
-    android:layout_marginTop="6dp"
-    android:paddingBottom="12dp" >
+    android:background="@color/list_white"
+    android:paddingBottom="6dp" >
 
     <RelativeLayout
         android:id="@+id/time_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#eee"
         android:paddingBottom="6dp"
         android:paddingTop="6dp" >
 
@@ -19,7 +18,9 @@
             android:id="@+id/time_top"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#ccc" >
+            android:layout_marginLeft="6dp"
+            android:layout_marginRight="6dp"
+            android:background="@drawable/bg_accent_flat_light" >
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -41,10 +42,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
+                    android:layout_marginRight="6dp"
                     android:lines="1"
                     android:text="DEPARTS IN 1 MIN"
                     android:textColor="#F16364"
-                    android:textSize="16dp" />
+                    android:textSize="15dp" />
             </RelativeLayout>
         </RelativeLayout>
     </RelativeLayout>
@@ -54,6 +56,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/time_container"
+        android:layout_toRightOf="@+id/train_info_container"
+        android:layout_marginLeft="12dp"
+        android:layout_marginRight="12dp"
         android:orientation="horizontal" >
 
         <TextView
@@ -82,16 +87,17 @@
     </LinearLayout>
 
     <RelativeLayout
+        android:id="@id/train_info_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_below="@id/train_info" >
+        android:layout_below="@id/train_info"
+        android:layout_marginLeft="6dp"
+        android:layout_marginRight="6dp" >
 
         <RelativeLayout
             android:id="@+id/line_indicator"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:layout_alignParentRight="true"
             android:background="#F16364"
             android:visibility="gone" >
 
@@ -133,19 +139,36 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
-            android:layout_below="@id/line_indicator" >
+            android:layout_below="@id/line_indicator"
+            android:layout_marginLeft="6dp"
+            android:layout_marginRight="6dp" >
 
             <TextView
                 android:id="@+id/duration"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
-                android:layout_marginLeft="2dp"
                 android:layout_marginTop="3dp"
                 android:lines="1"
-                android:paddingLeft="3dp"
-                android:paddingRight="3dp"
                 android:text="93 min"
+                android:textSize="12dp" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/line_indicator"
+            android:layout_centerHorizontal="true"
+            android:layout_marginLeft="6dp"
+            android:layout_marginRight="6dp" >
+
+            <TextView
+                android:id="@+id/trip_id"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:lines="1"
+                android:text="3289"
                 android:textSize="12dp" />
         </RelativeLayout>
     </RelativeLayout>

@@ -6,5 +6,7 @@
     <string name="hello_world">Hello world!</string>
     <string name="get_schedule">Get Schedule</string>
     <string name="pick_station">Pick Station</string>
+    <string name="fragment_alarm_type_arrive">Arrival Alarm</string>
+    <string name="fragment_alarm_type_depart">Departure Alarm</string>
 
 </resources>

@@ -37,7 +37,7 @@ import android.view.ViewGroup;
 
 import com.emilsjolander.components.stickylistheaders.StickyListHeadersListView;
 
-public class FragmentDepartureVision extends Fragment {
+public class FragmentDepartureVision extends Fragment implements IPrimary {
 
 	StickyListHeadersListView list;
 	View stationSelect;
@@ -403,6 +403,11 @@ public class FragmentDepartureVision extends Fragment {
 			}
 		}
 		super.onActivityResult(requestCode, resultCode, data);
+	}
+
+	@Override
+	public void setPrimaryItem() {
+		getActivity().getActionBar().setSubtitle("w/ DepartureVision");
 	}
 
 }

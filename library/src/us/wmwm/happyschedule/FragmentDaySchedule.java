@@ -6,11 +6,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Future;
 
+import us.wmwm.happyschedule.ScheduleControlsView.ScheduleControlListener;
 import us.wmwm.happyschedule.views.ScheduleView;
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -21,7 +23,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListView;
-import android.widget.TextView;
 
 public class FragmentDaySchedule extends Fragment {
 
@@ -57,14 +58,19 @@ public class FragmentDaySchedule extends Fragment {
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		super.onCreateOptionsMenu(menu, inflater);
-		inflater.inflate(R.menu.menu_schedule_day, menu);
-		getActivity().getActionBar().setSubtitle(from.name + " to " + to.name);
+		if(!isVisible()||!isAdded()) {
+			return;
+		}
+		inflater.inflate(R.menu.menu_schedule_day, menu);		
 	}
 
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
+	public boolean onOptionsItemSelected(MenuItem item) {		
 		if (item.getItemId() == R.id.menu_go_to_next_train) {
 			moveToNextTrain();
+		}
+		if(item.getItemId()== android.R.id.home) {
+			getActivity().onBackPressed();
 		}
 		return super.onOptionsItemSelected(item);
 	}
@@ -121,7 +127,6 @@ public class FragmentDaySchedule extends Fragment {
 
 			// @Override
 			public View getView(int position, View convertView, ViewGroup parent) {
-				System.out.println("get view");
 				ScheduleView view = (ScheduleView) convertView;
 				if (view == null) {
 					view = new ScheduleView(parent.getContext());
@@ -141,8 +146,8 @@ public class FragmentDaySchedule extends Fragment {
 				// TODO Auto-generated method stub
 				return null;
 			}
-
-			int TYPE_FARE = 0, TYPE_CONTROLS = 2, TYPE_TRIPS = 1;
+			
+			int TYPE_CONTROLS = 0;
 
 			@Override
 			public int getChildType(int groupPosition, int childPosition) {
@@ -151,26 +156,53 @@ public class FragmentDaySchedule extends Fragment {
 
 			@Override
 			public int getChildTypeCount() {
-				return 3;
+				return 1;
 			}
 
 			@Override
 			public int getChildrenCount(int groupPosition) {
-				return 3;
+				return 1;
 			}
 
 			@Override
-			public View getChildView(int groupPosition, int childPosition,
+			public View getChildView(final int groupPosition, int childPosition,
 					boolean isLastChild, View convertView, ViewGroup parent) {
-				TextView tv = new TextView(parent.getContext());
 				if (childPosition == TYPE_CONTROLS) {
-					return new ScheduleControlsView(parent.getContext());
-				} else if (childPosition == TYPE_FARE) {
-					tv.setText("Fare");
-				} else if (childPosition == TYPE_TRIPS) {
-					tv.setText("Trips");
+					ScheduleControlsView v = new ScheduleControlsView(parent.getContext());
+					final StationToStation sts = getItem(groupPosition);
+					v.setListener(new ScheduleControlListener() {
+
+						@Override
+						public void onTimer() {
+							FragmentAlarmPicker fdp = FragmentAlarmPicker.newInstance(sts);
+							fdp.show(getFragmentManager(), "alarmPicker");
+							//FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+							//ft.replace(R.id.fragment_alarm_picker, fdp);
+							//ft.commit();							
+						}
+
+						@Override
+						public void onTrips() {
+							// TODO Auto-generated method stub
+							
+						}
+
+						@Override
+						public void onPin() {
+							// TODO Auto-generated method stub
+							
+						}
+
+						@Override
+						public void onFavorite() {
+							// TODO Auto-generated method stub
+							
+						}
+						
+					});
+					return v;
 				}
-				return tv;
+				return null;
 			}
 
 			@Override

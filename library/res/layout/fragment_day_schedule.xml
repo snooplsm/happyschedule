@@ -6,12 +6,18 @@
     <ExpandableListView
         android:id="@+id/list2"
         android:layout_width="match_parent"
-        android:divider="@null"
-        android:groupIndicator="@null"
+        android:layout_height="match_parent"
         android:childIndicator="@null"
+        android:divider="@null"
         android:dividerHeight="0dp"
         android:drawSelectorOnTop="true"
-        android:layout_height="match_parent" >
+        android:groupIndicator="@null" >
     </ExpandableListView>
+
+    <RelativeLayout
+        android:id="@+id/fragment_alarm_picker"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+    </RelativeLayout>
 
 </RelativeLayout>

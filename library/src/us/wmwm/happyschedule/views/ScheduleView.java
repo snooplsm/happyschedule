@@ -7,6 +7,7 @@ import us.wmwm.happyschedule.R;
 import us.wmwm.happyschedule.StationToStation;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.RelativeLayout;
@@ -20,6 +21,7 @@ public class ScheduleView extends RelativeLayout {
 	TextView status;
 	TextView timeTillDepart;
 	TextView duration;
+	TextView train;
 	
 	static DateFormat TIME = DateFormat.getTimeInstance(DateFormat.SHORT);
 	
@@ -32,6 +34,7 @@ public class ScheduleView extends RelativeLayout {
 		status = (TextView) findViewById(R.id.status);
 		timeTillDepart = (TextView) findViewById(R.id.departs_in);
 		duration = (TextView) findViewById(R.id.duration);
+		train = (TextView) findViewById(R.id.trip_id);
 		bg = getBackground();
 	}
 
@@ -44,7 +47,7 @@ public class ScheduleView extends RelativeLayout {
 		long mins = diff / 60000;
 		if(mins>=0 && mins < 100) {
 			timeTillDepart.setVisibility(View.VISIBLE);
-			timeTillDepart.setText("DEPARTS IN " + mins + " MIN");
+			timeTillDepart.setText("departs in " + mins + " min");
 		} else {
 			timeTillDepart.setVisibility(View.GONE);
 			timeTillDepart.setText("");
@@ -55,7 +58,11 @@ public class ScheduleView extends RelativeLayout {
 //		} else {
 //			setBackground(bg);
 //		}
-		
+		if(!TextUtils.isEmpty(sts.tripId)) {
+			train.setText("#"+sts.tripId);
+		} else {
+			train.setText("");
+		}
 		duration.setText(((sts.arriveTime.getTimeInMillis() - sts.departTime.getTimeInMillis()) / 60000) + " minutes");
 			
 	}

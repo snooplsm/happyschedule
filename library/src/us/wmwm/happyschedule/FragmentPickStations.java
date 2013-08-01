@@ -14,7 +14,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 
-public class FragmentPickStations extends Fragment {
+public class FragmentPickStations extends Fragment implements IPrimary {
 
 	StationButton departureButton;
 	StationButton arrivalButton;
@@ -149,6 +149,11 @@ public class FragmentPickStations extends Fragment {
 				departureButton.setStation(station);
 			}
 		}
+	}
+	
+	@Override
+	public void setPrimaryItem() {
+		getActivity().getActionBar().setSubtitle(null);
 	}
 
 }
