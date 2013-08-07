@@ -15,22 +15,31 @@ import android.widget.BaseAdapter;
 
 import com.emilsjolander.components.stickylistheaders.StickyListHeadersAdapter;
 
-public class DepartureVisionAdapter extends BaseAdapter implements StickyListHeadersAdapter {
+public class DepartureVisionAdapter extends BaseAdapter implements
+		StickyListHeadersAdapter {
 
 	List<TrainStatus> statuses;
 	Map<String, LineStyle> keyToColor = Collections.emptyMap();
-	Map<String,Long> headerToPos = new HashMap<String,Long>();
-	
-	
-	
+	Map<String, Long> headerToPos = new HashMap<String, Long>();
+	StationToStation stationToStation;
+	Station station;
+
+	public DepartureVisionAdapter() {
+	}
+
+	public DepartureVisionAdapter(Station station, StationToStation sts) {
+		this.stationToStation = sts;
+		this.station = station;
+	}
+
 	@Override
 	public int getCount() {
-		if(statuses==null) {
+		if (statuses == null) {
 			return 0;
 		}
 		return statuses.size();
 	}
-	
+
 	@Override
 	public TrainStatus getItem(int arg0) {
 		return statuses.get(arg0);
@@ -44,36 +53,49 @@ public class DepartureVisionAdapter extends BaseAdapter implements StickyListHea
 	@Override
 	public View getView(int pos, View view, ViewGroup parent) {
 		DepartureVisionView de;
-		if(view==null) {			
+		if (view == null) {
 			de = new DepartureVisionView(parent.getContext());
 		} else {
-			de = (DepartureVisionView)view;
+			de = (DepartureVisionView) view;
 		}
-		de.setData(getItem(pos),keyToColor);
+		de.setData(getItem(pos), keyToColor);
 		return de;
 	}
-	
+
 	public void setData(List<TrainStatus> stats) {
 		notifyDataSetInvalidated();
 		this.statuses = stats;
 		headerToPos.clear();
-		Iterator<TrainStatus> iter = stats.iterator();
+		Iterator<TrainStatus> iter = statuses.iterator();
 		String status = "";
 		long lastPos = 1;
-		while(iter.hasNext()) {
+		while (iter.hasNext()) {
 			TrainStatus ts = iter.next();
-			if(ts.getStatus().equals(status)) {				
+			boolean canContinue = true;
+			if (stationToStation != null) {
+				if (stationToStation.blockId.equals(ts.getTrain())) {
+					canContinue = true;
+				} else {
+					canContinue = false;
+				}
+			}
+			if(!canContinue) {
+				iter.remove();
+				continue;
+			}
+			if (ts.getStatus().equals(status)) {
+
 			} else {
 				status = ts.getStatus();
 				lastPos++;
 			}
-			if(!headerToPos.containsKey(ts.getStatus())) {
-				headerToPos.put(ts.getStatus(),(long) headerToPos.size()+1);
+			if (canContinue && !headerToPos.containsKey(ts.getStatus())) {
+				headerToPos.put(ts.getStatus(), (long) headerToPos.size() + 1);
 			}
 		}
 		notifyDataSetChanged();
 	}
-	
+
 	public void setKeyToColor(Map<String, LineStyle> keyToColor) {
 		this.keyToColor = keyToColor;
 		notifyDataSetChanged();
@@ -82,14 +104,15 @@ public class DepartureVisionAdapter extends BaseAdapter implements StickyListHea
 	@Override
 	public View getHeaderView(int position, View convertView, ViewGroup parent) {
 		DepartureVisionHeader h;
-		if(convertView==null) {
+		if (convertView == null) {
 			h = new DepartureVisionHeader(parent.getContext());
-			h.setLayoutParams(new ViewGroup.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+			h.setLayoutParams(new ViewGroup.LayoutParams(
+					LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
 		} else {
-			h = (DepartureVisionHeader)convertView;
+			h = (DepartureVisionHeader) convertView;
 		}
 		String status = getItem(position).getStatus();
-		if(TextUtils.isEmpty(status)) {
+		if (TextUtils.isEmpty(status)) {
 			status = "SCHEDULED";
 		}
 		h.setData(status);

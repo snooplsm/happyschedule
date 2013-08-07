@@ -4,16 +4,14 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity" >
 
-    <fragment
-        android:id="@+id/main_fragment"
-        android:name="us.wmwm.happyschedule.FragmentMain"
+    <FrameLayout
+        android:id="@+id/fragment_main"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <RelativeLayout
+    <FrameLayout
         android:id="@+id/fragment_load"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
-    </RelativeLayout>
+        android:layout_height="match_parent" />
 
 </RelativeLayout>

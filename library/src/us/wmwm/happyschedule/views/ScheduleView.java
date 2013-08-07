@@ -8,6 +8,7 @@ import us.wmwm.happyschedule.StationToStation;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
+import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.RelativeLayout;
@@ -28,7 +29,13 @@ public class ScheduleView extends RelativeLayout {
 	Drawable bg;
 	
 	public ScheduleView(Context context) {
-		super(context);
+		this(context,null,0);		
+	}
+	
+	
+
+	public ScheduleView(Context context, AttributeSet attrs, int defStyle) {
+		super(context, attrs, defStyle);
 		LayoutInflater.from(context).inflate(R.layout.view_schedule,this);
 		time = (TextView) findViewById(R.id.time);
 		status = (TextView) findViewById(R.id.status);
@@ -37,6 +44,15 @@ public class ScheduleView extends RelativeLayout {
 		train = (TextView) findViewById(R.id.trip_id);
 		bg = getBackground();
 	}
+
+
+
+	public ScheduleView(Context context, AttributeSet attrs) {
+		this(context,attrs,0);
+		
+	}
+
+
 
 	public void setData(StationToStation sts) {
 		this.sts = sts;

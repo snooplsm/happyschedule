@@ -8,10 +8,10 @@ import java.util.List;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.text.format.DateUtils;
 
-public class FragmentScheduleAdapter extends FragmentPagerAdapter {
+public class FragmentScheduleAdapter extends FragmentStatePagerAdapter {
 
 	public FragmentScheduleAdapter(Station from, Station to, FragmentManager fm) {
 		super(fm);
@@ -57,10 +57,9 @@ public class FragmentScheduleAdapter extends FragmentPagerAdapter {
 	
 	private CharSequence getPageTitle2(int position) {
 		Calendar cal = getCalendar(position);
-//		cal.add(Calendar.DAY_OF_YEAR, position);
-//		if(DateUtils.isToday(cal.getTimeInMillis())) {
-//			return "Today";
-//		}
+		if(DateUtils.isToday(cal.getTimeInMillis())) {
+			return "Today";
+		}
 //		
 //		Calendar tom = Calendar.getInstance();
 //		tom.add(Calendar.DAY_OF_YEAR, 1);

@@ -2,7 +2,8 @@ package us.wmwm.happyschedule;
 
 import java.io.Serializable;
 import java.util.Calendar;
-import java.util.List;
+
+import org.json.JSONObject;
 
 public class StationToStation implements Serializable {
 		
@@ -15,6 +16,36 @@ public class StationToStation implements Serializable {
 		public String blockId;
 		public String tripId;
 		public String routeId;
+		
+		public StationToStation(){}
+		
+		public StationToStation(JSONObject o) {
+			departId = o.optString("departId");
+			arriveId = o.optString("arriveId");
+			Calendar d = Calendar.getInstance();
+			d.setTimeInMillis(o.optLong("departTime"));
+			departTime = d;
+			Calendar a = Calendar.getInstance();
+			a.setTimeInMillis(o.optLong("arriveTime"));
+			arriveTime = a;
+			blockId = o.optString("blockId");
+			tripId = o.optString("tripId");
+			routeId = o.optString("routeId");
+		}
+		
+		public String toJSON() {
+			JSONObject o  = new JSONObject();
+			try {
+				o.put("departId", departId);
+				o.put("arriveId", arriveId);
+				o.put("departTime", departTime.getTimeInMillis());
+				o.put("arriveTime", arriveTime.getTimeInMillis());
+				o.put("blockId", blockId);
+				o.put("tripId", tripId);
+				o.put("routeId", routeId);
+			} catch (Exception e) {}
+			return o.toString();
+		}
 		
 		public Calendar getDepartTime() {
 			return departTime;

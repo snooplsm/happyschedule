@@ -10,6 +10,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -59,6 +60,14 @@ public class FragmentPickStations extends Fragment implements IPrimary {
 	}
 
 	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {	
+		if(item.getItemId()==R.id.menu_reverse) {
+			reverse();
+		}
+		return super.onOptionsItemSelected(item);
+	}
+	
+	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		SharedPreferences manager = PreferenceManager.getDefaultSharedPreferences(getActivity());
@@ -84,7 +93,7 @@ public class FragmentPickStations extends Fragment implements IPrimary {
 			@Override
 			public void onClick(View v) {
 				final StationButton button = (StationButton) v;
-				Intent i = new Intent(getActivity(), ActivityPickStation.class);
+				Intent i = ActivityPickStation.from(getActivity(), false);
 				final int code;
 				if(button==arrivalButton) {
 					code = 200;
@@ -113,9 +122,7 @@ public class FragmentPickStations extends Fragment implements IPrimary {
 			
 			@Override
 			public void onClick(View v) {
-				Station tmp = departureButton.getStation();
-				departureButton.setStation(arrivalButton.getStation());
-				arrivalButton.setStation(tmp);
+				reverse();
 			}
 		};
 		
@@ -138,6 +145,12 @@ public class FragmentPickStations extends Fragment implements IPrimary {
 		getScheduleButton.setOnClickListener(onClickGetSchedule);
 	}
 
+	private void reverse() {
+		Station tmp = departureButton.getStation();
+		departureButton.setStation(arrivalButton.getStation());
+		arrivalButton.setStation(tmp);
+	}
+	
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);

@@ -39,7 +39,12 @@ public class FragmentStationPicker extends Fragment {
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		list.setAdapter(adapter = new StationAdapter(getActivity()));
+		Bundle args = getArguments();
+		boolean departureVisionOnly = false;
+		if(args!=null) {
+			departureVisionOnly = args.getBoolean("departureVisionOnly", false);
+		}
+		list.setAdapter(adapter = new StationAdapter(getActivity(),departureVisionOnly));
 		list.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> adapter, View view, int pos,
@@ -68,4 +73,11 @@ public class FragmentStationPicker extends Fragment {
 		jumper.setVisibility(View.VISIBLE);
 	}
 
+	public static FragmentStationPicker newInstance(boolean departureVisionOnly) {
+		Bundle b= new Bundle();
+		b.putBoolean("departureVisionOnly", departureVisionOnly);
+		FragmentStationPicker p = new FragmentStationPicker();
+		p.setArguments(b);
+		return p;
+	}
 }

@@ -33,9 +33,21 @@ public class FragmentAlarmPicker extends DialogFragment {
 	View timePicker;
 	View chooseType;
 	TextView type;
-	boolean depart;
+	Type typeType;
+	View okButton;
+	View cancelButton;
 	
 	Handler handler = new Handler();
+	
+	public interface OnTimerPicked {
+		void onTimer(Type type, Calendar cal, StationToStation stationToStation);
+	}
+	
+	OnTimerPicked onTimerPicked;
+	
+	public void setOnTimerPicked(OnTimerPicked onTimerPicked) {
+		this.onTimerPicked = onTimerPicked;
+	}
 	
 	SimpleDateFormat DATE = new SimpleDateFormat("MMM d");
 	
@@ -62,6 +74,8 @@ public class FragmentAlarmPicker extends DialogFragment {
 		arriveButton = view.findViewById(R.id.arrive_button);
 		chooseType = view.findViewById(R.id.choose_type);
 		timePicker = view.findViewById(R.id.time_picker);
+		okButton = view.findViewById(R.id.set_button);
+		cancelButton = view.findViewById(R.id.cancel_button);
 		type = (TextView) view.findViewById(R.id.type);
 		root = view;
 		alarmText = (TextView) view.findViewById(R.id.alarm_text);
@@ -100,6 +114,19 @@ public class FragmentAlarmPicker extends DialogFragment {
 		}
 	};
 	
+	OnClickListener okCancel = new OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			if(v==okButton) {
+				onTimerPicked.onTimer(typeType, (Calendar) cal.clone(), sts);
+			}
+			if(v==cancelButton) {
+				
+			}
+			dismiss();
+		}
+	};
+	
 	
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
@@ -127,22 +154,24 @@ public class FragmentAlarmPicker extends DialogFragment {
 			public void onClick(View v) {			
 				final int resourceId;
 				if(v.getId()==R.id.depart_button) {
-					depart = true;
+					typeType = Type.DEPARTURE;
 					resourceId = R.string.fragment_alarm_type_depart;
 				} else {
 					resourceId = R.string.fragment_alarm_type_arrive;
-					depart = false;
+					typeType = Type.ARRIVAL;
 				}
 				chooseType.setVisibility(View.GONE);
 				type.setText(resourceId);
 				cal = Calendar.getInstance();
-				cal.setTime(depart ? sts.departTime.getTime() : sts.arriveTime.getTime());
+				cal.setTime(typeType.equals(Type.DEPARTURE) ? sts.departTime.getTime() : sts.arriveTime.getTime());
 				populateValues();
 				timePicker.setVisibility(View.VISIBLE);
 			}
 		};
 		departButton.setOnClickListener(onButton);
 		arriveButton.setOnClickListener(onButton);
+		okButton.setOnClickListener(okCancel);
+		cancelButton.setOnClickListener(okCancel);
 //		Date d = (Date)b.getSerializable("date");
 //		cal = Calendar.getInstance();
 //		cal.setTime(d);
@@ -192,6 +221,11 @@ public class FragmentAlarmPicker extends DialogFragment {
 		if(cal==null) {
 			return;
 		}
+		
+		alarmText.setText(buildMessage(cal).toString());
+	}
+	
+	public static StringBuilder buildMessage(Calendar cal) {
 		long diff = cal.getTimeInMillis() - System.currentTimeMillis();
 		long hours = diff / 3600000;
 		diff = diff % 3600000;
@@ -211,7 +245,7 @@ public class FragmentAlarmPicker extends DialogFragment {
 			}
 			b.append(seconds).append("s");
 		}
-		alarmText.setText(b.toString());
+		return b;
 	}
 
 	private void populateValues() {

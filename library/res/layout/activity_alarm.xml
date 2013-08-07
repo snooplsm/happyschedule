@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical" >
+
+        <us.wmwm.happyschedule.views.ScheduleView
+            android:id="@+id/schedule_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+        </us.wmwm.happyschedule.views.ScheduleView>
+
+        <FrameLayout
+            android:id="@+id/fragment_depareturevision"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+        </FrameLayout>
+    </LinearLayout>
+    
+    <TextView 
+        android:id="@+id/dismiss"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:text="DISMISS"
+        android:background="@color/transparent_blck"
+        android:textColor="@color/clock_white"
+        style="@style/medium_bold"
+        />
+
+</RelativeLayout>

@@ -49,8 +49,8 @@
 
         <TextView
             android:id="@+id/track"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="41dp"
+            android:layout_height="41dp"
             android:background="@drawable/circle"
             android:gravity="center"
             android:includeFontPadding="false"
@@ -66,7 +66,7 @@
             android:layout_below="@id/track"
             android:gravity="center"
             android:text="3:33"
-            android:textSize="18dp" />
+            android:textSize="16sp" />
     </RelativeLayout>
 
 </RelativeLayout>

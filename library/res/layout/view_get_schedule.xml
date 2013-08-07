@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:background="#F0B562"
+    android:background="@drawable/selector_get_schedule"
     android:layout_height="80dp"
     android:orientation="vertical" >
 
@@ -12,7 +12,7 @@
         android:layout_centerInParent="true"
         android:text="@string/get_schedule"
         android:textColor="#eee"
-        android:textSize="27dp"
+        android:textSize="32sp"
         android:textStyle="bold" />
 
 </RelativeLayout>

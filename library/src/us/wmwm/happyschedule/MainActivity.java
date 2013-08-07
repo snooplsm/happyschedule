@@ -30,8 +30,11 @@ public class MainActivity extends FragmentActivity {
 													.beginTransaction()
 													.remove(fragmentLoad)
 													.commit();
+											getSupportFragmentManager().beginTransaction().replace(R.id.fragment_main, new FragmentMain()).commit();
 										}
 									})).commit();
+		} else {
+			getSupportFragmentManager().beginTransaction().replace(R.id.fragment_main, new FragmentMain()).commit();
 		}
 	}
 

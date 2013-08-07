@@ -13,10 +13,10 @@ import us.wmwm.happyschedule.Station;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.view.ViewGroup;
 
-public class FragmentMainAdapter extends FragmentPagerAdapter {
+public class FragmentMainAdapter extends FragmentStatePagerAdapter {
 
 	private JSONArray departureVisions;
 
@@ -64,7 +64,6 @@ public class FragmentMainAdapter extends FragmentPagerAdapter {
 	@Override
 	public void setPrimaryItem(ViewGroup container, int position, Object object) {
 		super.setPrimaryItem(container, position, object);
-		System.out.println(object.getClass());
 		if(object!=last) {
 			last = object;
 			if(object instanceof IPrimary) {
@@ -83,7 +82,7 @@ public class FragmentMainAdapter extends FragmentPagerAdapter {
 		}
 		Station station = getDepartureVision(pos);
 		FragmentDepartureVision dv = FragmentDepartureVision
-				.newInstance(station);
+				.newInstance(station,null);
 		dv.setOnStationSelected(onStationSelected);
 		return dv;
 	}

@@ -1,18 +1,28 @@
 package us.wmwm.happyschedule;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Future;
 
+import us.wmwm.happyschedule.FragmentAlarmPicker.OnTimerPicked;
 import us.wmwm.happyschedule.ScheduleControlsView.ScheduleControlListener;
 import us.wmwm.happyschedule.views.ScheduleView;
 import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.NotificationCompat;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -29,6 +39,8 @@ public class FragmentDaySchedule extends Fragment {
 	ExpandableListView list;
 
 	Future<?> loadScheduleFuture;
+	
+	View progressBar;
 
 	Station from;
 	Station to;
@@ -36,7 +48,11 @@ public class FragmentDaySchedule extends Fragment {
 	Handler handler = new Handler();
 
 	BaseExpandableListAdapter adapter;
+	
+	AlarmManager alarmManger;
 
+	NotificationManager notifs;
+	
 	public interface OnDateChange {
 		void onDateChange(Calendar cal);
 	}
@@ -107,13 +123,15 @@ public class FragmentDaySchedule extends Fragment {
 		View view = inflater.inflate(R.layout.fragment_day_schedule, container,
 				false);
 		list = (ExpandableListView) view.findViewById(R.id.list2);
+		progressBar = view.findViewById(R.id.progress);
 		return view;
 	}
 
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-
+		alarmManger = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
+		notifs = (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
 		Bundle b = getArguments();
 		from = (Station) b.getSerializable("from");
 		to = (Station) b.getSerializable("to");
@@ -175,6 +193,42 @@ public class FragmentDaySchedule extends Fragment {
 						@Override
 						public void onTimer() {
 							FragmentAlarmPicker fdp = FragmentAlarmPicker.newInstance(sts);
+							fdp.setOnTimerPicked(new OnTimerPicked() {
+								
+								@Override
+								public void onTimer(Type type, Calendar cal, StationToStation stationToStation) {
+									Intent i = AlarmActivity.from(getActivity(), stationToStation, cal, type);
+									Alarm alarm = (Alarm) i.getSerializableExtra("alarm");
+									Alarms.saveAlarm(getActivity(), alarm);
+									PendingIntent pi = PendingIntent.getActivity(getActivity(), 0, i , 0);
+									PendingIntent dismiss = PendingIntent.getService(getActivity(), 0, new Intent(getActivity(), HappyScheduleService.class).putExtra("alarm", alarm).setData(Uri.parse("http://wmwm.us?type=alarm&action=dismiss&id="+alarm.getId())), 0);
+									NotificationCompat.Builder b = new NotificationCompat.Builder(getActivity());
+									NotificationCompat.BigTextStyle bs = new NotificationCompat.BigTextStyle(b);
+									
+									bs.setBigContentTitle(getString(R.string.app_name) + " " + alarm.getType().name().toLowerCase() + " alarm");
+									StringBuilder text = new StringBuilder(alarm.getType().name().toLowerCase());
+									text.replace(0, 1, text.substring(0,1).toUpperCase());
+									String typet = text.toString();
+									text.append(" alarm set for ");
+									if(!DateUtils.isToday(alarm.getTime().getTimeInMillis())) {
+										text.append(new SimpleDateFormat("MMM d").format(alarm.getTime().getTime())).append(" at ");
+									}
+									text.append(DateFormat.getTimeInstance(DateFormat.SHORT).format(alarm.getTime().getTime()).toLowerCase());
+									text.append(".  For train #" + stationToStation.blockId + " departing from " + Db.get().getStop(stationToStation.departId).getName() + " arriving at " + Db.get().getStop(stationToStation.arriveId).getName()+".");
+									bs.bigText(text.toString());
+									b.addAction(R.drawable.ic_action_cancel, getString(R.string.notif_alarm_dismiss), dismiss);
+									b.setContentText(text.toString());
+									b.setContentTitle(getString(R.string.app_name) + " " + alarm.getType().name().toLowerCase() + " alarm");
+									//bs.setSummaryText(text.toString());
+									b.setOngoing(true);
+									b.setSmallIcon(R.drawable.stat_notify_alarm);
+									Notification notif = b.build();
+									notif.tickerText = typet + " alarm to go off in " + FragmentAlarmPicker.buildMessage(alarm.getTime()).toString();
+									System.out.println("notif : " + alarm.getId());
+									notifs.notify(alarm.getId().hashCode(), notif);
+									alarmManger.set(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), pi);
+								}
+							});
 							fdp.show(getFragmentManager(), "alarmPicker");
 							//FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
 							//ft.replace(R.id.fragment_alarm_picker, fdp);
@@ -277,7 +331,9 @@ public class FragmentDaySchedule extends Fragment {
 		loadSchedule();
 	}
 
-	List<StationToStation> o = new ArrayList<StationToStation>();
+	List<StationToStation> o = null;
+	
+	List<StationToStation> k = null;
 
 	private void loadSchedule() {
 		if (loadScheduleFuture != null) {
@@ -288,14 +344,13 @@ public class FragmentDaySchedule extends Fragment {
 			public void run() {
 				Calendar date = Calendar.getInstance();
 				date.setTime(day);
-				Calendar tomorrow = Calendar.getInstance();
+				final Calendar tomorrow = Calendar.getInstance();
 				tomorrow.setTime(day);
 				tomorrow.add(Calendar.DAY_OF_YEAR, 1);
 				Schedule schedule = null;
 				try {
 					schedule = ScheduleDao.get().getSchedule(from.id, to.id,
-							date.getTime(), tomorrow.getTime());
-					o.clear();
+							day, day);
 					final Calendar limit = Calendar.getInstance();
 					limit.setTime(schedule.end);
 					Calendar start = Calendar.getInstance();
@@ -303,8 +358,7 @@ public class FragmentDaySchedule extends Fragment {
 					final boolean isToday = DateUtils.isToday(start
 							.getTimeInMillis());
 					if (isToday) {
-						limit.set(Calendar.HOUR_OF_DAY, 9);
-						limit.set(Calendar.MINUTE, 0);
+						limit.add(Calendar.DAY_OF_YEAR, 1);
 					} else {
 						limit.add(Calendar.DAY_OF_YEAR, 0);
 						limit.set(Calendar.HOUR_OF_DAY, 0);
@@ -316,29 +370,30 @@ public class FragmentDaySchedule extends Fragment {
 					final Calendar priorLimit = Calendar.getInstance();
 					priorLimit.setTime(day);
 					// priorLimit.add(Calendar.HOUR_OF_DAY, -2);
-
+					k = new ArrayList<StationToStation>();
 					schedule.inOrderTraversal(new ScheduleTraverser() {
 
 						@Override
 						public void populateItem(int index,
 								StationToStation stationToStation, int total) {
+							//k.add(stationToStation);
 							if (!isToday) {
-								if (!stationToStation.departTime.before(limit)) {
+								if (!stationToStation.departTime.before(limit) && !stationToStation.departTime.after(tomorrow)) {
 									// System.out.println(stationToStation.departTime.getTime());
-									o.add(stationToStation);
+									k.add(stationToStation);
 								}
 							} else {
 								if (!stationToStation.departTime
 										.before(priorLimit)
 										&& !stationToStation.departTime
 												.after(limit))
-									o.add(stationToStation);
+									k.add(stationToStation);
 
 							}
 
 						}
 					});
-					getActivity().runOnUiThread(populateAdpter);
+					handler.post(populateAdpter);
 					Log.i(TAG, "SUCCESSFUL SCHEDULE");
 				} catch (Exception e) {
 					Log.e(TAG, "UNSUCCESSFUL SCHEDULE", e);
@@ -354,12 +409,15 @@ public class FragmentDaySchedule extends Fragment {
 		public void run() {
 			Activity activity = getActivity();
 			if (activity == null) {
+				Log.e(TAG,"ACTIVITY IS NULL");
 				return;
 			}
+			o = k;
 			adapter.notifyDataSetChanged();
 			if (DateUtils.isToday(day.getTime())) {
 				moveToNextTrain();
 			}
+			progressBar.setVisibility(View.GONE);
 		}
 	};
 

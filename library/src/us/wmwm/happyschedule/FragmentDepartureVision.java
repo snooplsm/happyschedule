@@ -56,6 +56,8 @@ public class FragmentDepartureVision extends Fragment implements IPrimary {
 
 	Station station;
 	
+	StationToStation stationToStation;
+	
 	View erroText;
 
 	long lastStatusesReceived;
@@ -89,16 +91,19 @@ public class FragmentDepartureVision extends Fragment implements IPrimary {
 		}
 	};
 
-	public static FragmentDepartureVision newInstance(Station station) {
+	public static FragmentDepartureVision newInstance(Station station, StationToStation sts) {
 		FragmentDepartureVision dv = new FragmentDepartureVision();
 		Bundle b = new Bundle();
 		b.putSerializable("station", station);
+		if(sts!=null) {
+			b.putSerializable("stationToStation", sts);
+		}
 		dv.setArguments(b);
 		return dv;
 	}
 
 	private String getKey() {
-		return "lastStatuses" + station;
+		return "lastStatuses" + station.id;
 	}
 
 	Runnable r = new Runnable() {
@@ -173,8 +178,12 @@ public class FragmentDepartureVision extends Fragment implements IPrimary {
 	public void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
-
-		setHasOptionsMenu(true);
+		Bundle args = getArguments();
+		boolean showControls = true;
+		if(args!=null) {
+			showControls = !args.containsKey("stationToStation");
+		}
+		setHasOptionsMenu(showControls);
 	}
 
 	@Override
@@ -234,44 +243,50 @@ public class FragmentDepartureVision extends Fragment implements IPrimary {
 	}
 
 	@Override
-	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		inflater.inflate(R.menu.departurevision, menu);
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {		
 		super.onCreateOptionsMenu(menu, inflater);
+		inflater.inflate(R.menu.departurevision, menu);
 	}
 
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
 		poller = new DeparturePoller();
 		Bundle arguments = getArguments();
 		if (arguments != null) {
 			station = (Station) arguments.getSerializable("station");
+			stationToStation = (StationToStation) arguments.getSerializable("stationToStation");
 		}
-		list.setAdapter(adapter = new DepartureVisionAdapter());
+		if(stationToStation==null) {
+			list.setAdapter(adapter = new DepartureVisionAdapter());
+		} else {
+			list.setAdapter(adapter = new DepartureVisionAdapter(station, stationToStation));
+		}
+
+		manager = (ConnectivityManager) getActivity().getSystemService(
+				Context.CONNECTIVITY_SERVICE);
+		loadColors();
 		if (station == null) {
 			stationSelect.setVisibility(View.VISIBLE);
 			stationSelect.setOnClickListener(new OnClickListener() {
 
 				@Override
 				public void onClick(View v) {
-					startActivityForResult(new Intent(getActivity(),
-							ActivityPickStation.class), 100);
+					startActivityForResult(ActivityPickStation.from(getActivity(), true), 100);
 				}
 			});
+			return;
 		} else {
 			stationSelect.setVisibility(View.GONE);
 		}
-		manager = (ConnectivityManager) getActivity().getSystemService(
-				Context.CONNECTIVITY_SERVICE);
 		loadInitial();
-		loadColors();
-		super.onActivityCreated(savedInstanceState);
 	}
 
 	private void loadInitial() {
 		Long time = PreferenceManager
 				.getDefaultSharedPreferences(getActivity()).getLong(
 						getKey() + "Time", 0);
-		if (System.currentTimeMillis() - time > 40000) {
+		if (System.currentTimeMillis() - time > 50000) {
 			return;
 		}
 		String data = PreferenceManager.getDefaultSharedPreferences(
@@ -408,6 +423,7 @@ public class FragmentDepartureVision extends Fragment implements IPrimary {
 	@Override
 	public void setPrimaryItem() {
 		getActivity().getActionBar().setSubtitle("w/ DepartureVision");
+		
 	}
 
 }

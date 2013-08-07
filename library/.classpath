@@ -6,5 +6,6 @@
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
 	<classpathentry kind="lib" path="libs/jsoup-1.6.2.jar"/>
+	<classpathentry kind="lib" path="libs/svg-android-1.1.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

@@ -19,7 +19,7 @@ public class StationAdapter extends CursorAdapter implements StickyListHeadersAd
 	
 	List<String> letters = new ArrayList<String>();
 	
-	public StationAdapter(Context context) {
+	public StationAdapter(Context context, boolean departureVisionOnly) {
 		super(context, null, true);
 		char A = 'A';
 		int AIND = (int)A;
@@ -30,7 +30,7 @@ public class StationAdapter extends CursorAdapter implements StickyListHeadersAd
 				letters.add(String.valueOf(A));
 			}
 		}
-		swapCursor(Db.get().getStops());
+		swapCursor(Db.get().getStops(departureVisionOnly));
 	}
 
 	@Override

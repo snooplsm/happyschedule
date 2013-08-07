@@ -5,5 +5,18 @@
     <color name="error_background">#99F16364</color>
     <color name="error_text">#eee</color>
     <color name="list_white">#F6F6F6</color>
+    <color name="transparent_blck">#88000000</color>
+    <color name="get_schedule">#F0B565</color>
+    <color name="get_schedule_1">#F0B560</color>
+    <color name="get_schedule_2">#F0B555</color>
+    <color name="get_schedule_3">#F0B550</color>
+    <color name="get_schedule_4">#F0B545</color>
+    <color name="get_schedule_5">#F0B540</color>
+    <color name="get_schedule_6">#F0B535</color>
+    <color name="get_schedule_7">#F0B530</color>
+    <color name="get_schedule_8">#F0B525</color>
+    <color name="get_schedule_9">#F0B520</color>
+    <color name="get_schedule_10">#F0B515</color>
+    <color name="get_schedule_11">#F09C15</color>
     
 </resources>

@@ -20,11 +20,18 @@ public class Db {
 		return INSTANCE;
 	}
 
-	public Cursor getStops() {
+	public Cursor getStops(boolean departureVisionOnly) {
+		if(departureVisionOnly) {
+			return db
+					.rawQuery(
+							"select stop_id as _id, stop_id, name, departure_vision from stop where departure_vision is not null order by name asc",
+							null);
+		} else {
 		return db
 				.rawQuery(
 						"select stop_id as _id, stop_id, name, departure_vision from stop order by name asc",
 						null);
+		}
 	}
 
 	public Station getStop(String id) {

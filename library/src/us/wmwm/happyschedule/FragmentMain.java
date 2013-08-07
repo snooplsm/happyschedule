@@ -40,10 +40,6 @@ public class FragmentMain extends Fragment {
 		}
 	};
 	
-	public void onCreateOptionsMenu(android.view.Menu menu, android.view.MenuInflater inflater) {
-		super.onCreateOptionsMenu(menu, inflater);
-	};
-	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {

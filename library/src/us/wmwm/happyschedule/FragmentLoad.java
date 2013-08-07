@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.Future;
+import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import android.content.Context;
@@ -12,16 +13,27 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+
+import com.larvalabs.svgandroid.SVG;
+import com.larvalabs.svgandroid.SVGParser;
 
 public class FragmentLoad extends Fragment {
 
 	Future<?> loadFuture;
+	
+	ImageView logo; 
+	
+	Handler handler = new Handler();
 	
 	public static interface OnLoadListener {
 		void onLoaded();		
@@ -35,9 +47,25 @@ public class FragmentLoad extends Fragment {
 	}
 	
 	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setHasOptionsMenu(true);
+	}
+	
+	@Override
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		super.onCreateOptionsMenu(menu, inflater);
+		menu.clear();
+	}
+	
+	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		return inflater.inflate(R.layout.fragment_load,container,false);
+		View v = inflater.inflate(R.layout.fragment_load,container,false);
+		logo = (ImageView) v.findViewById(R.id.logo);
+		logo.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+		return v;
+		
 	}
 
 	@Override
@@ -48,6 +76,9 @@ public class FragmentLoad extends Fragment {
 			removeDatabase(getActivity());
 			createDatabase();
 		}
+		
+		SVG svg = SVGParser.getSVGFromResource(getResources(), R.raw.logo);
+		logo.setImageDrawable(svg.createPictureDrawable());
 
 	}
 
@@ -56,6 +87,7 @@ public class FragmentLoad extends Fragment {
 			@Override
 			public void run() {
 				Context ctx = getActivity();
+				boolean success = false;
 				if(ctx==null) {
 					return;
 				}
@@ -78,11 +110,13 @@ public class FragmentLoad extends Fragment {
 					zin = new ZipInputStream(in);
 					fos = new FileOutputStream(outputFile);
 					int read;
-					zin.getNextEntry();
+					ZipEntry ent = zin.getNextEntry();
+					System.out.println(ent.getSize());
 					while ((read = zin.read(buffer)) != -1) {
 						fos.write(buffer, 0, read);
-					}
+					}					
 					saveVersion(ctx, isExternal, getVersionCode(ctx));
+					success = true;
 				} catch (Exception e) {
 					Log.e(getClass().getSimpleName(),
 							"Unable to copy database to file system", e);
@@ -104,6 +138,14 @@ public class FragmentLoad extends Fragment {
 									"Unable to close input file", e);
 						}
 					}
+				}
+				if(success) {
+					handler.post(new Runnable() {
+						@Override
+						public void run() {
+							listener.onLoaded();	
+						}
+					});
 				}
 			}
 		});
