@@ -5,7 +5,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Future;
 
 import us.wmwm.happyschedule.FragmentAlarmPicker.OnTimerPicked;
@@ -52,6 +54,8 @@ public class FragmentDaySchedule extends Fragment {
 	AlarmManager alarmManger;
 
 	NotificationManager notifs;
+	
+	Map<StationToStation,Alarm> tripIdToAlarm;
 	
 	public interface OnDateChange {
 		void onDateChange(Calendar cal);
@@ -149,7 +153,9 @@ public class FragmentDaySchedule extends Fragment {
 				if (view == null) {
 					view = new ScheduleView(parent.getContext());
 				}
-				view.setData(getItem(position));
+				StationToStation sts = getItem(position);
+				view.setData(sts);
+				view.setAlarm(tripIdToAlarm.get(sts));
 				return view;
 			}
 
@@ -200,6 +206,7 @@ public class FragmentDaySchedule extends Fragment {
 									Intent i = AlarmActivity.from(getActivity(), stationToStation, cal, type);
 									Alarm alarm = (Alarm) i.getSerializableExtra("alarm");
 									Alarms.saveAlarm(getActivity(), alarm);
+									tripIdToAlarm.put(alarm.getStationToStation(),alarm);
 									PendingIntent pi = PendingIntent.getActivity(getActivity(), 0, i , 0);
 									PendingIntent dismiss = PendingIntent.getService(getActivity(), 0, new Intent(getActivity(), HappyScheduleService.class).putExtra("alarm", alarm).setData(Uri.parse("http://wmwm.us?type=alarm&action=dismiss&id="+alarm.getId())), 0);
 									NotificationCompat.Builder b = new NotificationCompat.Builder(getActivity());
@@ -342,6 +349,11 @@ public class FragmentDaySchedule extends Fragment {
 		Runnable load = new Runnable() {
 			@Override
 			public void run() {
+				List<Alarm> alarms = Alarms.getAlarms(getActivity());
+				tripIdToAlarm = new HashMap<StationToStation,Alarm>();
+				for(Alarm a : alarms) {
+					tripIdToAlarm.put(a.getStationToStation(), a);
+				}
 				Calendar date = Calendar.getInstance();
 				date.setTime(day);
 				final Calendar tomorrow = Calendar.getInstance();

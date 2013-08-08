@@ -68,7 +68,6 @@ public class StationToStation implements Serializable {
 					+ arriveId + ", departTime=" + (departTime!=null ? departTime.getTime() : null) + ", arriveTime="
 					+ (arriveTime!=null ? arriveTime.getTime() : null) + ", duration=" + getDuration() + "]";
 		}
-
 		@Override
 		public int hashCode() {
 			final int prime = 31;
@@ -101,6 +100,54 @@ public class StationToStation implements Serializable {
 				return false;
 			return true;
 		}
+
+
+		public boolean equalsEntirerty(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			StationToStation other = (StationToStation) obj;
+			if (arriveId == null) {
+				if (other.arriveId != null)
+					return false;
+			} else if (!arriveId.equals(other.arriveId))
+				return false;
+			if (arriveTime == null) {
+				if (other.arriveTime != null)
+					return false;
+			} else if (!arriveTime.equals(other.arriveTime))
+				return false;
+			if (blockId == null) {
+				if (other.blockId != null)
+					return false;
+			} else if (!blockId.equals(other.blockId))
+				return false;
+			if (departId == null) {
+				if (other.departId != null)
+					return false;
+			} else if (!departId.equals(other.departId))
+				return false;
+			if (departTime == null) {
+				if (other.departTime != null)
+					return false;
+			} else if (!departTime.equals(other.departTime))
+				return false;
+			if (routeId == null) {
+				if (other.routeId != null)
+					return false;
+			} else if (!routeId.equals(other.routeId))
+				return false;
+			if (tripId == null) {
+				if (other.tripId != null)
+					return false;
+			} else if (!tripId.equals(other.tripId))
+				return false;
+			return true;
+		}
+
 
 		
 	}

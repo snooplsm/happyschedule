@@ -31,22 +31,42 @@
                     android:id="@+id/time"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
                     android:layout_marginLeft="6dp"
                     android:text="11:30p - 12:15a"
                     android:textColor="#2a2a2a"
                     android:textSize="16dp"
                     android:textStyle="bold" />
 
-                <TextView
-                    android:id="@+id/departs_in"
+                <RelativeLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
-                    android:layout_marginRight="6dp"
-                    android:lines="1"
-                    android:text="DEPARTS IN 1 MIN"
-                    android:textColor="#F16364"
-                    android:textSize="15dp" />
+                    android:layout_centerVertical="true" >
+
+                    <TextView
+                        android:id="@+id/departs_in"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="3dp"
+                        android:layout_toLeftOf="@+id/alarm"
+                        android:layout_centerVertical="true"
+                        android:lines="1"
+                        android:text="DEPARTS IN 1 MIN"
+                        android:textColor="#F16364"
+                        android:textSize="15dp" />
+
+                    <ImageView
+                        android:id="@id/alarm"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginRight="1dp"
+                        android:src="@drawable/stat_notify_alarm"
+                        android:tint="@color/blackish"
+                        android:visibility="gone" />
+                </RelativeLayout>
             </RelativeLayout>
         </RelativeLayout>
     </RelativeLayout>
@@ -56,9 +76,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/time_container"
-        android:layout_toRightOf="@+id/train_info_container"
         android:layout_marginLeft="12dp"
         android:layout_marginRight="12dp"
+        android:layout_toRightOf="@+id/train_info_container"
         android:orientation="horizontal" >
 
         <TextView

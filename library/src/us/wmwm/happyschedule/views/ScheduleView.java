@@ -3,6 +3,7 @@ package us.wmwm.happyschedule.views;
 import java.text.DateFormat;
 import java.util.Calendar;
 
+import us.wmwm.happyschedule.Alarm;
 import us.wmwm.happyschedule.R;
 import us.wmwm.happyschedule.StationToStation;
 import android.content.Context;
@@ -23,6 +24,7 @@ public class ScheduleView extends RelativeLayout {
 	TextView timeTillDepart;
 	TextView duration;
 	TextView train;
+	View alarm;
 	
 	static DateFormat TIME = DateFormat.getTimeInstance(DateFormat.SHORT);
 	
@@ -42,6 +44,7 @@ public class ScheduleView extends RelativeLayout {
 		timeTillDepart = (TextView) findViewById(R.id.departs_in);
 		duration = (TextView) findViewById(R.id.duration);
 		train = (TextView) findViewById(R.id.trip_id);
+		alarm = findViewById(R.id.alarm);
 		bg = getBackground();
 	}
 
@@ -79,8 +82,15 @@ public class ScheduleView extends RelativeLayout {
 		} else {
 			train.setText("");
 		}
-		duration.setText(((sts.arriveTime.getTimeInMillis() - sts.departTime.getTimeInMillis()) / 60000) + " minutes");
-			
+		duration.setText(((sts.arriveTime.getTimeInMillis() - sts.departTime.getTimeInMillis()) / 60000) + " minutes");			
+	}
+	
+	public void setAlarm(Alarm alarm) {
+		if(alarm==null) {
+			this.alarm.setVisibility(View.GONE);
+		} else {
+			this.alarm.setVisibility(View.VISIBLE);
+		}
 	}
 	
 	private String shrink(Calendar cal) {
