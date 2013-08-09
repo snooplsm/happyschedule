@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:background="@drawable/selector_get_schedule"
-    android:layout_height="80dp"
+    android:layout_height="90dp"
     android:orientation="vertical" >
 
     <TextView
