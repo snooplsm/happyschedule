@@ -3,6 +3,7 @@ package us.wmwm.happyschedule;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
@@ -109,7 +110,7 @@ public class Alarms {
 		b.setOngoing(true);
 		b.setSmallIcon(R.drawable.stat_notify_alarm);
 		Notification notif = b.build();
-		notif.tickerText = typet + " alarm to go off in " + FragmentAlarmPicker.buildMessage(alarm.getTime()).toString();
+		notif.tickerText = typet + " alarm to go off in " + FragmentAlarmPicker.buildMessage(alarm.getTime(),Calendar.getInstance()).toString();
 		notifs.notify(alarm.getId().hashCode(), notif);
 		alarmManger.set(AlarmManager.RTC_WAKEUP, alarm.getTime().getTimeInMillis(), pi);
 	}

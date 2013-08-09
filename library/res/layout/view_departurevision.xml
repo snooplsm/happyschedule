@@ -60,13 +60,15 @@
 
         <TextView
             android:id="@+id/time"
-            android:layout_width="50dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
+            android:layout_alignLeft="@id/track"
+            android:layout_alignRight="@id/track"
+            android:textColor="@color/blackish"
             android:layout_below="@id/track"
             android:gravity="center"
             android:text="3:33"
-            android:textSize="16sp" />
+            android:textSize="15sp" />
     </RelativeLayout>
 
 </RelativeLayout>

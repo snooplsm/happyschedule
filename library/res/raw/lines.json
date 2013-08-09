@@ -10,29 +10,27 @@
 		},
 		"color": "#59A2BE",
 		"acronym": "No"
-	}, 
-	{
+	}, {
 		"keys": {
 			"septa": ""
 		},
 		"color": "#59A2BE",
 		"acronym": "SEP"
-	},
-	{
+	}, {
 		"keys": {
 			"amtk": "",
 			"amtrak": "",
 			"carolinian": "",
 			"acela express": "",
 			"keystone": "",
-			"miami":"",
-			"norfolk":"",
-			"silver meteor-r":"",
-			"regional-r":"",
-			"springfield":"",
-			"regional":"",
-			"silver star -r":"",
-			"silver star-r":""
+			"miami": "",
+			"norfolk": "",
+			"silver meteor-r": "",
+			"regional-r": "",
+			"springfield": "",
+			"regional": "",
+			"silver star -r": "",
+			"silver star-r": ""
 		},
 		"color": "#E4C62E",
 		"acronym": "Am"
@@ -49,6 +47,30 @@
 		},
 		"color": "#F58559",
 		"acronym": "RAV"
+	}, {
+		"keys": {
+			"pascack valley": ""
+		},
+		"color": "#000000",
+		"acronym": "PV"
+	}, {
+		"keys": {
+			"main line": ""
+		},
+		"color": "#000000",
+		"acronym": "ML"
+	}, {
+		"keys": {
+			"bergen co. line": ""
+		},
+		"color": "#000000",
+		"acronym": "BL"
+	}, {
+	"keys": {
+			"meadowlands rail": ""
+		},
+		"color": "#000000",
+		"acronym": "MDW"
 	}, {
 		"keys": {
 			"mnbtn": "",

@@ -279,6 +279,6 @@
         android:gravity="right"
         android:paddingRight="@dimen/timer_padding_left"
         android:paddingTop="16dp"
-        android:text="5 min before depart" />
+        android:text="" />
 
 </RelativeLayout>
