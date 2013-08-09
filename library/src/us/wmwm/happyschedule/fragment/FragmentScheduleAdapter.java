@@ -8,11 +8,11 @@ import java.util.List;
 
 import us.wmwm.happyschedule.dao.ScheduleDao;
 import us.wmwm.happyschedule.model.Station;
-
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.text.format.DateUtils;
+import android.view.ViewGroup;
 
 public class FragmentScheduleAdapter extends FragmentStatePagerAdapter {
 
@@ -29,6 +29,8 @@ public class FragmentScheduleAdapter extends FragmentStatePagerAdapter {
 	Station from;
 	Station to;
 	DateFormat SHORT = new SimpleDateFormat("E M/d");
+	
+	Object last;
 
 	@Override
 	public int getCount() {
@@ -48,6 +50,21 @@ public class FragmentScheduleAdapter extends FragmentStatePagerAdapter {
 		return cal;
 	}
 
+	@Override
+	public void setPrimaryItem(ViewGroup container, int position, Object object) {
+		super.setPrimaryItem(container, position, object);
+		if(object == last) {
+			if(object instanceof IPrimary) {
+				((IPrimary)object).setPrimaryItem();
+			}
+		} else {
+			if(last!=null && last instanceof ISecondary) {
+				((ISecondary)last).setSecondary();
+			}
+			last = object;
+		}
+	}
+	
 	@Override
 	public Fragment getItem(int pos) {
 		Calendar cal = getCalendar(pos);

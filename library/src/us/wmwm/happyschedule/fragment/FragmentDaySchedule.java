@@ -22,8 +22,8 @@ import us.wmwm.happyschedule.model.Station;
 import us.wmwm.happyschedule.model.StationToStation;
 import us.wmwm.happyschedule.model.Type;
 import us.wmwm.happyschedule.views.ScheduleControlsView;
-import us.wmwm.happyschedule.views.ScheduleView;
 import us.wmwm.happyschedule.views.ScheduleControlsView.ScheduleControlListener;
+import us.wmwm.happyschedule.views.ScheduleView;
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.NotificationManager;
@@ -43,7 +43,7 @@ import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListView;
 
-public class FragmentDaySchedule extends Fragment {
+public class FragmentDaySchedule extends Fragment implements IPrimary, ISecondary {
 
 	ExpandableListView list;
 
@@ -63,6 +63,10 @@ public class FragmentDaySchedule extends Fragment {
 	NotificationManager notifs;
 	
 	Map<StationToStation,List<Alarm>> tripIdToAlarm;
+	
+	boolean canLoad = false;
+	
+	boolean activityCreated = false;
 	
 	private void addAlarm(Alarm alarm) {
 		List<Alarm> alarms = tripIdToAlarm.get(alarm.getStationToStation());
@@ -350,8 +354,8 @@ public class FragmentDaySchedule extends Fragment {
 				return 0;
 			}
 		};
-		list.setAdapter(adapter);
-		loadSchedule();
+		list.setAdapter(adapter);		
+		activityCreated = true;
 	}
 
 	List<StationToStation> o = null;
@@ -488,6 +492,20 @@ public class FragmentDaySchedule extends Fragment {
 		b.putSerializable("date", date);
 		f.setArguments(b);
 		return f;
+	}
+
+	@Override
+	public void setPrimaryItem() {
+		if(activityCreated && o==null) {
+			loadSchedule();
+		}
+	}
+
+	@Override
+	public void setSecondary() {
+		if(loadScheduleFuture!=null) {
+			loadScheduleFuture.cancel(true);
+		}
 	}
 
 }
