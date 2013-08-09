@@ -14,17 +14,17 @@
         <TextView
             android:id="@+id/type"
             style="@style/dialog_button"
-            android:layout_marginTop="6dp"
-            android:layout_marginLeft="@dimen/timer_padding_left"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/timer_padding_left"
+            android:layout_marginTop="6dp" />
 
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginTop="6dp"
             android:layout_marginLeft="8dip"
             android:layout_marginRight="8dip"
+            android:layout_marginTop="6dp"
             android:background="#28ffffff" />
 
         <TextView
@@ -262,12 +262,23 @@
     <TextView
         android:id="@+id/alarm_text"
         style="@style/dialog_button"
-        android:paddingTop="6dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
         android:paddingRight="@dimen/timer_padding_left"
-        />
+        android:paddingTop="6dp" />
+
+    <TextView
+        android:id="@+id/time_text"
+        style="@style/dialog_button"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/alarm_text"
+        android:gravity="right"
+        android:paddingRight="@dimen/timer_padding_left"
+        android:paddingTop="16dp"
+        android:text="5 min before depart" />
 
 </RelativeLayout>

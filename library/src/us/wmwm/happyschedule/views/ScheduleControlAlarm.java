@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 
 import us.wmwm.happyschedule.R;
 import us.wmwm.happyschedule.model.Alarm;
+import us.wmwm.happyschedule.views.ScheduleControlsView.ScheduleControlListener;
 import android.content.Context;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
@@ -17,12 +18,24 @@ public class ScheduleControlAlarm extends RelativeLayout {
 	TextView alarmV;
 	View dismiss;
 	Alarm alarm;
+	ScheduleControlListener listener;
+	
+	public void setListener(ScheduleControlListener listener) {
+		this.listener = listener;
+	}
 	
 	public ScheduleControlAlarm(Context context) {
 		super(context);
 		LayoutInflater.from(context).inflate(R.layout.view_alarm, this);
 		alarmV = (TextView) findViewById(R.id.alarm);
 		dismiss = findViewById(R.id.dismiss);
+		dismiss.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				listener.onTimerCancel(alarm);
+			}
+		});
 	}
 	
 	public void setData(Alarm alarm) {

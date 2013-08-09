@@ -222,7 +222,7 @@ public class FragmentDaySchedule extends Fragment implements IPrimary, ISecondar
 				if (childPosition == TYPE_CONTROLS) {
 					ScheduleControlsView v = new ScheduleControlsView(parent.getContext());
 					final StationToStation sts = getItem(groupPosition);
-					v.setData(tripIdToAlarm.get(sts));
+					
 					v.setListener(new ScheduleControlListener() {
 
 						public void onTimerCancel(Alarm alarm) {
@@ -231,6 +231,7 @@ public class FragmentDaySchedule extends Fragment implements IPrimary, ISecondar
 								alarms.remove(alarm);
 							}
 							getActivity().startService(Alarms.newDismissIntent(getActivity(), alarm));
+							adapter.notifyDataSetChanged();
 						};
 						
 						@Override
@@ -271,7 +272,6 @@ public class FragmentDaySchedule extends Fragment implements IPrimary, ISecondar
 
 						@Override
 						public void onPin() {
-							// TODO Auto-generated method stub
 							
 						}
 
@@ -282,6 +282,7 @@ public class FragmentDaySchedule extends Fragment implements IPrimary, ISecondar
 						}
 						
 					});
+					v.setData(tripIdToAlarm.get(sts));
 					return v;
 				}
 				return null;

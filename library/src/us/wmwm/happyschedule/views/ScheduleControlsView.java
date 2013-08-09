@@ -4,8 +4,6 @@ package us.wmwm.happyschedule.views;
 import java.util.List;
 
 import us.wmwm.happyschedule.R;
-import us.wmwm.happyschedule.R.id;
-import us.wmwm.happyschedule.R.layout;
 import us.wmwm.happyschedule.model.Alarm;
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -68,6 +66,7 @@ public class ScheduleControlsView extends LinearLayout {
 		}
 		for(Alarm alarm : alarms) {
 			ScheduleControlAlarm alarmView = new ScheduleControlAlarm(getContext());
+			alarmView.setListener(listener);
 			this.alarms.addView(alarmView);
 			alarmView.setData(alarm);
 		}

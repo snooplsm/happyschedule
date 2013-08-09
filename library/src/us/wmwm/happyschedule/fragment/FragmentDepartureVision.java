@@ -53,7 +53,7 @@ import android.view.ViewGroup;
 
 import com.emilsjolander.components.stickylistheaders.StickyListHeadersListView;
 
-public class FragmentDepartureVision extends Fragment implements IPrimary {
+public class FragmentDepartureVision extends Fragment implements IPrimary, ISecondary {
 
 	StickyListHeadersListView list;
 	View stationSelect;
@@ -79,6 +79,10 @@ public class FragmentDepartureVision extends Fragment implements IPrimary {
 	long lastStatusesReceived;
 
 	OnStationSelectedListener onStationSelected;
+	
+	boolean canLoad;
+	
+	boolean activityCreated;
 
 	public void setOnStationSelected(OnStationSelectedListener onStationSelected) {
 		this.onStationSelected = onStationSelected;
@@ -321,7 +325,7 @@ public class FragmentDepartureVision extends Fragment implements IPrimary {
 		} catch (Exception e) {
 
 		}
-
+		activityCreated = true;
 	}
 
 	private void loadColors() {
@@ -376,7 +380,7 @@ public class FragmentDepartureVision extends Fragment implements IPrimary {
 			return;
 		}
 		NetworkInfo i = manager.getActiveNetworkInfo();
-		if (i != null && i.isConnected()) {
+		if (i != null && i.isConnected() && canLoad) {
 			poll = ThreadHelper.getScheduler().scheduleAtFixedRate(r, 100,
 					10000, TimeUnit.MILLISECONDS);
 		}
@@ -424,8 +428,10 @@ public class FragmentDepartureVision extends Fragment implements IPrimary {
 				if (poll != null) {
 					poll.cancel(true);
 				}
-				poll = ThreadHelper.getScheduler().scheduleAtFixedRate(r, 100,
-						10000, TimeUnit.MILLISECONDS);
+				if(canLoad) {
+					poll = ThreadHelper.getScheduler().scheduleAtFixedRate(r, 100,
+							10000, TimeUnit.MILLISECONDS);
+				}
 				List<TrainStatus> ks = Collections.emptyList();
 				adapter.setData(ks);
 			}
@@ -438,8 +444,34 @@ public class FragmentDepartureVision extends Fragment implements IPrimary {
 
 	@Override
 	public void setPrimaryItem() {
-		getActivity().getActionBar().setSubtitle("w/ DepartureVision");
+		if(activityCreated) {
+			getActivity().getActionBar().setSubtitle("w/ DepartureVision");
+			canLoad = true;
+			NetworkInfo info = manager.getActiveNetworkInfo();
+			if(info==null || !info.isConnected()) {
+				erroText.setVisibility(View.VISIBLE);
+			}
+			if (info != null && info.isConnected()) {
+				erroText.setVisibility(View.GONE);
+				if (poll == null || poll.isCancelled()) {
+					poll = ThreadHelper.getScheduler().scheduleAtFixedRate(r,
+							100, 10000, TimeUnit.MILLISECONDS);
+				}
+			} else {
+				if (poll != null) {
+					poll.cancel(true);
+				}
+			}
+		}
 		
+	}
+	
+	@Override
+	public void setSecondary() {
+		canLoad = false;
+		if(poll!=null) {
+			poll.cancel(true);
+		}
 	}
 
 }
