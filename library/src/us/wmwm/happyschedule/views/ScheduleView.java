@@ -2,6 +2,7 @@ package us.wmwm.happyschedule.views;
 
 import java.text.DateFormat;
 import java.util.Calendar;
+import java.util.List;
 
 import us.wmwm.happyschedule.Alarm;
 import us.wmwm.happyschedule.R;
@@ -85,7 +86,8 @@ public class ScheduleView extends RelativeLayout {
 		duration.setText(((sts.arriveTime.getTimeInMillis() - sts.departTime.getTimeInMillis()) / 60000) + " minutes");			
 	}
 	
-	public void setAlarm(Alarm alarm) {
+	public void setAlarm(List<Alarm> alarm) {
+		System.out.println(alarm);
 		if(alarm==null) {
 			this.alarm.setVisibility(View.GONE);
 		} else {

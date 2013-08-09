@@ -62,92 +62,97 @@ public class StationToStation implements Serializable {
 			return (int)(arriveTime.getTimeInMillis()-departTime.getTimeInMillis())/60000;
 		}
 
+
 		@Override
 		public String toString() {
 			return "StationToStation [departId=" + departId + ", arriveId="
-					+ arriveId + ", departTime=" + (departTime!=null ? departTime.getTime() : null) + ", arriveTime="
-					+ (arriveTime!=null ? arriveTime.getTime() : null) + ", duration=" + getDuration() + "]";
+					+ arriveId + ", departTime=" + departTime + ", arriveTime="
+					+ arriveTime + ", blockId=" + blockId + ", tripId="
+					+ tripId + ", routeId=" + routeId + "]";
 		}
+
 		@Override
 		public int hashCode() {
 			final int prime = 31;
 			int result = 1;
 			result = prime * result
+					+ ((arriveId == null) ? 0 : arriveId.hashCode());
+			result = prime * result
 					+ ((arriveTime == null) ? 0 : arriveTime.hashCode());
 			result = prime * result
+					+ ((blockId == null) ? 0 : blockId.hashCode());
+			result = prime * result
+					+ ((departId == null) ? 0 : departId.hashCode());
+			result = prime * result
 					+ ((departTime == null) ? 0 : departTime.hashCode());
+			result = prime * result
+					+ ((routeId == null) ? 0 : routeId.hashCode());
+			result = prime * result
+					+ ((tripId == null) ? 0 : tripId.hashCode());
 			return result;
 		}
 
 		@Override
 		public boolean equals(Object obj) {
-			if (this == obj)
+			if (this == obj) {
 				return true;
-			if (obj == null)
+			}
+			if (obj == null) {
 				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			StationToStation other = (StationToStation) obj;
-			if (arriveTime == null) {
-				if (other.arriveTime != null)
-					return false;
-			} else if (!arriveTime.equals(other.arriveTime))
-				return false;
-			if (departTime == null) {
-				if (other.departTime != null)
-					return false;
-			} else if (!departTime.equals(other.departTime))
-				return false;
-			return true;
-		}
-
-
-		public boolean equalsEntirerty(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
+			}
 			StationToStation other = (StationToStation) obj;
 			if (arriveId == null) {
-				if (other.arriveId != null)
+				if (other.arriveId != null) {
 					return false;
-			} else if (!arriveId.equals(other.arriveId))
+				}
+			} else if (!arriveId.equals(other.arriveId)) {
 				return false;
+			}
 			if (arriveTime == null) {
-				if (other.arriveTime != null)
+				if (other.arriveTime != null) {
 					return false;
-			} else if (!arriveTime.equals(other.arriveTime))
+				}
+			} else if (!arriveTime.equals(other.arriveTime)) {
 				return false;
+			}
 			if (blockId == null) {
-				if (other.blockId != null)
+				if (other.blockId != null) {
 					return false;
-			} else if (!blockId.equals(other.blockId))
+				}
+			} else if (!blockId.equals(other.blockId)) {
 				return false;
+			}
 			if (departId == null) {
-				if (other.departId != null)
+				if (other.departId != null) {
 					return false;
-			} else if (!departId.equals(other.departId))
+				}
+			} else if (!departId.equals(other.departId)) {
 				return false;
+			}
 			if (departTime == null) {
-				if (other.departTime != null)
+				if (other.departTime != null) {
 					return false;
-			} else if (!departTime.equals(other.departTime))
+				}
+			} else if (!departTime.equals(other.departTime)) {
 				return false;
+			}
 			if (routeId == null) {
-				if (other.routeId != null)
+				if (other.routeId != null) {
 					return false;
-			} else if (!routeId.equals(other.routeId))
+				}
+			} else if (!routeId.equals(other.routeId)) {
 				return false;
+			}
 			if (tripId == null) {
-				if (other.tripId != null)
+				if (other.tripId != null) {
 					return false;
-			} else if (!tripId.equals(other.tripId))
+				}
+			} else if (!tripId.equals(other.tripId)) {
 				return false;
+			}
 			return true;
 		}
 
-
+		
 		
 	}

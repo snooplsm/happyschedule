@@ -162,8 +162,8 @@ public class ScheduleDao {
 		String middle = simpleDate(startDate);
 		String endString = simpleDate(endDate);
 		
-		System.out.println("start : " + startString);
-		System.out.println("end   : " + endString);
+//		System.out.println("start : " + startString);
+//		System.out.println("end   : " + endString);
 
 
 		Map<String[], Map<String, List<ConnectionInterval>>> pairToTimes = new HashMap<String[], Map<String, List<ConnectionInterval>>>();

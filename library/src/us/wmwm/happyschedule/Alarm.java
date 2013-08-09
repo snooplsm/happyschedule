@@ -74,5 +74,11 @@ public class Alarm implements Serializable {
 	public void setStationToStation(StationToStation stationToStation) {
 		this.stationToStation = stationToStation;
 	}
+
+	@Override
+	public String toString() {
+		return "Alarm [type=" + type + ", time=" + time + ", stationToStation="
+				+ stationToStation + ", id=" + id + "]";
+	}
 	
 }

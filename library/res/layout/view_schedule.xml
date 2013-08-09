@@ -38,7 +38,7 @@
                     android:textSize="16dp"
                     android:textStyle="bold" />
 
-                <RelativeLayout
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
@@ -66,7 +66,7 @@
                         android:src="@drawable/stat_notify_alarm"
                         android:tint="@color/blackish"
                         android:visibility="gone" />
-                </RelativeLayout>
+                </LinearLayout>
             </RelativeLayout>
         </RelativeLayout>
     </RelativeLayout>

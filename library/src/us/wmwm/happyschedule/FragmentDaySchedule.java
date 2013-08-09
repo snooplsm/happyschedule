@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Future;
@@ -55,7 +56,16 @@ public class FragmentDaySchedule extends Fragment {
 
 	NotificationManager notifs;
 	
-	Map<StationToStation,Alarm> tripIdToAlarm;
+	Map<StationToStation,List<Alarm>> tripIdToAlarm;
+	
+	private void addAlarm(Alarm alarm) {
+		List<Alarm> alarms = tripIdToAlarm.get(alarm.getStationToStation());
+		if(alarms==null) {
+			alarms = new ArrayList<Alarm>();
+			tripIdToAlarm.put(alarm.getStationToStation(), alarms);
+		}
+		alarms.add(alarm);
+	}
 	
 	public interface OnDateChange {
 		void onDateChange(Calendar cal);
@@ -130,6 +140,14 @@ public class FragmentDaySchedule extends Fragment {
 		progressBar = view.findViewById(R.id.progress);
 		return view;
 	}
+	
+	@Override
+	public void onResume() {
+		super.onResume();
+		if(adapter!=null) {
+			adapter.notifyDataSetChanged();
+		}
+	}
 
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
@@ -194,46 +212,39 @@ public class FragmentDaySchedule extends Fragment {
 				if (childPosition == TYPE_CONTROLS) {
 					ScheduleControlsView v = new ScheduleControlsView(parent.getContext());
 					final StationToStation sts = getItem(groupPosition);
+					v.setData(tripIdToAlarm.get(sts));
 					v.setListener(new ScheduleControlListener() {
 
+						public void onTimerCancel(Alarm alarm) {
+							List<Alarm> alarms = tripIdToAlarm.get(alarm.getStationToStation());
+							if(alarms!=null) {
+								alarms.remove(alarm);
+							}
+							getActivity().startService(Alarms.newDismissIntent(getActivity(), alarm));
+						};
+						
 						@Override
 						public void onTimer() {
 							FragmentAlarmPicker fdp = FragmentAlarmPicker.newInstance(sts);
 							fdp.setOnTimerPicked(new OnTimerPicked() {
 								
 								@Override
-								public void onTimer(Type type, Calendar cal, StationToStation stationToStation) {
-									Intent i = AlarmActivity.from(getActivity(), stationToStation, cal, type);
-									Alarm alarm = (Alarm) i.getSerializableExtra("alarm");
-									Alarms.saveAlarm(getActivity(), alarm);
-									tripIdToAlarm.put(alarm.getStationToStation(),alarm);
-									PendingIntent pi = PendingIntent.getActivity(getActivity(), 0, i , 0);
-									PendingIntent dismiss = PendingIntent.getService(getActivity(), 0, new Intent(getActivity(), HappyScheduleService.class).putExtra("alarm", alarm).setData(Uri.parse("http://wmwm.us?type=alarm&action=dismiss&id="+alarm.getId())), 0);
-									NotificationCompat.Builder b = new NotificationCompat.Builder(getActivity());
-									NotificationCompat.BigTextStyle bs = new NotificationCompat.BigTextStyle(b);
+								public void onTimer(final Type type, final Calendar cal, final StationToStation stationToStation) {
+									ThreadHelper.getScheduler().submit(new Runnable() {
+										@Override
+										public void run() {
+											Intent i = AlarmActivity.from(getActivity(), stationToStation, cal, type);
+											Alarm alarm = (Alarm) i.getSerializableExtra("alarm");
+											addAlarm(alarm);
+											Alarms.startAlarm(getActivity(), alarm);
+											handler.post(new Runnable() {
+												public void run() {
+													adapter.notifyDataSetChanged();
+												};
+											});
+										}
+									});
 									
-									bs.setBigContentTitle(getString(R.string.app_name) + " " + alarm.getType().name().toLowerCase() + " alarm");
-									StringBuilder text = new StringBuilder(alarm.getType().name().toLowerCase());
-									text.replace(0, 1, text.substring(0,1).toUpperCase());
-									String typet = text.toString();
-									text.append(" alarm set for ");
-									if(!DateUtils.isToday(alarm.getTime().getTimeInMillis())) {
-										text.append(new SimpleDateFormat("MMM d").format(alarm.getTime().getTime())).append(" at ");
-									}
-									text.append(DateFormat.getTimeInstance(DateFormat.SHORT).format(alarm.getTime().getTime()).toLowerCase());
-									text.append(".  For train #" + stationToStation.blockId + " departing from " + Db.get().getStop(stationToStation.departId).getName() + " arriving at " + Db.get().getStop(stationToStation.arriveId).getName()+".");
-									bs.bigText(text.toString());
-									b.addAction(R.drawable.ic_action_cancel, getString(R.string.notif_alarm_dismiss), dismiss);
-									b.setContentText(text.toString());
-									b.setContentTitle(getString(R.string.app_name) + " " + alarm.getType().name().toLowerCase() + " alarm");
-									//bs.setSummaryText(text.toString());
-									b.setOngoing(true);
-									b.setSmallIcon(R.drawable.stat_notify_alarm);
-									Notification notif = b.build();
-									notif.tickerText = typet + " alarm to go off in " + FragmentAlarmPicker.buildMessage(alarm.getTime()).toString();
-									System.out.println("notif : " + alarm.getId());
-									notifs.notify(alarm.getId().hashCode(), notif);
-									alarmManger.set(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), pi);
 								}
 							});
 							fdp.show(getFragmentManager(), "alarmPicker");
@@ -293,7 +304,6 @@ public class FragmentDaySchedule extends Fragment {
 				if (o == null) {
 					return 0;
 				}
-				System.out.println(o.size());
 				return o.size();
 			}
 
@@ -350,9 +360,9 @@ public class FragmentDaySchedule extends Fragment {
 			@Override
 			public void run() {
 				List<Alarm> alarms = Alarms.getAlarms(getActivity());
-				tripIdToAlarm = new HashMap<StationToStation,Alarm>();
+				tripIdToAlarm = new HashMap<StationToStation,List<Alarm>>();
 				for(Alarm a : alarms) {
-					tripIdToAlarm.put(a.getStationToStation(), a);
+					addAlarm(a);
 				}
 				Calendar date = Calendar.getInstance();
 				date.setTime(day);
@@ -409,6 +419,26 @@ public class FragmentDaySchedule extends Fragment {
 					Log.i(TAG, "SUCCESSFUL SCHEDULE");
 				} catch (Exception e) {
 					Log.e(TAG, "UNSUCCESSFUL SCHEDULE", e);
+				}
+				
+				Iterator<Map.Entry<StationToStation, List<Alarm>>> ak = tripIdToAlarm.entrySet().iterator();
+				while(ak.hasNext()) {
+					Map.Entry<StationToStation, List<Alarm>> entry = ak.next();
+					Activity activity = getActivity();
+					if(activity!=null) {
+						Iterator<Alarm> aks = entry.getValue().iterator();
+						while(aks.hasNext()) {
+							Alarm alarm = aks.next();
+							if(alarm.getTime().before(Calendar.getInstance())) {
+								activity.startService(Alarms.newDismissIntent(activity, alarm));
+								aks.remove();
+							}
+							if(entry.getValue().isEmpty()) {
+								ak.remove();
+							}
+						}
+						
+					}
 				}
 
 			}
