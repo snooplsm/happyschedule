@@ -2,14 +2,13 @@ package us.wmwm.happyschedule.views;
 
 import org.json.JSONArray;
 
-import us.wmwm.happyschedule.Db;
-import us.wmwm.happyschedule.FragmentDepartureVision;
-import us.wmwm.happyschedule.FragmentPickStations;
-import us.wmwm.happyschedule.FragmentPickStations.OnGetSchedule;
-import us.wmwm.happyschedule.HappyApplication;
-import us.wmwm.happyschedule.IPrimary;
-import us.wmwm.happyschedule.OnStationSelectedListener;
-import us.wmwm.happyschedule.Station;
+import us.wmwm.happyschedule.application.HappyApplication;
+import us.wmwm.happyschedule.dao.Db;
+import us.wmwm.happyschedule.fragment.FragmentDepartureVision;
+import us.wmwm.happyschedule.fragment.FragmentPickStations;
+import us.wmwm.happyschedule.fragment.IPrimary;
+import us.wmwm.happyschedule.fragment.FragmentPickStations.OnGetSchedule;
+import us.wmwm.happyschedule.model.Station;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;

@@ -1,7 +1,7 @@
 package us.wmwm.happyschedule.views;
 
 import us.wmwm.happyschedule.R;
-import us.wmwm.happyschedule.Station;
+import us.wmwm.happyschedule.model.Station;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;

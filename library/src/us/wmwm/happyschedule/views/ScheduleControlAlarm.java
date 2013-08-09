@@ -3,8 +3,8 @@ package us.wmwm.happyschedule.views;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
-import us.wmwm.happyschedule.Alarm;
 import us.wmwm.happyschedule.R;
+import us.wmwm.happyschedule.model.Alarm;
 import android.content.Context;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;

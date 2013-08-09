@@ -4,9 +4,9 @@ import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.List;
 
-import us.wmwm.happyschedule.Alarm;
 import us.wmwm.happyschedule.R;
-import us.wmwm.happyschedule.StationToStation;
+import us.wmwm.happyschedule.model.Alarm;
+import us.wmwm.happyschedule.model.StationToStation;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
