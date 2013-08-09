@@ -24,7 +24,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="us.wmwm.happyschedule.ActivityPickStation"
+            android:name="us.wmwm.happyschedule.activity.ActivityPickStation"
             android:label="@string/app_name"
             android:screenOrientation="nosensor"
             android:theme="@style/AppTheme" >
@@ -40,7 +40,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="us.wmwm.happyschedule.AlarmActivity"
+            android:name="us.wmwm.happyschedule.activity.AlarmActivity"
             android:configChanges="orientation|screenSize|keyboardHidden|keyboard|navigation"
             android:excludeFromRecents="true"
             android:label="@string/app_name"

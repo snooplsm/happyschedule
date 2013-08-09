@@ -13,6 +13,7 @@ import java.util.concurrent.Future;
 
 import us.wmwm.happyschedule.FragmentAlarmPicker.OnTimerPicked;
 import us.wmwm.happyschedule.ScheduleControlsView.ScheduleControlListener;
+import us.wmwm.happyschedule.activity.AlarmActivity;
 import us.wmwm.happyschedule.views.ScheduleView;
 import android.app.Activity;
 import android.app.AlarmManager;

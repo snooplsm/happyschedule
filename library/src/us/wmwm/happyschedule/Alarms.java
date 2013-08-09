@@ -9,6 +9,8 @@ import java.util.Map;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import us.wmwm.happyschedule.activity.AlarmActivity;
+
 import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationManager;

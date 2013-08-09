@@ -1,5 +1,6 @@
 package us.wmwm.happyschedule;
 
+import us.wmwm.happyschedule.activity.AlarmActivity;
 import android.app.AlarmManager;
 import android.app.NotificationManager;
 import android.app.PendingIntent;

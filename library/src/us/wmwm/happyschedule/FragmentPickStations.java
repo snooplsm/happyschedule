@@ -1,5 +1,6 @@
 package us.wmwm.happyschedule;
 
+import us.wmwm.happyschedule.activity.ActivityPickStation;
 import us.wmwm.happyschedule.views.StationButton;
 import android.app.Activity;
 import android.content.Intent;

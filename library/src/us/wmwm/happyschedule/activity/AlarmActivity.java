@@ -1,8 +1,19 @@
-package us.wmwm.happyschedule;
+package us.wmwm.happyschedule.activity;
 
 import java.util.Calendar;
 import java.util.UUID;
 
+import us.wmwm.happyschedule.Alarm;
+import us.wmwm.happyschedule.Alarms;
+import us.wmwm.happyschedule.Db;
+import us.wmwm.happyschedule.FragmentDepartureVision;
+import us.wmwm.happyschedule.R;
+import us.wmwm.happyschedule.Station;
+import us.wmwm.happyschedule.StationToStation;
+import us.wmwm.happyschedule.Type;
+import us.wmwm.happyschedule.R.id;
+import us.wmwm.happyschedule.R.layout;
+import us.wmwm.happyschedule.R.string;
 import us.wmwm.happyschedule.views.ScheduleView;
 import android.app.NotificationManager;
 import android.content.Context;
@@ -62,8 +73,8 @@ public class AlarmActivity extends FragmentActivity {
         scheduleView.setData(sts);
         Station from = Db.get().getStop(sts.departId);
         Station to = Db.get().getStop(sts.arriveId);
-        getActionBar().setSubtitle(from.name + " to " + to.name);
-        if(!TextUtils.isEmpty(from.departureVision)) {
+        getActionBar().setSubtitle(from.getName() + " to " + to.getName());
+        if(!TextUtils.isEmpty(from.getDepartureVision())) {
         	getSupportFragmentManager().beginTransaction().replace(R.id.fragment_depareturevision, FragmentDepartureVision.newInstance(from,sts)).commit();
         }
 	}

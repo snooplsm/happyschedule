@@ -16,6 +16,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import us.wmwm.happyschedule.activity.ActivityPickStation;
+
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
