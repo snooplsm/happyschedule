@@ -15,6 +15,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 
 public class Schedule implements Serializable {
 
@@ -42,6 +45,31 @@ public class Schedule implements Serializable {
 	private static final SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
 	
 	private Map<String,StationInterval> goodStations = new HashMap<String, StationInterval>();
+	
+	public Schedule() {}
+	
+	public Schedule(JSONObject o) {
+		JSONArray a = o.optJSONArray("services");
+		services = new HashMap<String,Service>();
+		if(a!=null) {
+			for(int i = 0 ; i < a.length(); i++) {
+				JSONObject ob = a.optJSONObject(i);
+				Service service = new Service(ob);
+				services.put(service.serviceId, service);				
+			}
+		}
+		a = o.optJSONArray("tripIdToTrip");
+		tripIdToTrip = new HashMap<String,Trip>();
+		if(a!=null) {
+			for(int i = 0; i < a.length(); i++) {
+				JSONObject ob = a.optJSONObject(i);
+				Trip trip = new Trip(ob);
+				tripIdToTrip.put(trip.id, trip);
+			}
+		}
+		departId = o.optString("departId");
+		arriveId = o.optString("arriveId");
+	}
 
 	void traverse(List<? extends StationToStation> stationToStations,
 			ScheduleTraverser traverser) {

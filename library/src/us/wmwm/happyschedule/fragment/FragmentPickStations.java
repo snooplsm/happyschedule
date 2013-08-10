@@ -1,17 +1,20 @@
 package us.wmwm.happyschedule.fragment;
 
+import java.text.DecimalFormat;
+import java.util.Map;
+
 import us.wmwm.happyschedule.R;
-import us.wmwm.happyschedule.R.id;
-import us.wmwm.happyschedule.R.layout;
-import us.wmwm.happyschedule.R.menu;
+import us.wmwm.happyschedule.ThreadHelper;
 import us.wmwm.happyschedule.activity.ActivityPickStation;
 import us.wmwm.happyschedule.dao.Db;
+import us.wmwm.happyschedule.dao.ScheduleDao;
 import us.wmwm.happyschedule.model.Station;
 import us.wmwm.happyschedule.views.StationButton;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -21,6 +24,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 public class FragmentPickStations extends Fragment implements IPrimary {
 
@@ -29,7 +33,10 @@ public class FragmentPickStations extends Fragment implements IPrimary {
 	View getScheduleButton;
 	FragmentStationPicker picker;
 	View reverseButton;
-
+	TextView fare;
+	
+	Handler handler = new Handler();
+	
 	public static interface OnGetSchedule {
 		void onGetSchedule(Station from, Station to);
 	}
@@ -57,6 +64,7 @@ public class FragmentPickStations extends Fragment implements IPrimary {
 		arrivalButton.setHint("Arrival Station");
 		getScheduleButton = root.findViewById(R.id.get_schedule);
 		reverseButton = root.findViewById(R.id.reverse);
+		fare = (TextView) root.findViewById(R.id.fare);
 		return root;
 	}
 	
@@ -72,6 +80,32 @@ public class FragmentPickStations extends Fragment implements IPrimary {
 			reverse();
 		}
 		return super.onOptionsItemSelected(item);
+	}
+	
+	private void findFare() {
+		fare.setVisibility(View.GONE);
+		ThreadHelper.getScheduler().submit(new Runnable() {
+			@Override
+			public void run() {
+				if(departureButton.getStation()!=null && arrivalButton.getStation()!=null) {
+					
+				} else {
+					return;
+				}
+				Map<String,Double> fares = ScheduleDao.get().getFairs(departureButton.getStation().getId(), arrivalButton.getStation().getId());
+				if(fares==null) {
+					return;
+				}
+				final String adult = DecimalFormat.getCurrencyInstance().format(fares.get("Adult"));
+				handler.post(new Runnable() {
+					@Override
+					public void run() {
+						fare.setText(adult);
+						fare.setVisibility(View.VISIBLE);
+					}
+				});
+			}
+		});
 	}
 	
 	@Override
@@ -95,6 +129,7 @@ public class FragmentPickStations extends Fragment implements IPrimary {
 			}
 		}
 		
+		findFare();
 		OnClickListener onClick = new OnClickListener() {
 
 			@Override
@@ -168,6 +203,7 @@ public class FragmentPickStations extends Fragment implements IPrimary {
 			} else {
 				departureButton.setStation(station);
 			}
+			findFare();
 		}
 	}
 	

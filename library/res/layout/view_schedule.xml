@@ -48,9 +48,9 @@
                         android:id="@+id/departs_in"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
                         android:layout_marginRight="3dp"
                         android:layout_toLeftOf="@+id/alarm"
-                        android:layout_centerVertical="true"
                         android:lines="1"
                         android:text="DEPARTS IN 1 MIN"
                         android:textColor="#F16364"
@@ -76,38 +76,23 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/time_container"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
         android:layout_marginLeft="12dp"
-        android:layout_marginRight="12dp"
-        android:layout_toRightOf="@+id/train_info_container"
-        android:orientation="horizontal" >
+        android:layout_marginRight="12dp" >
 
         <TextView
             android:id="@+id/depart"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:ellipsize="end"
-            android:gravity="right"
-            android:singleLine="true"
+            android:gravity="left"
             android:text="New York Penn Station" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text=">" />
-
-        <TextView
-            android:id="@+id/arrive"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:ellipsize="end"
-            android:singleLine="true"
-            android:text="Trenton Transit Center" />
     </LinearLayout>
 
     <RelativeLayout
-        android:id="@id/train_info_container"
+        android:id="@+id/train_info_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/train_info"

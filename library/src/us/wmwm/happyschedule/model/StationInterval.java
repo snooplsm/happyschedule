@@ -7,6 +7,8 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
+import org.json.JSONObject;
+
 
 public class StationInterval extends StationToStation {
 
@@ -20,6 +22,19 @@ public class StationInterval extends StationToStation {
 	public Schedule schedule;
 
 	private transient Boolean transfer;
+	
+	public StationInterval(JSONObject o) {
+		super(o);
+		level = o.optInt("level");
+		transferDuration = o.optInt("transferDuration");
+		arriveSequence = o.optInt("arriveSequence");
+		schedule = new Schedule(o.optJSONObject("schedule"));
+		transfer = isTransfer();		
+	}
+	
+	public StationInterval() {
+		super();
+	}
 
 	public int getTransferDuration() {
 		return transferDuration;

@@ -70,9 +70,10 @@ public class AlarmActivity extends FragmentActivity {
         Alarms.removeAlarm(this, alarm);
         notifs.cancel(alarm.getId().hashCode());
         StationToStation sts = alarm.getStationToStation();
-        scheduleView.setData(sts);
+        
         Station from = Db.get().getStop(sts.departId);
         Station to = Db.get().getStop(sts.arriveId);
+        scheduleView.setData(sts,from,to);
         getActionBar().setSubtitle(from.getName() + " to " + to.getName());
         if(!TextUtils.isEmpty(from.getDepartureVision())) {
         	getSupportFragmentManager().beginTransaction().replace(R.id.fragment_depareturevision, FragmentDepartureVision.newInstance(from,sts)).commit();
