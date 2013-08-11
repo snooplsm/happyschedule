@@ -10,5 +10,6 @@
     <string name="fragment_alarm_type_arrive">Arrival Alarm</string>
     <string name="fragment_alarm_type_depart">Departure Alarm</string>
     <string name="notif_alarm_dismiss">Dismiss</string>
+    <string name="amazon_app_key">3045443539525247434a305056575358</string>
 
 </resources>

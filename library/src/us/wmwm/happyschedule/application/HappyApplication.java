@@ -3,7 +3,10 @@ package us.wmwm.happyschedule.application;
 import java.util.Calendar;
 import java.util.List;
 
+import com.amazon.device.ads.AdRegistration;
+
 import us.wmwm.happyschedule.Alarms;
+import us.wmwm.happyschedule.R;
 import us.wmwm.happyschedule.ThreadHelper;
 import us.wmwm.happyschedule.model.Alarm;
 
@@ -17,6 +20,11 @@ public class HappyApplication extends Application {
 	public void onCreate() {
 		INSTANCE = this;
 		super.onCreate();
+		try {
+			AdRegistration.setAppKey(getString(R.string.amazon_app_key));
+		} catch (Exception e) {
+			
+		}
 		ThreadHelper.getScheduler().submit(new Runnable() {
 			@Override
 			public void run() {

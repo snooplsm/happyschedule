@@ -68,6 +68,7 @@ public class FragmentMain extends Fragment {
 			public void run() {
 				final FragmentMainAdapter fma = new FragmentMainAdapter(getFragmentManager());
 				pager.setAdapter(fma);
+				pager.setCurrentItem(1);
 				fma.setOnGetScheduleListener(new OnGetSchedule() {
 					
 					@Override

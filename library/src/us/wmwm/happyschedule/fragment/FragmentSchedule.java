@@ -101,6 +101,9 @@ public class FragmentSchedule extends Fragment {
 			}
 		});
 		
+		FragmentAmazonAd ad = new FragmentAmazonAd();
+		getFragmentManager().beginTransaction().replace(R.id.fragment_ad, ad).commit();
+		
 	}
 
 	public static FragmentSchedule newInstance(Station from, Station to) {
