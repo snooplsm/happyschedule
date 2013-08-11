@@ -93,8 +93,8 @@
 
         <TextView
             android:id="@+id/track"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="41dp"
+            android:layout_height="41dp"
             android:layout_alignParentRight="true"
             android:layout_centerInParent="true"
             android:background="@drawable/circle"
@@ -132,7 +132,7 @@
                     android:lines="1"
                     android:paddingLeft="3dp"
                     android:paddingRight="3dp"
-                    android:text="30 MIN LATE"
+                    android:visibility="gone"
                     android:textColor="#eaeaea"
                     android:textSize="13sp" />
             </LinearLayout>

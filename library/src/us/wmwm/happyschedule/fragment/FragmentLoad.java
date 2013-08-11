@@ -100,11 +100,11 @@ public class FragmentLoad extends Fragment {
 				File outputFile = null;
 				boolean isExternal = false;
 				if (isMediaMounted()) {
-					outputFile = getExternalFile(ctx);
+					outputFile = getExternalFile(ctx,"database.db");
 					outputFile.getParentFile().mkdirs();
 					isExternal = true;
 				} else {
-					outputFile = getInternalFile(ctx);
+					outputFile = getInternalFile(ctx, "database.db");
 				}
 
 				InputStream in = null;
@@ -163,29 +163,29 @@ public class FragmentLoad extends Fragment {
 			removeInstalledVersion(getActivity());
 		}
 		if (isMediaMounted()) {
-			File file = getExternalFile(ctx);
+			File file = getExternalFile(ctx,"database.db");
 			if (file.delete()) {
 				removeInstalledExternalVersion(getActivity());
 			}
 		}
 	}
 
-	public static File getFile(Context ctx) {
+	public static File getFile(Context ctx, String name) {
 		if(isExternal(ctx)) {
-			return getExternalFile(ctx);
+			return getExternalFile(ctx,name);
 		}
-		return getInternalFile(ctx);
+		return getInternalFile(ctx,name);
 	}
 	
-	private static File getInternalFile(Context ctx) {
+	private static File getInternalFile(Context ctx, String name) {
 		return new File(ctx.getFilesDir(),
 				"database.db");
 	}
 	
-	private static File getExternalFile(Context ctx) {
+	private static File getExternalFile(Context ctx, String name) {
 		return new File(Environment.getExternalStorageDirectory(),
 				"Android/data/" + ctx.getPackageName()
-						+ "/databases/database.db");
+						+ "/databases/" + name);
 	}
 
 	private boolean isMediaMounted() {

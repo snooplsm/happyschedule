@@ -5,6 +5,7 @@ import org.json.JSONArray;
 import us.wmwm.happyschedule.application.HappyApplication;
 import us.wmwm.happyschedule.dao.Db;
 import us.wmwm.happyschedule.fragment.FragmentDepartureVision;
+import us.wmwm.happyschedule.fragment.FragmentHistory;
 import us.wmwm.happyschedule.fragment.FragmentPickStations;
 import us.wmwm.happyschedule.fragment.IPrimary;
 import us.wmwm.happyschedule.fragment.FragmentPickStations.OnGetSchedule;
@@ -59,29 +60,33 @@ public class FragmentMainAdapter extends FragmentStatePagerAdapter {
 	}
 
 	Object last;
-	
+
 	@Override
 	public void setPrimaryItem(ViewGroup container, int position, Object object) {
 		super.setPrimaryItem(container, position, object);
-		if(object!=last) {
+		if (object != last) {
 			last = object;
-			if(object instanceof IPrimary) {
-				((IPrimary)object).setPrimaryItem();
+			if (object instanceof IPrimary) {
+				((IPrimary) object).setPrimaryItem();
 			}
 		}
 	}
-	
+
 	@Override
 	public Fragment getItem(int pos) {
 		int count = getCount();
 		if (pos == 0) {
+			FragmentHistory history = new FragmentHistory();
+			return history;
+		}
+		if (pos == 1) {
 			FragmentPickStations pick = new FragmentPickStations();
 			pick.setOnGetSchedule(onGetSchedule);
 			return pick;
 		}
 		Station station = getDepartureVision(pos);
-		FragmentDepartureVision dv = FragmentDepartureVision
-				.newInstance(station,null);
+		FragmentDepartureVision dv = FragmentDepartureVision.newInstance(
+				station, null);
 		dv.setOnStationSelected(onStationSelected);
 		return dv;
 	}
@@ -102,13 +107,19 @@ public class FragmentMainAdapter extends FragmentStatePagerAdapter {
 		} catch (Exception e) {
 			departureVisions = new JSONArray();
 		}
-		return 1 + (departureVisions.length() == 0 ? 1 : departureVisions
+		return 2 + (departureVisions.length() == 0 ? 1 : departureVisions
 				.length());
 	}
 
 	@Override
 	public CharSequence getPageTitle(int position) {
-		if (position > 0) {
+		if (position == 0) {
+			return "History";
+		}
+		if (position == 1) {
+			return "Schedule";
+		}
+		if (position > 1) {
 			Station station = getDepartureVision(position);
 			if (station == null) {
 				return "Departurevision";

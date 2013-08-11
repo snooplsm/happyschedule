@@ -8,6 +8,7 @@ import us.wmwm.happyschedule.ThreadHelper;
 import us.wmwm.happyschedule.activity.ActivityPickStation;
 import us.wmwm.happyschedule.dao.Db;
 import us.wmwm.happyschedule.dao.ScheduleDao;
+import us.wmwm.happyschedule.dao.WDb;
 import us.wmwm.happyschedule.model.Station;
 import us.wmwm.happyschedule.views.StationButton;
 import android.app.Activity;
@@ -17,6 +18,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -175,12 +177,19 @@ public class FragmentPickStations extends Fragment implements IPrimary {
 		OnClickListener onClickGetSchedule = new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Station depart = departureButton.getStation();
-				Station arrive = arrivalButton.getStation();
+				final Station depart = departureButton.getStation();
+				final Station arrive = arrivalButton.getStation();
 				PreferenceManager.getDefaultSharedPreferences(getActivity()).edit().
 				putString("lastDepartId", depart.getId()).
 				putString("lastArriveId", arrive.getId()).commit();
 				onGetSchedule.onGetSchedule(depart, arrive);
+				ThreadHelper.getScheduler().submit(new Runnable() {
+					@Override
+					public void run() {
+						WDb.get().saveHistory(depart, arrive);
+						Log.d(getClass().getSimpleName(), "saving history " + depart + " to " + arrive);
+					}
+				});
 			}
 		};
 		
