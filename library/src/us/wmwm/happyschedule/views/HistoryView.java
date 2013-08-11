@@ -1,5 +1,8 @@
 package us.wmwm.happyschedule.views;
 
+import java.text.DateFormat;
+import java.util.Calendar;
+
 import us.wmwm.happyschedule.R;
 import us.wmwm.happyschedule.dao.Db;
 import android.content.Context;
@@ -12,12 +15,15 @@ public class HistoryView extends RelativeLayout {
 
 	TextView from;
 	TextView to;
+	DateFormat TIME = DateFormat.getTimeInstance(DateFormat.SHORT);
+	TextView time;
 	
 	public HistoryView(Context ctx) {
 		super(ctx);
 		LayoutInflater.from(ctx).inflate(R.layout.view_history, this);
 		from = (TextView) findViewById(R.id.from);
 		to = (TextView) findViewById(R.id.to);
+		time = (TextView) findViewById(R.id.time);
 	}
 	
 	public void setData(Cursor cursor) {
@@ -32,6 +38,11 @@ public class HistoryView extends RelativeLayout {
 		} catch (Exception e) {
 			
 		}
+		
+		Calendar cal = Calendar.getInstance();
+		cal.setTimeInMillis(cursor.getLong(2));
+		time.setText(TIME.format(cal.getTime()));
+		
 	}
 	
 }
