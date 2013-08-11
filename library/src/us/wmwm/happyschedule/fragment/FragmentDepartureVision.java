@@ -428,7 +428,7 @@ public class FragmentDepartureVision extends Fragment implements IPrimary, ISeco
 				if (poll != null) {
 					poll.cancel(true);
 				}
-				if(canLoad) {
+				if(canLoad && station!=null) {
 					poll = ThreadHelper.getScheduler().scheduleAtFixedRate(r, 100,
 							10000, TimeUnit.MILLISECONDS);
 				}
@@ -453,7 +453,7 @@ public class FragmentDepartureVision extends Fragment implements IPrimary, ISeco
 			}
 			if (info != null && info.isConnected()) {
 				erroText.setVisibility(View.GONE);
-				if (poll == null || poll.isCancelled()) {
+				if ((poll == null || poll.isCancelled()) && station!=null) {
 					poll = ThreadHelper.getScheduler().scheduleAtFixedRate(r,
 							100, 10000, TimeUnit.MILLISECONDS);
 				}

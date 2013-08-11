@@ -11,5 +11,6 @@
     <string name="fragment_alarm_type_depart">Departure Alarm</string>
     <string name="notif_alarm_dismiss">Dismiss</string>
     <string name="amazon_app_key">3045443539525247434a305056575358</string>
+    <string name="admob_app_key">a14cbf2b9d15c90</string>
 
 </resources>

@@ -47,7 +47,9 @@
             android:screenOrientation="nosensor"
             android:showOnLockScreen="true" >
         </activity>
-        <activity android:name="com.amazon.device.ads.AdActivity" android:configChanges="keyboardHidden|orientation|screenSize"/> 
+        <activity android:name="com.amazon.device.ads.AdActivity" android:configChanges="keyboardHidden|orientation|screenSize"/>
+        <activity android:name="com.google.ads.AdActivity"
+              android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"/> 
         <service android:name="us.wmwm.happyschedule.service.HappyScheduleService" >
         </service>
     </application>

@@ -102,6 +102,7 @@ public class FragmentSchedule extends Fragment {
 		});
 		
 		FragmentAmazonAd ad = new FragmentAmazonAd();
+		FragmentGoogleAd gad = new FragmentGoogleAd();
 		getFragmentManager().beginTransaction().replace(R.id.fragment_ad, ad).commit();
 		
 	}

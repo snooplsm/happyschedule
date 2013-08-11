@@ -22,17 +22,21 @@ import android.widget.FrameLayout;
 
 import com.amazon.device.ads.AdError;
 import com.amazon.device.ads.AdLayout;
-import com.amazon.device.ads.AdListener;
 import com.amazon.device.ads.AdProperties;
-import com.amazon.device.ads.AdTargetingOptions;
+import com.google.ads.Ad;
+import com.google.ads.AdListener;
+import com.google.ads.AdRequest;
+import com.google.ads.AdRequest.ErrorCode;
+import com.google.ads.AdSize;
+import com.google.ads.AdView;
 
-public class FragmentAmazonAd extends Fragment implements AdListener {
+public class FragmentGoogleAd extends Fragment implements AdListener {
 
 	private ViewGroup adViewContainer; // View group to which the ad view will
 										// be added
-	private AdLayout currentAdView; // The ad that is currently visible to the
+	private AdView currentAdView; // The ad that is currently visible to the
 									// user
-	private AdLayout nextAdView; // A placeholder for the next ad so we can keep
+	private AdView nextAdView; // A placeholder for the next ad so we can keep
 									// the current ad visible while the next ad
 									// loads
 
@@ -56,7 +60,11 @@ public class FragmentAmazonAd extends Fragment implements AdListener {
 	private void LoadAd() {
 		if (nextAdView == null) { // Create and configure a new ad if the next
 									// ad doesn't currently exist
-			nextAdView = new AdLayout(getActivity());
+			try {
+				nextAdView = new AdView(getActivity(),AdSize.SMART_BANNER,getString(R.string.admob_app_key));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 			LayoutParams layoutParams = new FrameLayout.LayoutParams(
 					LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT,
 					Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL);
@@ -77,12 +85,11 @@ public class FragmentAmazonAd extends Fragment implements AdListener {
 			nextAdView.setLayoutParams(layoutParams);
 			// Register our ad handler that will receive call-backs for state
 			// changes during the ad life cycle
-			nextAdView.setListener(this);
+			nextAdView.setAdListener(this);
 		}
 
 		// Load the ad with the appropriate ad options.
-		AdTargetingOptions adOptions = new AdTargetingOptions();
-		nextAdView.loadAd(adOptions);
+		nextAdView.loadAd(new AdRequest());
 	}
 
 	@Override
@@ -117,7 +124,7 @@ public class FragmentAmazonAd extends Fragment implements AdListener {
 		if(newAdFuture!=null) {
 			newAdFuture.cancel(true);
 		}
-		newAdFuture = ThreadHelper.getScheduler().scheduleAtFixedRate(loadAd, 10000, 10000, TimeUnit.MILLISECONDS);
+		newAdFuture = ThreadHelper.getScheduler().scheduleAtFixedRate(newAdRequest, 10000, 10000, TimeUnit.MILLISECONDS);
 	}
 
 	@Override
@@ -129,27 +136,7 @@ public class FragmentAmazonAd extends Fragment implements AdListener {
 	}
 
 	@Override
-	public void onAdCollapsed(AdLayout arg0) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void onAdExpanded(AdLayout arg0) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void onAdFailedToLoad(AdLayout arg0, AdError arg1) {
-		// TODO Auto-generated method stub
-		Log.d(getClass().getSimpleName(),
-				"onAdFailedToLoad " + arg1.getMessage());
-	}
-
-	@Override
-	public void onAdLoaded(AdLayout ad, AdProperties arg1) {
-
+	public void onReceiveAd(Ad arg0) {
 		Activity a = getActivity();
 		if (a == null) {
 			return;
@@ -199,7 +186,7 @@ public class FragmentAmazonAd extends Fragment implements AdListener {
 
 	private void ShowNextAd() {
 		adViewContainer.removeView(currentAdView);
-		AdLayout tmp = currentAdView;
+		AdView tmp = currentAdView;
 		currentAdView = nextAdView;
 		nextAdView = tmp;
 		ShowCurrentAd();
@@ -215,4 +202,29 @@ public class FragmentAmazonAd extends Fragment implements AdListener {
 				a, R.anim.slide_up);
 		currentAdView.startAnimation(slideUp);
 	}
+
+	@Override
+	public void onDismissScreen(Ad arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onFailedToReceiveAd(Ad arg0, ErrorCode arg1) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onLeaveApplication(Ad arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onPresentScreen(Ad arg0) {
+		// TODO Auto-generated method stub
+		
+	}
 }
+
