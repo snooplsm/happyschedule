@@ -92,4 +92,13 @@ public class TrainStatus implements Serializable {
 		return o;
 	}
 
+	@Override
+	public String toString() {
+		return "TrainStatus [departs=" + departs + ", train=" + train
+				+ ", dest=" + dest + ", line=" + line + ", track=" + track
+				+ ", status=" + status + "]";
+	}
+	
+	
+
 }

@@ -145,6 +145,13 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 			progressBar.setVisibility(View.GONE);
 		}
 	};
+	
+	Runnable updateEverySixtySeconds = new Runnable() {
+		public void run() {
+			Log.d(FragmentDaySchedule.class.getSimpleName(), "updating schedule view");
+			handler.post(populateAdpter);
+		};
+	};
 
 	View progressBar;
 
@@ -152,10 +159,10 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 		@Override
 		public void run() {
 			try {
-				System.out.println("getting train statuses");
+				Log.d(FragmentDaySchedule.class.getSimpleName(), "getting train statuses");
 				final List<TrainStatus> s = poller.getTrainStatuses(from
 						.getDepartureVision());
-				System.out.println("got train statuses: " + s.size());
+				Log.d(FragmentDaySchedule.class.getSimpleName(), "got train statuses: " + s.size());
 				String key = getKey();
 				if (s != null && !s.isEmpty()) {
 					JSONArray a = new JSONArray();
@@ -174,7 +181,7 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 										System.currentTimeMillis()).commit();
 					}
 					for(TrainStatus status : s) {
-						System.out.println(status.getTrain() + " : " + status.getStatus());
+						Log.d(FragmentDaySchedule.class.getSimpleName(),status.getTrain() + " : " + status.getStatus());
 						tripIdToTrainStatus.put(status.getTrain(), status);
 					}
 					lastStatuses = s;
@@ -301,8 +308,9 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 
 					}
 				}
-
+				updateSchedulePeriodically();
 			}
+			
 		};
 		loadScheduleFuture = ThreadHelper.getScheduler().submit(load);
 	}
@@ -524,7 +532,7 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 				StationToStation sts = getItem(position);
 				view.setData(sts,from,to);
 				view.setAlarm(tripIdToAlarm.get(sts));
-				view.setStatus(tripIdToTrainStatus.get(sts.tripId));
+				view.setStatus(tripIdToTrainStatus.get(sts.blockId));
 				return view;
 			}
 
@@ -576,6 +584,12 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 		if (loadScheduleFuture != null) {
 			loadScheduleFuture.cancel(true);
 		}
+		if(poll!=null) {
+			poll.cancel(true);
+		}
+		if(updateScheduleFuture!=null) {
+			updateScheduleFuture.cancel(true);
+		}
 		super.onDestroy();
 
 	}
@@ -597,6 +611,9 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 		if (poll != null) {
 			poll.cancel(true);
 		}
+		if(updateScheduleFuture!=null) {
+			updateScheduleFuture.cancel(true);
+		}
 	}
 
 	@Override
@@ -608,6 +625,8 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 			menu.removeItem(R.id.menu_go_to_next_train);
 		}
 	}
+	
+	Future<?> updateScheduleFuture;
 
 	@Override
 	public void onResume() {
@@ -621,12 +640,30 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 						android.net.ConnectivityManager.CONNECTIVITY_ACTION));
 		if (!DateUtils.isToday(day.getTime())) {
 			return;
+		} else {
+			updateSchedulePeriodically();
 		}
 		NetworkInfo i = manager.getActiveNetworkInfo();
 		if (i != null && i.isConnected() && canLoad) {
 			poll = ThreadHelper.getScheduler().scheduleAtFixedRate(r, 100,
 					10000, TimeUnit.MILLISECONDS);
 		}
+	}
+	
+	private void updateSchedulePeriodically() {
+		if(updateScheduleFuture!=null) {
+			updateScheduleFuture.cancel(true);
+		}
+		if(o==null) {
+			return;
+		}
+		Calendar now = Calendar.getInstance();
+		Calendar later = Calendar.getInstance();
+		later.add(Calendar.MINUTE, 1);
+		later.set(Calendar.SECOND, 0);
+		later.set(Calendar.MILLISECOND, 0);
+		Log.d(FragmentDaySchedule.class.getSimpleName(), "updateScheduleFuture delay : " + (later.getTimeInMillis() - now.getTimeInMillis()));
+		updateScheduleFuture = ThreadHelper.getScheduler().scheduleAtFixedRate(updateEverySixtySeconds, later.getTimeInMillis()-now.getTimeInMillis(), 60000, TimeUnit.MILLISECONDS);
 	}
 
 	public void setOnDateChange(OnDateChange onDateChange) {
@@ -644,6 +681,12 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 	public void setSecondary() {
 		if (loadScheduleFuture != null) {
 			loadScheduleFuture.cancel(true);
+		}
+		if(poll!=null) {
+			poll.cancel(true);
+		}
+		if(updateScheduleFuture!=null) {
+			updateScheduleFuture.cancel(true);
 		}
 	}
 

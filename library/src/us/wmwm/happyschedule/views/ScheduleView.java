@@ -28,6 +28,7 @@ public class ScheduleView extends RelativeLayout {
 	TextView duration;
 	TextView train;
 	TextView track;
+	View lineIndicator;
 	TextView depart;
 	View alarm;
 
@@ -47,8 +48,10 @@ public class ScheduleView extends RelativeLayout {
 		timeTillDepart = (TextView) findViewById(R.id.departs_in);
 		duration = (TextView) findViewById(R.id.duration);
 		train = (TextView) findViewById(R.id.trip_id);
+		track = (TextView) findViewById(R.id.track);
 		alarm = findViewById(R.id.alarm);
 		depart = (TextView) findViewById(R.id.depart);
+		lineIndicator = findViewById(R.id.line_indicator);
 		bg = getBackground();
 	}
 
@@ -104,9 +107,22 @@ public class ScheduleView extends RelativeLayout {
 	}
 
 	public void setStatus(TrainStatus trainStatus) {
+		track.setVisibility(View.GONE);
+		status.setVisibility(View.GONE);
 		if (trainStatus != null) {
-			status.setVisibility(View.VISIBLE);
-			status.setText(trainStatus.getStatus());
+			if(!TextUtils.isEmpty(trainStatus.getStatus())) {
+				status.setVisibility(View.VISIBLE);
+				status.setText(trainStatus.getStatus());
+			} else {
+				status.setVisibility(View.GONE);
+			}
+			
+			if(!TextUtils.isEmpty(trainStatus.getTrack()) ) {
+				track.setVisibility(View.VISIBLE);
+				track.setText(trainStatus.getTrack().trim());
+			} else {
+				track.setVisibility(View.GONE);
+			}
 		} else {
 			status.setVisibility(View.GONE);
 		}

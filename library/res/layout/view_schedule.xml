@@ -71,111 +71,107 @@
         </RelativeLayout>
     </RelativeLayout>
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/train_info"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/time_container"
-        android:paddingTop="4dp"
-        android:paddingBottom="4dp"
         android:layout_marginLeft="12dp"
-        android:layout_marginRight="12dp" >
+        android:layout_marginRight="12dp"
+        android:paddingBottom="4dp"
+        android:paddingTop="4dp" >
 
         <TextView
             android:id="@+id/depart"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:textSize="14sp"
             android:ellipsize="end"
             android:gravity="left"
             android:text="New York Penn Station" />
-    </LinearLayout>
 
-    <RelativeLayout
-        android:id="@+id/train_info_container"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/train_info"
-        android:layout_marginLeft="6dp"
-        android:layout_marginRight="6dp" >
-
-        <RelativeLayout
-            android:id="@+id/line_indicator"
+        <TextView
+            android:id="@+id/track"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:background="#F16364"
-            android:visibility="gone" >
+            android:layout_alignParentRight="true"
+            android:layout_centerInParent="true"
+            android:background="@drawable/circle"
+            android:gravity="center"
+            android:text=""
+            android:textColor="#eaeaea"
+            android:textSize="24dp" />
 
-            <TextView
-                android:id="@+id/acronym"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:gravity="center"
-                android:text="14"
-                android:textColor="#eaeaea"
-                android:textSize="24dp" />
         </RelativeLayout>
-
-        <LinearLayout
-            android:id="@+id/status_container"
+        
+        <RelativeLayout
+            android:id="@+id/train_info_container"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:layout_below="@id/line_indicator"
-            android:orientation="horizontal" >
+            android:layout_below="@id/train_info"
+            android:layout_marginLeft="6dp"
+            android:layout_marginRight="6dp" >
 
-            <TextView
-                android:id="@+id/status"
+            <LinearLayout
+                android:id="@+id/status_container"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
-                android:layout_marginTop="3dp"
-                android:background="#aaa"
-                android:lines="1"
-                android:paddingLeft="3dp"
-                android:paddingRight="3dp"
-                android:text="30 MIN LATE"
-                android:textColor="#eaeaea"
-                android:textSize="12dp" />
-        </LinearLayout>
+                android:layout_below="@id/train_info"
+                android:orientation="horizontal" >
 
-        <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_below="@id/line_indicator"
-            android:layout_marginLeft="6dp"
-            android:layout_marginRight="6dp" >
+                <TextView
+                    android:id="@+id/status"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginTop="3dp"
+                    android:background="#aaa"
+                    android:lines="1"
+                    android:paddingLeft="3dp"
+                    android:paddingRight="3dp"
+                    android:text="30 MIN LATE"
+                    android:textColor="#eaeaea"
+                    android:textSize="13sp" />
+            </LinearLayout>
 
-            <TextView
-                android:id="@+id/duration"
+            <RelativeLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
-                android:layout_marginTop="3dp"
-                android:lines="1"
-                android:text="93 min"
-                android:textSize="12dp" />
-        </RelativeLayout>
+                android:layout_below="@id/train_info"
+                android:layout_marginLeft="6dp"
+                android:layout_marginRight="6dp" >
 
-        <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/line_indicator"
-            android:layout_centerHorizontal="true"
-            android:layout_marginLeft="6dp"
-            android:layout_marginRight="6dp" >
+                <TextView
+                    android:id="@+id/duration"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_marginTop="3dp"
+                    android:lines="1"
+                    android:text="93 min"
+                    android:textSize="13sp" />
+            </RelativeLayout>
 
-            <TextView
-                android:id="@+id/trip_id"
+            <RelativeLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="3dp"
-                android:lines="1"
-                android:text="3289"
-                android:textSize="12dp" />
+                android:layout_below="@id/train_info"
+                android:layout_centerHorizontal="true"
+                android:layout_marginLeft="6dp"
+                android:layout_marginRight="6dp" >
+
+                <TextView
+                    android:id="@+id/trip_id"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:lines="1"
+                    android:text="3289"
+                    android:textSize="12dp" />
+            </RelativeLayout>
         </RelativeLayout>
     </RelativeLayout>
-
-</RelativeLayout>
