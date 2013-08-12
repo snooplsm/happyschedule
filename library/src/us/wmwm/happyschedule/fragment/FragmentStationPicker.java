@@ -1,15 +1,11 @@
 package us.wmwm.happyschedule.fragment;
 
 import us.wmwm.happyschedule.R;
-import us.wmwm.happyschedule.R.dimen;
-import us.wmwm.happyschedule.R.id;
-import us.wmwm.happyschedule.R.layout;
 import us.wmwm.happyschedule.adapter.StationAdapter;
 import us.wmwm.happyschedule.dao.Db;
 import us.wmwm.happyschedule.views.OnStationSelectedListener;
 import us.wmwm.happyschedule.views.StationView;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +16,7 @@ import com.emilsjolander.components.stickylistheaders.StickyListHeadersListView;
 import com.happytap.jumper.JumpListener;
 import com.happytap.jumper.JumpView;
 
-public class FragmentStationPicker extends Fragment {
+public class FragmentStationPicker extends HappyFragment {
 	
 	StickyListHeadersListView list;
 	

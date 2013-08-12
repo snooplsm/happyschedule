@@ -1,8 +1,6 @@
 package us.wmwm.happyschedule.activity;
 
 import us.wmwm.happyschedule.R;
-import us.wmwm.happyschedule.R.id;
-import us.wmwm.happyschedule.R.layout;
 import us.wmwm.happyschedule.fragment.FragmentStationPicker;
 import us.wmwm.happyschedule.model.Station;
 import us.wmwm.happyschedule.views.OnStationSelectedListener;
@@ -10,9 +8,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 
-public class ActivityPickStation extends FragmentActivity {
+public class ActivityPickStation extends HappyActivity {
 
 	FragmentStationPicker picker;
 

@@ -10,10 +10,6 @@ import java.util.zip.ZipInputStream;
 
 import us.wmwm.happyschedule.R;
 import us.wmwm.happyschedule.ThreadHelper;
-import us.wmwm.happyschedule.R.id;
-import us.wmwm.happyschedule.R.layout;
-import us.wmwm.happyschedule.R.raw;
-
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -21,7 +17,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -33,7 +28,7 @@ import android.widget.ImageView;
 import com.larvalabs.svgandroid.SVG;
 import com.larvalabs.svgandroid.SVGParser;
 
-public class FragmentLoad extends Fragment {
+public class FragmentLoad extends HappyFragment {
 
 	Future<?> loadFuture;
 	

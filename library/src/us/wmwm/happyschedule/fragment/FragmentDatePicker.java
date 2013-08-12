@@ -3,12 +3,8 @@ package us.wmwm.happyschedule.fragment;
 import java.util.Date;
 
 import us.wmwm.happyschedule.R;
-import us.wmwm.happyschedule.R.id;
-import us.wmwm.happyschedule.R.layout;
 import us.wmwm.happyschedule.dao.ScheduleDao;
-
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -18,7 +14,7 @@ import android.view.ViewGroup;
 import com.squareup.timessquare.CalendarPickerView;
 import com.squareup.timessquare.CalendarPickerView.OnDateSelectedListener;
 
-public class FragmentDatePicker extends Fragment {
+public class FragmentDatePicker extends HappyFragment {
 
 	CalendarPickerView calendar;
 	

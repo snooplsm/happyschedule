@@ -8,7 +8,6 @@ import us.wmwm.happyschedule.ThreadHelper;
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -26,7 +25,7 @@ import com.amazon.device.ads.AdListener;
 import com.amazon.device.ads.AdProperties;
 import com.amazon.device.ads.AdTargetingOptions;
 
-public class FragmentAmazonAd extends Fragment implements AdListener {
+public class FragmentAmazonAd extends HappyFragment implements AdListener {
 
 	private ViewGroup adViewContainer; // View group to which the ad view will
 										// be added

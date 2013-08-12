@@ -8,7 +8,6 @@ import us.wmwm.happyschedule.ThreadHelper;
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -20,9 +19,6 @@ import android.view.animation.Animation.AnimationListener;
 import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
 
-import com.amazon.device.ads.AdError;
-import com.amazon.device.ads.AdLayout;
-import com.amazon.device.ads.AdProperties;
 import com.google.ads.Ad;
 import com.google.ads.AdListener;
 import com.google.ads.AdRequest;
@@ -30,7 +26,7 @@ import com.google.ads.AdRequest.ErrorCode;
 import com.google.ads.AdSize;
 import com.google.ads.AdView;
 
-public class FragmentGoogleAd extends Fragment implements AdListener {
+public class FragmentGoogleAd extends HappyFragment implements AdListener {
 
 	private ViewGroup adViewContainer; // View group to which the ad view will
 										// be added

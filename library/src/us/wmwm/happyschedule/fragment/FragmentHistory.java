@@ -10,7 +10,6 @@ import us.wmwm.happyschedule.views.HistoryView;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.widget.CursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,7 +19,7 @@ import android.view.ViewGroup.LayoutParams;
 import com.emilsjolander.components.stickylistheaders.StickyListHeadersAdapter;
 import com.emilsjolander.components.stickylistheaders.StickyListHeadersListView;
 
-public class FragmentHistory extends Fragment {
+public class FragmentHistory extends HappyFragment {
 
 	StickyListHeadersListView list;
 	
@@ -67,9 +66,9 @@ public class FragmentHistory extends Fragment {
 
 		@Override
 		public long getHeaderId(int position) {
-			Cursor cursor = (Cursor) getItem(position);
+			Cursor cursor = getItem(position);
 			Calendar cal = Calendar.getInstance();
-			cal.setTimeInMillis(position);
+			cal.setTimeInMillis(cursor.getLong(2));
 			cal.set(Calendar.HOUR_OF_DAY, 0);
 			cal.set(Calendar.MINUTE,0);
 			cal.set(Calendar.SECOND, 0);

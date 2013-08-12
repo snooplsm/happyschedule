@@ -1,17 +1,13 @@
 package us.wmwm.happyschedule.activity;
 
 import us.wmwm.happyschedule.R;
-import us.wmwm.happyschedule.R.id;
-import us.wmwm.happyschedule.R.layout;
-import us.wmwm.happyschedule.R.menu;
 import us.wmwm.happyschedule.fragment.FragmentLoad;
-import us.wmwm.happyschedule.fragment.FragmentMain;
 import us.wmwm.happyschedule.fragment.FragmentLoad.OnLoadListener;
+import us.wmwm.happyschedule.fragment.FragmentMain;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
 
-public class MainActivity extends FragmentActivity {
+public class MainActivity extends HappyActivity {
 
 	FragmentLoad fragmentLoad;
 

@@ -5,9 +5,6 @@ import java.util.UUID;
 
 import us.wmwm.happyschedule.Alarms;
 import us.wmwm.happyschedule.R;
-import us.wmwm.happyschedule.R.id;
-import us.wmwm.happyschedule.R.layout;
-import us.wmwm.happyschedule.R.string;
 import us.wmwm.happyschedule.dao.Db;
 import us.wmwm.happyschedule.fragment.FragmentDepartureVision;
 import us.wmwm.happyschedule.model.Alarm;
@@ -19,15 +16,14 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.MenuItem;
 import android.view.Window;
 import android.view.WindowManager;
 
-public class AlarmActivity extends FragmentActivity {
+public class AlarmActivity extends HappyActivity {
 
 	Integer mVolumeBehavior;
 	

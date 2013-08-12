@@ -18,10 +18,6 @@ import org.json.JSONObject;
 
 import us.wmwm.happyschedule.R;
 import us.wmwm.happyschedule.ThreadHelper;
-import us.wmwm.happyschedule.R.id;
-import us.wmwm.happyschedule.R.layout;
-import us.wmwm.happyschedule.R.menu;
-import us.wmwm.happyschedule.R.raw;
 import us.wmwm.happyschedule.activity.ActivityPickStation;
 import us.wmwm.happyschedule.adapter.DepartureVisionAdapter;
 import us.wmwm.happyschedule.application.HappyApplication;
@@ -31,7 +27,6 @@ import us.wmwm.happyschedule.model.StationToStation;
 import us.wmwm.happyschedule.model.TrainStatus;
 import us.wmwm.happyschedule.service.DeparturePoller;
 import us.wmwm.happyschedule.views.OnStationSelectedListener;
-
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -42,7 +37,6 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -53,7 +47,7 @@ import android.view.ViewGroup;
 
 import com.emilsjolander.components.stickylistheaders.StickyListHeadersListView;
 
-public class FragmentDepartureVision extends Fragment implements IPrimary, ISecondary {
+public class FragmentDepartureVision extends HappyFragment implements IPrimary, ISecondary {
 
 	StickyListHeadersListView list;
 	View stationSelect;

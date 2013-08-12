@@ -9,12 +9,8 @@ import java.util.concurrent.TimeUnit;
 
 import us.wmwm.happyschedule.R;
 import us.wmwm.happyschedule.ThreadHelper;
-import us.wmwm.happyschedule.R.id;
-import us.wmwm.happyschedule.R.layout;
-import us.wmwm.happyschedule.R.string;
 import us.wmwm.happyschedule.model.StationToStation;
 import us.wmwm.happyschedule.model.Type;
-
 import android.app.Dialog;
 import android.os.Bundle;
 import android.os.Handler;

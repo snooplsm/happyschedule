@@ -3,11 +3,7 @@ package us.wmwm.happyschedule.fragment;
 import java.util.Date;
 
 import us.wmwm.happyschedule.R;
-import us.wmwm.happyschedule.R.id;
-import us.wmwm.happyschedule.R.layout;
-import us.wmwm.happyschedule.R.menu;
 import us.wmwm.happyschedule.model.Station;
-
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;

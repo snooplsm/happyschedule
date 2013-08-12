@@ -31,6 +31,8 @@ public class ScheduleView extends RelativeLayout {
 	View lineIndicator;
 	TextView depart;
 	View alarm;
+	View trainInfoContainer;
+	RelativeLayout.LayoutParams trainInfoContainerParams;
 
 	static DateFormat TIME = DateFormat.getTimeInstance(DateFormat.SHORT);
 
@@ -52,6 +54,8 @@ public class ScheduleView extends RelativeLayout {
 		alarm = findViewById(R.id.alarm);
 		depart = (TextView) findViewById(R.id.depart);
 		lineIndicator = findViewById(R.id.line_indicator);
+		trainInfoContainer = findViewById(R.id.train_info_container);
+		trainInfoContainerParams = (RelativeLayout.LayoutParams) trainInfoContainer.getLayoutParams();
 		bg = getBackground();
 	}
 
@@ -109,19 +113,22 @@ public class ScheduleView extends RelativeLayout {
 	public void setStatus(TrainStatus trainStatus) {
 		track.setVisibility(View.GONE);
 		status.setVisibility(View.GONE);
+		trainInfoContainerParams.addRule(RelativeLayout.BELOW, R.id.train_info);
 		if (trainStatus != null) {
 			if(!TextUtils.isEmpty(trainStatus.getStatus())) {
 				status.setVisibility(View.VISIBLE);
 				status.setText(trainStatus.getStatus());
+				trainInfoContainerParams.addRule(RelativeLayout.BELOW, R.id.train_info);
 			} else {
 				status.setVisibility(View.GONE);
+				trainInfoContainerParams.addRule(RelativeLayout.BELOW, R.id.track);
 			}
 			
 			if(!TextUtils.isEmpty(trainStatus.getTrack()) ) {
 				track.setVisibility(View.VISIBLE);
 				track.setText(trainStatus.getTrack().trim());
 			} else {
-				track.setVisibility(View.GONE);
+				track.setVisibility(View.INVISIBLE);
 			}
 		} else {
 			status.setVisibility(View.GONE);
