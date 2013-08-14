@@ -5,6 +5,8 @@ import java.util.List;
 
 import us.wmwm.happyschedule.R;
 import us.wmwm.happyschedule.model.Alarm;
+import us.wmwm.happyschedule.model.Schedule;
+import us.wmwm.happyschedule.model.StationToStation;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,24 +16,16 @@ public class ScheduleControlsView extends LinearLayout {
 
 	
 	public interface ScheduleControlListener {
+		void onFavorite();
+		void onPin();
 		void onTimer();
 		void onTimerCancel(Alarm alarm);
-		void onTrips();
-		void onPin();
-		void onFavorite();
+		void onTrips(Schedule schedule, StationToStation stationToStation);
 	}
 	
-	View pin;
-	View trips;
 	View addTimer;
-	
 	LinearLayout alarms;
-	
 	ScheduleControlListener listener;
-	
-	public void setListener(ScheduleControlListener listener) {
-		this.listener = listener;
-	}
 	
 	OnClickListener onClick = new OnClickListener() {
 		public void onClick(View v) {
@@ -39,13 +33,20 @@ public class ScheduleControlsView extends LinearLayout {
 				listener.onPin();
 			}
 			if(v==trips) {
-				listener.onTrips();
+				listener.onTrips(schedule, stationToStation);
 			}
 			if(v==addTimer) {
 				listener.onTimer();
 			}
 		};
 	};
+	
+	View pin;
+	
+	Schedule schedule;
+	StationToStation stationToStation;
+	
+	View trips;
 	
 	public ScheduleControlsView(Context context) {
 		super(context);
@@ -59,7 +60,9 @@ public class ScheduleControlsView extends LinearLayout {
 		alarms = (LinearLayout) findViewById(R.id.alarms);
 	}
 	
-	public void setData(List<Alarm> alarms) {
+	public void setData(List<Alarm> alarms, Schedule schedule, StationToStation sts) {
+		this.schedule = schedule;
+		this.stationToStation = sts;
 		if(alarms==null) {
 			this.alarms.removeAllViews();
 			return;
@@ -70,6 +73,10 @@ public class ScheduleControlsView extends LinearLayout {
 			this.alarms.addView(alarmView);
 			alarmView.setData(alarm);
 		}
+	}
+	
+	public void setListener(ScheduleControlListener listener) {
+		this.listener = listener;
 	}
 
 	

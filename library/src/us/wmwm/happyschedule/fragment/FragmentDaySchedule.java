@@ -106,6 +106,8 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 	Station from;
 
 	Handler handler = new Handler();
+	
+	Schedule schedule;
 
 	List<StationToStation> k = null;
 
@@ -233,7 +235,6 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 				final Calendar tomorrow = Calendar.getInstance();
 				tomorrow.setTime(day);
 				tomorrow.add(Calendar.DAY_OF_YEAR, 1);
-				Schedule schedule = null;
 				try {
 					schedule = ScheduleDao.get().getSchedule(from.getId(),
 							to.getId(), day, day);
@@ -458,13 +459,12 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 						}
 
 						@Override
-						public void onTrips() {
-							// TODO Auto-generated method stub
-
+						public void onTrips(Schedule schedule, StationToStation stationToStation) {
+							controlListener.onTrips(schedule, stationToStation);
 						}
 
 					});
-					v.setData(tripIdToAlarm.get(sts));					
+					v.setData(tripIdToAlarm.get(sts), schedule, sts);					
 					return v;
 				}
 				return null;
@@ -688,6 +688,13 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 		if(updateScheduleFuture!=null) {
 			updateScheduleFuture.cancel(true);
 		}
+	}
+
+	ScheduleControlListener controlListener;
+	public void setScheduleControlListener(
+			ScheduleControlListener controlListener) {
+		this.controlListener = controlListener;
+		
 	}
 
 }

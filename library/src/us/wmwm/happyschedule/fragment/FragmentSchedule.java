@@ -3,7 +3,11 @@ package us.wmwm.happyschedule.fragment;
 import java.util.Date;
 
 import us.wmwm.happyschedule.R;
+import us.wmwm.happyschedule.model.Alarm;
+import us.wmwm.happyschedule.model.Schedule;
 import us.wmwm.happyschedule.model.Station;
+import us.wmwm.happyschedule.model.StationToStation;
+import us.wmwm.happyschedule.views.ScheduleControlsView.ScheduleControlListener;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -31,6 +35,39 @@ public class FragmentSchedule extends Fragment {
 	Handler handler = new Handler();
 	
 	FragmentScheduleAdapter adapter;
+	
+	ScheduleControlListener controlListener = new ScheduleControlListener() {
+		
+		@Override
+		public void onTrips(Schedule schedule, StationToStation stationToStation) {
+			FragmentTrip t = FragmentTrip.newInstance(from, to, stationToStation, schedule);
+			getFragmentManager().beginTransaction().replace(R.id.fragment_date_picker, t).addToBackStack(null).commit();
+		}
+		
+		@Override
+		public void onTimerCancel(Alarm alarm) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+		@Override
+		public void onTimer() {
+			// TODO Auto-generated method stub
+			
+		}
+		
+		@Override
+		public void onPin() {
+			// TODO Auto-generated method stub
+			
+		}
+		
+		@Override
+		public void onFavorite() {
+			// TODO Auto-generated method stub
+			
+		}
+	};
 
 	private static final String TAG = FragmentSchedule.class.getSimpleName();
 
@@ -93,12 +130,26 @@ public class FragmentSchedule extends Fragment {
 			@Override
 			public void run() {
 				pager.setAdapter(adapter  = new FragmentScheduleAdapter(from,to,getFragmentManager()));
+				adapter.setControlListener(controlListener);
 				pager.setCurrentItem(adapter.getTodaysPosition());		
 			}
 		});
-		
 		FragmentAmazonAd ad = new FragmentAmazonAd();
-		FragmentGoogleAd gad = new FragmentGoogleAd();
+		ad.setHappyAdListener(new HappyAdListener() {
+			@Override
+			public void onAd() {				
+			}
+			@Override
+			public void onAdFailed(int count, boolean noFill) {
+				handler.post(new Runnable() {
+					@Override
+					public void run() {
+						FragmentGoogleAd gad = new FragmentGoogleAd();
+						getFragmentManager().beginTransaction().replace(R.id.fragment_ad, gad);
+					}
+				});
+			}
+		});
 		getFragmentManager().beginTransaction().replace(R.id.fragment_ad, ad).commit();
 		
 	}

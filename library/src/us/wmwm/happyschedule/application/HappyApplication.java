@@ -4,6 +4,7 @@ import java.util.Calendar;
 import java.util.List;
 
 import com.amazon.device.ads.AdRegistration;
+import com.flurry.android.FlurryAgent;
 
 import us.wmwm.happyschedule.Alarms;
 import us.wmwm.happyschedule.R;
@@ -20,6 +21,7 @@ public class HappyApplication extends Application {
 	public void onCreate() {
 		INSTANCE = this;
 		super.onCreate();
+		FlurryAgent.setReportLocation(false);
 		try {
 			AdRegistration.setAppKey(getString(R.string.amazon_app_key));
 		} catch (Exception e) {

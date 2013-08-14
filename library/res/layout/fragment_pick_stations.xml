@@ -84,8 +84,7 @@
         android:layout_marginRight="3dp"
 		android:textColor="#eee"
         android:textSize="16sp"
-        android:textStyle="bold"
-        android:text="$15.50"        
+        android:textStyle="bold"    
         android:visibility="gone" />
 
     <RelativeLayout

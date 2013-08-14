@@ -8,6 +8,7 @@ import java.util.List;
 
 import us.wmwm.happyschedule.dao.ScheduleDao;
 import us.wmwm.happyschedule.model.Station;
+import us.wmwm.happyschedule.views.ScheduleControlsView.ScheduleControlListener;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -68,7 +69,10 @@ public class FragmentScheduleAdapter extends FragmentStatePagerAdapter {
 	@Override
 	public Fragment getItem(int pos) {
 		Calendar cal = getCalendar(pos);
-		return FragmentDaySchedule.newInstance(from, to, cal.getTime());
+		FragmentDaySchedule fds = 
+		 FragmentDaySchedule.newInstance(from, to, cal.getTime());
+		fds.setScheduleControlListener(controlListener);
+		return fds;
 	}
 	
 	public CharSequence getPageTitle(int position) {
@@ -124,5 +128,11 @@ public class FragmentScheduleAdapter extends FragmentStatePagerAdapter {
 		Calendar cal = Calendar.getInstance();
 		int days = (int) ((cal.getTimeInMillis() - min.getTime()) / 86400000);
 		return days;
+	}
+
+	ScheduleControlListener controlListener;
+	
+	public void setControlListener(ScheduleControlListener controlListener) {
+		this.controlListener = controlListener;
 	}
 }

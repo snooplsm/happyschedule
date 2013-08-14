@@ -37,6 +37,20 @@ public class FragmentGoogleAd extends HappyFragment implements AdListener {
 									// loads
 
 	Handler handler = new Handler();
+	
+	private HappyAdListener happyAdListener;
+	
+	private int failureCount;
+	
+	public void setHappyAdListener(HappyAdListener happyAdListener) {
+		this.happyAdListener = happyAdListener;
+	}
+	
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putInt("failureCount", failureCount);
+	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -50,6 +64,9 @@ public class FragmentGoogleAd extends HappyFragment implements AdListener {
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
+		if(savedInstanceState!=null) {
+			failureCount = savedInstanceState.getInt("failureCount"); 
+		}
 		LoadAd();
 	}
 
@@ -152,6 +169,10 @@ public class FragmentGoogleAd extends HappyFragment implements AdListener {
 			nextAdView = null;
 			ShowCurrentAd();
 		}
+		failureCount = 0;
+		if(happyAdListener!=null) {
+			happyAdListener.onAd();
+		}
 		Log.d(getClass().getSimpleName(), "onAdLoaded ");
 	}
 
@@ -206,9 +227,11 @@ public class FragmentGoogleAd extends HappyFragment implements AdListener {
 	}
 
 	@Override
-	public void onFailedToReceiveAd(Ad arg0, ErrorCode arg1) {
-		// TODO Auto-generated method stub
-		
+	public void onFailedToReceiveAd(Ad arg0, ErrorCode error) {
+		failureCount++;
+		if(happyAdListener!=null) {
+			happyAdListener.onAdFailed(failureCount, error==ErrorCode.NO_FILL);
+		}
 	}
 
 	@Override
@@ -222,5 +245,6 @@ public class FragmentGoogleAd extends HappyFragment implements AdListener {
 		// TODO Auto-generated method stub
 		
 	}
+	
 }
 

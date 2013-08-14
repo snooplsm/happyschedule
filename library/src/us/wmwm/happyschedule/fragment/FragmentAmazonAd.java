@@ -20,6 +20,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
 
 import com.amazon.device.ads.AdError;
+import com.amazon.device.ads.AdError.ErrorCode;
 import com.amazon.device.ads.AdLayout;
 import com.amazon.device.ads.AdListener;
 import com.amazon.device.ads.AdProperties;
@@ -36,6 +37,8 @@ public class FragmentAmazonAd extends HappyFragment implements AdListener {
 									// loads
 
 	Handler handler = new Handler();
+	
+	private HappyAdListener happyAdListener;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -45,10 +48,25 @@ public class FragmentAmazonAd extends HappyFragment implements AdListener {
 		adViewContainer = (ViewGroup) root;
 		return root;
 	}
+	
+	private int failureCount;
+	
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putInt("failureCount", failureCount);
+	}
+	
+	public void setHappyAdListener(HappyAdListener happyAdListener) {
+		this.happyAdListener = happyAdListener;
+	}
 
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
+		if(savedInstanceState!=null) {
+			failureCount = savedInstanceState.getInt("failureCount");
+		}
 		LoadAd();
 	}
 
@@ -116,7 +134,7 @@ public class FragmentAmazonAd extends HappyFragment implements AdListener {
 		if(newAdFuture!=null) {
 			newAdFuture.cancel(true);
 		}
-		newAdFuture = ThreadHelper.getScheduler().scheduleAtFixedRate(loadAd, 10000, 10000, TimeUnit.MILLISECONDS);
+		newAdFuture = ThreadHelper.getScheduler().scheduleAtFixedRate(loadAd, 60000, 60000, TimeUnit.MILLISECONDS);
 	}
 
 	@Override
@@ -140,15 +158,19 @@ public class FragmentAmazonAd extends HappyFragment implements AdListener {
 	}
 
 	@Override
-	public void onAdFailedToLoad(AdLayout arg0, AdError arg1) {
+	public void onAdFailedToLoad(AdLayout arg0, AdError arg) {
 		// TODO Auto-generated method stub
 		Log.d(getClass().getSimpleName(),
-				"onAdFailedToLoad " + arg1.getMessage());
+				"onAdFailedToLoad " + arg.getMessage());
+		failureCount++;
+		if(happyAdListener!=null) {
+			happyAdListener.onAdFailed(failureCount, arg.getCode()==ErrorCode.NO_FILL);
+		}
 	}
 
 	@Override
 	public void onAdLoaded(AdLayout ad, AdProperties arg1) {
-
+		
 		Activity a = getActivity();
 		if (a == null) {
 			return;
@@ -167,6 +189,10 @@ public class FragmentAmazonAd extends HappyFragment implements AdListener {
 			currentAdView = nextAdView;
 			nextAdView = null;
 			ShowCurrentAd();
+		}
+		failureCount = 0;
+		if(happyAdListener!=null) {
+			happyAdListener.onAd();
 		}
 		Log.d(getClass().getSimpleName(), "onAdLoaded ");
 	}
