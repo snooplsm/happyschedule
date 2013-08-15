@@ -26,6 +26,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.TextView;
 
 public class FragmentPickStations extends Fragment implements IPrimary {
@@ -177,6 +179,9 @@ public class FragmentPickStations extends Fragment implements IPrimary {
 		OnClickListener onClickGetSchedule = new OnClickListener() {
 			@Override
 			public void onClick(View v) {
+				if(!canGetSchedule()) {
+					return;
+				}
 				final Station depart = departureButton.getStation();
 				final Station arrive = arrivalButton.getStation();
 				PreferenceManager.getDefaultSharedPreferences(getActivity()).edit().
@@ -186,6 +191,7 @@ public class FragmentPickStations extends Fragment implements IPrimary {
 				ThreadHelper.getScheduler().submit(new Runnable() {
 					@Override
 					public void run() {
+						
 						WDb.get().saveHistory(depart, arrive);
 						Log.d(getClass().getSimpleName(), "saving history " + depart + " to " + arrive);
 					}
@@ -194,6 +200,27 @@ public class FragmentPickStations extends Fragment implements IPrimary {
 		};
 		
 		getScheduleButton.setOnClickListener(onClickGetSchedule);
+	}
+
+	protected boolean canGetSchedule() {
+		Station depart = departureButton.getStation();
+		Station arrive = arrivalButton.getStation();
+		boolean canGet = true;
+		if(depart==null) {
+			animate(departureButton);
+			canGet = false;
+		}
+		if(arrive==null) {
+			animate(arrivalButton);
+			canGet = false;
+		}
+		
+		return canGet;
+	}
+	
+	private void animate(View view) {
+		Animation anim = AnimationUtils.loadAnimation(getActivity(), R.anim.scale_up);
+		view.startAnimation(anim);		
 	}
 
 	private void reverse() {

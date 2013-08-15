@@ -92,13 +92,34 @@
             android:textSize="14sp" />
     </RelativeLayout>
 
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/train_info_container"
+        android:layout_below="@id/time_container" >
+
+        <TextView
+            android:id="@+id/track2"
+            android:layout_width="41dp"
+            android:layout_height="41dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="4dp"
+            android:background="@drawable/circle"
+            android:gravity="center"
+            android:text=""
+            android:visibility="gone"
+            android:textColor="#eaeaea"
+            android:textSize="24dp" />
+    </RelativeLayout>
+
     <TextView
         android:id="@+id/track"
         android:layout_width="41dp"
         android:layout_height="41dp"
         android:layout_alignParentRight="true"
-        android:layout_marginRight="4dp"
         android:layout_below="@id/time_container"
+        android:layout_marginRight="4dp"
         android:background="@drawable/circle"
         android:gravity="center"
         android:text=""
@@ -106,7 +127,7 @@
         android:textSize="24dp" />
 
     <RelativeLayout
-        android:id="@+id/train_info_container"
+        android:id="@id/train_info_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"

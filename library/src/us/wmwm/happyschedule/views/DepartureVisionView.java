@@ -44,9 +44,9 @@ public class DepartureVisionView extends RelativeLayout {
 		
 		destination.setText(status.getDest());
 		if(TextUtils.isEmpty(status.getTrack())) {
-			trackContainer.setVisibility(View.INVISIBLE);
+			track.setVisibility(View.INVISIBLE);
 		} else {
-			trackContainer.setVisibility(View.VISIBLE);
+			track.setVisibility(View.VISIBLE);
 			track.setText(status.getTrack());
 		}
 		time.setText(status.getDeparts());

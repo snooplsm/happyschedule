@@ -1,8 +1,5 @@
 package us.wmwm.happyschedule.fragment;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -21,11 +18,13 @@ import us.wmwm.happyschedule.ThreadHelper;
 import us.wmwm.happyschedule.activity.ActivityPickStation;
 import us.wmwm.happyschedule.adapter.DepartureVisionAdapter;
 import us.wmwm.happyschedule.application.HappyApplication;
+import us.wmwm.happyschedule.model.AppConfig;
 import us.wmwm.happyschedule.model.LineStyle;
 import us.wmwm.happyschedule.model.Station;
 import us.wmwm.happyschedule.model.StationToStation;
 import us.wmwm.happyschedule.model.TrainStatus;
 import us.wmwm.happyschedule.service.DeparturePoller;
+import us.wmwm.happyschedule.util.Streams;
 import us.wmwm.happyschedule.views.OnStationSelectedListener;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -329,21 +328,11 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary, 
 				Activity a = getActivity();
 				if (a == null) {
 					return;
-				}
-				InputStream is = a.getResources().openRawResource(R.raw.lines);
-				BufferedReader r = new BufferedReader(new InputStreamReader(is));
-				String line = null;
-				StringBuilder b = new StringBuilder();
-				try {
-					while ((line = r.readLine()) != null) {
-						b.append(line);
-					}
-					JSONObject o = new JSONObject(b.toString());
-					JSONArray k = o.optJSONArray("lines");
+				}				
+				try {					
+					AppConfig config = new AppConfig(new JSONObject(Streams.readFully(a.getResources().openRawResource(R.raw.lines))));
 					final Map<String, LineStyle> keyToColor = new HashMap<String, LineStyle>();
-					for (int i = 0; i < k.length(); i++) {
-						JSONObject li = k.optJSONObject(i);
-						LineStyle l = new LineStyle(li);
+					for (LineStyle l : config.getLines()) {						
 						Iterator<String> keys = l.keys.keySet().iterator();
 						while (keys.hasNext()) {
 							keyToColor.put(keys.next(), l);

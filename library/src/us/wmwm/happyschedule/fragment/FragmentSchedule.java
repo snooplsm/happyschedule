@@ -1,8 +1,11 @@
 package us.wmwm.happyschedule.fragment;
 
 import java.util.Date;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import us.wmwm.happyschedule.R;
+import us.wmwm.happyschedule.ThreadHelper;
 import us.wmwm.happyschedule.model.Alarm;
 import us.wmwm.happyschedule.model.Schedule;
 import us.wmwm.happyschedule.model.Station;
@@ -152,6 +155,37 @@ public class FragmentSchedule extends Fragment {
 		});
 		getFragmentManager().beginTransaction().replace(R.id.fragment_ad, ad).commit();
 		
+	}
+	
+	private long started;
+	
+//	Future<?> fetchTweetsFuture;
+//	
+//	@Override
+//	public void onResume() {
+//		super.onResume();
+//		if(started!=0) {
+//			started = System.currentTimeMillis();
+//		}
+//		long delay = 60000;
+//		if(System.currentTimeMillis()-started < delay) {
+//			delay = Math.max(delay, 0);
+//		}
+//		fetchTweetsFuture = ThreadHelper.getScheduler().scheduleWithFixedDelay(r, delay, 60000, TimeUnit.MILLISECONDS);		
+//	}
+//	
+//	private Runnable fetchTweets = new Runnable() {
+//		@Override
+//		public void run() {
+//			// TODO Auto-generated method stub
+//			
+//		}
+//	};
+	
+	@Override
+	public void onPause() {
+		// TODO Auto-generated method stub
+		super.onPause();
 	}
 
 	public static FragmentSchedule newInstance(Station from, Station to) {

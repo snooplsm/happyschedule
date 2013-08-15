@@ -28,6 +28,7 @@ public class ScheduleView extends RelativeLayout {
 	TextView duration;
 	TextView train;
 	TextView track;
+	TextView track2;
 	View lineIndicator;
 	TextView depart;
 	View alarm;
@@ -51,6 +52,7 @@ public class ScheduleView extends RelativeLayout {
 		duration = (TextView) findViewById(R.id.duration);
 		train = (TextView) findViewById(R.id.trip_id);
 		track = (TextView) findViewById(R.id.track);
+		track2 = (TextView) findViewById(R.id.track2);
 		alarm = findViewById(R.id.alarm);
 		depart = (TextView) findViewById(R.id.depart);
 		lineIndicator = findViewById(R.id.line_indicator);
