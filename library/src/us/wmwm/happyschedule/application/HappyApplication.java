@@ -40,6 +40,12 @@ public class HappyApplication extends Application {
 				}
 			}
 		});
+		ThreadHelper.getScheduler().submit(new Runnable() {
+			@Override
+			public void run() {
+				
+			}
+		});
 	}
 	
 	public static HappyApplication get() {

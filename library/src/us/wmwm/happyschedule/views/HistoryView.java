@@ -5,6 +5,7 @@ import java.util.Calendar;
 
 import us.wmwm.happyschedule.R;
 import us.wmwm.happyschedule.dao.Db;
+import us.wmwm.happyschedule.model.Station;
 import android.content.Context;
 import android.database.Cursor;
 import android.view.LayoutInflater;
@@ -18,6 +19,9 @@ public class HistoryView extends RelativeLayout {
 	DateFormat TIME = DateFormat.getTimeInstance(DateFormat.SHORT);
 	TextView time;
 	
+	Station fromStation;
+	Station toStation;
+	
 	public HistoryView(Context ctx) {
 		super(ctx);
 		LayoutInflater.from(ctx).inflate(R.layout.view_history, this);
@@ -28,13 +32,14 @@ public class HistoryView extends RelativeLayout {
 	
 	public void setData(Cursor cursor) {
 		
-		try {
-			from.setText(Db.get().getStop(cursor.getString(0)).getName());
+		try {fromStation = Db.get().getStop(cursor.getString(0));
+			from.setText(fromStation.getName());
 		} catch (Exception e) {
 			
 		}
 		try {
-			to.setText(Db.get().getStop(cursor.getString(1)).getName());
+			toStation = Db.get().getStop(cursor.getString(1));
+			to.setText(toStation.getName());
 		} catch (Exception e) {
 			
 		}
@@ -43,6 +48,14 @@ public class HistoryView extends RelativeLayout {
 		cal.setTimeInMillis(cursor.getLong(2));
 		time.setText(TIME.format(cal.getTime()));
 		
+	}
+	
+	public Station getFromStation() {
+		return fromStation;
+	}
+	
+	public Station getToStation() {
+		return toStation;
 	}
 	
 }

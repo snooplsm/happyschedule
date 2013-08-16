@@ -80,7 +80,13 @@ public class FragmentLoad extends HappyFragment {
 		
 		SVG svg = SVGParser.getSVGFromResource(getResources(), R.raw.logo);
 		logo.setImageDrawable(svg.createPictureDrawable());
-
+		getActivity().getActionBar().hide();
+	}
+	
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		getActivity().getActionBar().show();
 	}
 
 	private void createDatabase() {

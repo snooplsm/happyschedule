@@ -1,6 +1,7 @@
 package us.wmwm.happyschedule.model;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import org.json.JSONArray;
@@ -10,6 +11,7 @@ public class AppConfig {
 	
 	List<AppAd> ads;
 	List<LineStyle> lines;
+	String departureVision;
 
 	public AppConfig(JSONObject o) {
 		ads = new ArrayList<AppAd>();
@@ -26,6 +28,11 @@ public class AppConfig {
 				this.lines.add(new LineStyle(lines.optJSONObject(i)));
 			}
 		}
+		departureVision = o.optString("departureVision");
+	}
+	
+	public String getDepartureVision() {
+		return departureVision;
 	}
 	
 	public AppConfig() {}
@@ -44,6 +51,28 @@ public class AppConfig {
 
 	public List<AppAd> getAds() {
 		return ads;
+	}
+
+	public AppAd getBestAd() {
+		List<AppAd> ads = getAds();
+		if(ads==null) {
+			return null;
+		}
+		for(AppAd ad : ads) {
+			Calendar start = ad.getStart();
+			if(start==null || start.before(Calendar.getInstance())) {
+				
+			} else {
+				continue;
+			}
+			Calendar end = ad.getEnd();
+			if(end==null || end.after(Calendar.getInstance())) {
+				return ad;
+			} else {
+				continue;
+			}
+		}
+		return null;
 	}
 	
 }

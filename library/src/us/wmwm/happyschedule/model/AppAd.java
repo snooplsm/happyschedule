@@ -21,6 +21,7 @@ public class AppAd implements Serializable {
 	String alignment;
 	String discardKey;
 	String height;
+	boolean closeable;
 	
 	private static SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm Z");
 	
@@ -111,6 +112,7 @@ public class AppAd implements Serializable {
 		alignment = o.optString("alignment","top");
 		discardKey = o.optString("discardKey");
 		height = o.optString("height");
+		closeable = o.optBoolean("closeable");
 		if(o.has("start")) {			
 			Calendar start = Calendar.getInstance();
 			try {

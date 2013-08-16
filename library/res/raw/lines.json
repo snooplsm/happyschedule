@@ -3,6 +3,15 @@
 		"url": "http://dv.njtransit.com/mobile/tid-mobile.aspx?sid=$stop_id"
 	},
 
+	"ads": [
+	
+		{
+			"webviewUrl":"http://ryangravener.com",
+			"height":"50"
+		}
+		
+	],
+
 	"lines": [{
 		"keys": {
 			"njcl": "",

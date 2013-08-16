@@ -10,7 +10,7 @@
         android:childIndicator="@null"
         android:divider="@null"
         android:dividerHeight="0dp"
-        android:drawSelectorOnTop="true"
+        android:drawSelectorOnTop="true"        
         android:groupIndicator="@null" >
     </ExpandableListView>
 

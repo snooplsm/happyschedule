@@ -79,6 +79,14 @@ public class FragmentPickStations extends Fragment implements IPrimary {
 	}
 
 	@Override
+	public void onPrepareOptionsMenu(Menu menu) {
+		super.onPrepareOptionsMenu(menu);
+		if(reverseButton.getVisibility()!=View.VISIBLE) {
+			menu.removeItem(R.id.menu_reverse);
+		}
+	}
+	
+	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {	
 		if(item.getItemId()==R.id.menu_reverse) {
 			reverse();
@@ -112,6 +120,17 @@ public class FragmentPickStations extends Fragment implements IPrimary {
 		});
 	}
 	
+	private void setupReverseButton() {
+		boolean canShowReverse = arrivalButton.getStation()!=null && departureButton.getStation()!=null;
+		if(!canShowReverse) {
+			reverseButton.setVisibility(View.GONE);
+			
+		} else {
+			reverseButton.setVisibility(View.VISIBLE);
+		}
+		getActivity().invalidateOptionsMenu();
+	}
+	
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
@@ -119,6 +138,8 @@ public class FragmentPickStations extends Fragment implements IPrimary {
 		String lastDepartId = manager.getString("lastDepartId", null);
 		String lastArriveId = manager.getString("lastArriveId", null);
 		
+
+
 		if(lastDepartId!=null) {
 			Station station = Db.get().getStop(lastDepartId);
 			if(station!=null) {
@@ -132,6 +153,8 @@ public class FragmentPickStations extends Fragment implements IPrimary {
 				arrivalButton.setStation(station);
 			}
 		}
+		
+		setupReverseButton();
 		
 		findFare();
 		OnClickListener onClick = new OnClickListener() {
@@ -240,6 +263,7 @@ public class FragmentPickStations extends Fragment implements IPrimary {
 				departureButton.setStation(station);
 			}
 			findFare();
+			setupReverseButton();
 		}
 	}
 	

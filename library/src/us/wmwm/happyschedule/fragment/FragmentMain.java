@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import us.wmwm.happyschedule.R;
+import us.wmwm.happyschedule.fragment.FragmentHistory.OnHistoryListener;
 import us.wmwm.happyschedule.fragment.FragmentPickStations.OnGetSchedule;
 import us.wmwm.happyschedule.model.Station;
 import us.wmwm.happyschedule.views.FragmentMainAdapter;
@@ -63,6 +64,8 @@ public class FragmentMain extends Fragment {
 		return super.onOptionsItemSelected(item);
 	}
 
+	OnGetSchedule onGetSchedule;
+	
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
@@ -74,7 +77,7 @@ public class FragmentMain extends Fragment {
 						getFragmentManager());
 				pager.setAdapter(fma);
 				pager.setCurrentItem(1);
-				fma.setOnGetScheduleListener(new OnGetSchedule() {
+				fma.setOnGetScheduleListener(onGetSchedule = new OnGetSchedule() {
 
 					@Override
 					public void onGetSchedule(Station from, Station to) {
@@ -95,6 +98,13 @@ public class FragmentMain extends Fragment {
 						a.setHomeButtonEnabled(true);
 						getActivity().getActionBar().setSubtitle(
 								(from.getName() + " to " + to.getName()));
+					}
+				});
+				fma.setOnHistoryListener(new OnHistoryListener() {
+					
+					@Override
+					public void onHistory(Station from, Station to) {
+						onGetSchedule.onGetSchedule(from, to);
 					}
 				});
 				// fma.setOnStationSelectedListener(new

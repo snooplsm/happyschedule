@@ -53,12 +53,6 @@
                         android:layout_width="60dp"
                         android:layout_height="60dp" >
 
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="1px"
-                            android:layout_centerVertical="true"
-                            android:background="?android:attr/windowBackground" />
-
                         <ImageView
                             android:id="@+id/reverse"
                             android:layout_width="match_parent"

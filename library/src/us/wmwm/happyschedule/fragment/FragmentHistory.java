@@ -5,6 +5,7 @@ import java.util.Calendar;
 
 import us.wmwm.happyschedule.R;
 import us.wmwm.happyschedule.dao.WDb;
+import us.wmwm.happyschedule.model.Station;
 import us.wmwm.happyschedule.views.DepartureVisionHeader;
 import us.wmwm.happyschedule.views.HistoryView;
 import android.content.Context;
@@ -15,6 +16,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 
 import com.emilsjolander.components.stickylistheaders.StickyListHeadersAdapter;
 import com.emilsjolander.components.stickylistheaders.StickyListHeadersListView;
@@ -23,10 +26,18 @@ public class FragmentHistory extends HappyFragment {
 
 	StickyListHeadersListView list;
 	
-	@Override
-	public void onActivityCreated(Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
-		super.onActivityCreated(savedInstanceState);
+	HistoryAdapter adapter;
+	
+	View empty;
+	
+	public interface OnHistoryListener {
+		void onHistory(Station from, Station to);
+	}
+	
+	OnHistoryListener onHistoryListener;
+	
+	public void setOnHistoryListener(OnHistoryListener onHistoryListener) {
+		this.onHistoryListener = onHistoryListener;
 	}
 	
 	@Override
@@ -34,8 +45,29 @@ public class FragmentHistory extends HappyFragment {
 			Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.fragment_station_picker, container,false);
 		list = (StickyListHeadersListView) view.findViewById(R.id.list);
-		list.setAdapter(new HistoryAdapter(getActivity()));
+		list.setAdapter(adapter = new HistoryAdapter(getActivity()));
+		list.setOnItemClickListener(new OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
+					long arg3) {
+				HistoryView v = (HistoryView) arg1;
+				onHistoryListener.onHistory(v.getFromStation(), v.getToStation());
+			}
+		});
+		empty = view.findViewById(R.id.empty);
 		return view;
+	}
+	
+	@Override
+	public void onResume() {
+		super.onResume();
+		adapter.notifyDataSetChanged();
+		if(adapter.getCount()==0) {
+			empty.setVisibility(View.VISIBLE);
+		} else {
+			empty.setVisibility(View.GONE);
+		}
+		
 	}
 	
 	private static class HistoryAdapter extends CursorAdapter implements StickyListHeadersAdapter {

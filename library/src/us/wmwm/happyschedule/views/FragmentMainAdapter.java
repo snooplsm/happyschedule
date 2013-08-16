@@ -6,6 +6,7 @@ import us.wmwm.happyschedule.application.HappyApplication;
 import us.wmwm.happyschedule.dao.Db;
 import us.wmwm.happyschedule.fragment.FragmentDepartureVision;
 import us.wmwm.happyschedule.fragment.FragmentHistory;
+import us.wmwm.happyschedule.fragment.FragmentHistory.OnHistoryListener;
 import us.wmwm.happyschedule.fragment.FragmentPickStations;
 import us.wmwm.happyschedule.fragment.IPrimary;
 import us.wmwm.happyschedule.fragment.FragmentPickStations.OnGetSchedule;
@@ -23,6 +24,12 @@ public class FragmentMainAdapter extends FragmentStatePagerAdapter {
 	OnStationSelectedListener onStationSelectedListener;
 
 	OnGetSchedule onGetScheduleListener;
+	
+	OnHistoryListener onHistoryListener;
+	
+	public void setOnHistoryListener(OnHistoryListener onHistoryListener) {
+		this.onHistoryListener = onHistoryListener;
+	}
 
 	public void setOnGetScheduleListener(OnGetSchedule onGetScheduleListener) {
 		this.onGetScheduleListener = onGetScheduleListener;
@@ -77,6 +84,7 @@ public class FragmentMainAdapter extends FragmentStatePagerAdapter {
 		int count = getCount();
 		if (pos == 0) {
 			FragmentHistory history = new FragmentHistory();
+			history.setOnHistoryListener(onHistoryListener);
 			return history;
 		}
 		if (pos == 1) {
@@ -95,7 +103,7 @@ public class FragmentMainAdapter extends FragmentStatePagerAdapter {
 		if (departureVisions.length() == 0) {
 			return null;
 		}
-		return Db.get().getStop(departureVisions.optString(pos - 1));
+		return Db.get().getStop(departureVisions.optString(pos - 2));
 	}
 
 	@Override

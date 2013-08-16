@@ -1,15 +1,18 @@
 package us.wmwm.happyschedule.fragment;
 
 import java.util.Date;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
+
+import org.json.JSONObject;
 
 import us.wmwm.happyschedule.R;
 import us.wmwm.happyschedule.ThreadHelper;
 import us.wmwm.happyschedule.model.Alarm;
+import us.wmwm.happyschedule.model.AppAd;
+import us.wmwm.happyschedule.model.AppConfig;
 import us.wmwm.happyschedule.model.Schedule;
 import us.wmwm.happyschedule.model.Station;
 import us.wmwm.happyschedule.model.StationToStation;
+import us.wmwm.happyschedule.util.Streams;
 import us.wmwm.happyschedule.views.ScheduleControlsView.ScheduleControlListener;
 import android.os.Bundle;
 import android.os.Handler;
@@ -154,6 +157,26 @@ public class FragmentSchedule extends Fragment {
 			}
 		});
 		getFragmentManager().beginTransaction().replace(R.id.fragment_ad, ad).commit();
+		ThreadHelper.getScheduler().submit(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					AppConfig config = new AppConfig(new JSONObject(Streams.readFully(getActivity().getResources().openRawResource(R.raw.lines))));
+					final AppAd ad = config.getBestAd();
+					if(ad!=null) {
+						handler.post(new Runnable() {
+							@Override
+							public void run() {
+								FragmentHappyAd fad = FragmentHappyAd.newIntance(ad);
+								getFragmentManager().beginTransaction().replace(R.id.top_ad, fad).commit();
+							}
+						});
+					}
+				} catch (Exception e) {
+					
+				}
+			}
+		});
 		
 	}
 	

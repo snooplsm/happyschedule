@@ -3,20 +3,26 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?android:attr/windowBackground"
-    android:orientation="vertical" >    
+    android:orientation="vertical" >
 
     <com.emilsjolander.components.stickylistheaders.StickyListHeadersListView
         android:id="@+id/list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:divider="@null"
-        android:dividerHeight="0dp" /> 
-        
-   	<com.happytap.jumper.JumpView
-   	    android:background="#CC000000"
-   	    android:visibility="gone"
-   	    android:id="@+id/jumper"
-   	    android:layout_width="match_parent"
-   	    android:layout_height="match_parent"/>
+        android:dividerHeight="0dp" />
+
+    <us.wmwm.happyschedule.views.EmptyView
+        android:id="@+id/empty"
+        android:layout_width="match_parent"
+        android:visibility="gone"
+        android:layout_height="match_parent" />
+
+    <com.happytap.jumper.JumpView
+        android:id="@+id/jumper"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#CC000000"
+        android:visibility="gone" />
 
 </RelativeLayout>
