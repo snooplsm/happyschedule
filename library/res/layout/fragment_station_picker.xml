@@ -9,14 +9,22 @@
         android:id="@+id/list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_above="@+id/fragment_ad"
         android:divider="@null"
         android:dividerHeight="0dp" />
+
+    <RelativeLayout
+        android:id="@id/fragment_ad"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true" >
+    </RelativeLayout>
 
     <us.wmwm.happyschedule.views.EmptyView
         android:id="@+id/empty"
         android:layout_width="match_parent"
-        android:visibility="gone"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:visibility="gone" />
 
     <com.happytap.jumper.JumpView
         android:id="@+id/jumper"

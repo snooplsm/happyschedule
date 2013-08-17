@@ -137,7 +137,7 @@ public class FragmentGoogleAd extends HappyFragment implements AdListener {
 		if(newAdFuture!=null) {
 			newAdFuture.cancel(true);
 		}
-		newAdFuture = ThreadHelper.getScheduler().scheduleAtFixedRate(newAdRequest, 10000, 10000, TimeUnit.MILLISECONDS);
+		newAdFuture = ThreadHelper.getScheduler().scheduleAtFixedRate(newAdRequest, 60000, 60000, TimeUnit.MILLISECONDS);
 	}
 
 	@Override

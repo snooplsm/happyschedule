@@ -158,43 +158,54 @@ public class FragmentAmazonAd extends HappyFragment implements AdListener {
 	}
 
 	@Override
-	public void onAdFailedToLoad(AdLayout arg0, AdError arg) {
+	public void onAdFailedToLoad(AdLayout arg0, final AdError arg) {
 		// TODO Auto-generated method stub
 		Log.d(getClass().getSimpleName(),
 				"onAdFailedToLoad " + arg.getMessage());
 		failureCount++;
-		if(happyAdListener!=null) {
-			happyAdListener.onAdFailed(failureCount, arg.getCode()==ErrorCode.NO_FILL);
-		}
+		handler.post(new Runnable() {
+			@Override
+			public void run() {
+				if(happyAdListener!=null) {
+					happyAdListener.onAdFailed(failureCount, arg.getCode()==ErrorCode.NO_FILL);
+				}
+			}
+		});
+		
 	}
 
 	@Override
 	public void onAdLoaded(AdLayout ad, AdProperties arg1) {
-		
-		Activity a = getActivity();
-		if (a == null) {
-			return;
-		}
+		handler.post(new Runnable() {
+			@Override
+			public void run() {
+				Activity a = getActivity();
+				if (a == null) {
+					return;
+				}
 
-		// If there is an ad currently being displayed, swap the ad that just
-		// loaded
-		// with ad currently being displayed, else display the ad that just
-		// loaded.
-		if (currentAdView != null) {
-			SwapCurrentAd();
-		} else {
-			// This is the first time we're loading an ad, so set the
-			// current ad view to the ad we just loaded and set the next to null
-			// so that we can load a new ad in the background.
-			currentAdView = nextAdView;
-			nextAdView = null;
-			ShowCurrentAd();
-		}
-		failureCount = 0;
-		if(happyAdListener!=null) {
-			happyAdListener.onAd();
-		}
-		Log.d(getClass().getSimpleName(), "onAdLoaded ");
+				// If there is an ad currently being displayed, swap the ad that just
+				// loaded
+				// with ad currently being displayed, else display the ad that just
+				// loaded.
+				if (currentAdView != null) {
+					SwapCurrentAd();
+				} else {
+					// This is the first time we're loading an ad, so set the
+					// current ad view to the ad we just loaded and set the next to null
+					// so that we can load a new ad in the background.
+					currentAdView = nextAdView;
+					nextAdView = null;
+					ShowCurrentAd();
+				}
+				failureCount = 0;
+				if(happyAdListener!=null) {
+					happyAdListener.onAd();
+				}
+				Log.d(getClass().getSimpleName(), "onAdLoaded ");
+			}
+		});
+		
 	}
 
 	private void SwapCurrentAd() {

@@ -561,10 +561,10 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		super.onCreateOptionsMenu(menu, inflater);
 		if (!isVisible() || !isAdded()) {
 			return;
 		}
+		menu.clear();
 		inflater.inflate(R.menu.menu_schedule_day, menu);
 	};
 

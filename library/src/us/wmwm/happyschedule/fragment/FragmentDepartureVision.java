@@ -301,6 +301,23 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary, 
 			stationSelect.setVisibility(View.GONE);
 		}
 		loadInitial();
+		FragmentAmazonAd ad = new FragmentAmazonAd();
+		ad.setHappyAdListener(new HappyAdListener() {
+			@Override
+			public void onAd() {				
+			}
+			@Override
+			public void onAdFailed(int count, boolean noFill) {
+				handler.post(new Runnable() {
+					@Override
+					public void run() {
+						FragmentGoogleAd gad = new FragmentGoogleAd();
+						getFragmentManager().beginTransaction().replace(R.id.fragment_ad, gad).commit();
+					}
+				});
+			}
+		});
+		getFragmentManager().beginTransaction().replace(R.id.fragment_ad, ad).commit();
 	}
 
 	private void loadInitial() {

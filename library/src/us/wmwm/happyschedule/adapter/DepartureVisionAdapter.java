@@ -31,6 +31,11 @@ public class DepartureVisionAdapter extends BaseAdapter implements
 
 	public DepartureVisionAdapter() {
 	}
+	
+	@Override
+	public boolean isEnabled(int position) {
+		return false;
+	}
 
 	public DepartureVisionAdapter(Station station, StationToStation sts) {
 		this.stationToStation = sts;

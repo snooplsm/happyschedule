@@ -11,6 +11,7 @@ import us.wmwm.happyschedule.views.HistoryView;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.widget.CursorAdapter;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -31,6 +32,8 @@ public class FragmentHistory extends HappyFragment {
 	HistoryAdapter adapter;
 	
 	View empty;
+	
+	Handler handler = new Handler();
 	
 	public interface OnHistoryListener {
 		void onHistory(Station from, Station to);
@@ -70,6 +73,29 @@ public class FragmentHistory extends HappyFragment {
 		});
 		empty = view.findViewById(R.id.empty);
 		return view;
+	}
+	
+	@Override
+	public void onActivityCreated(Bundle savedInstanceState) {
+		// TODO Auto-generated method stub
+		super.onActivityCreated(savedInstanceState);
+		FragmentAmazonAd ad = new FragmentAmazonAd();
+		ad.setHappyAdListener(new HappyAdListener() {
+			@Override
+			public void onAd() {				
+			}
+			@Override
+			public void onAdFailed(int count, boolean noFill) {
+				handler.post(new Runnable() {
+					@Override
+					public void run() {
+						FragmentGoogleAd gad = new FragmentGoogleAd();
+						getFragmentManager().beginTransaction().replace(R.id.fragment_ad, gad).commit();
+					}
+				});
+			}
+		});
+		getFragmentManager().beginTransaction().replace(R.id.fragment_ad, ad).commit();
 	}
 	
 	@Override
