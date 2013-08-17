@@ -1,12 +1,14 @@
 package us.wmwm.happyschedule.views;
 
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
 
 import us.wmwm.happyschedule.R;
 import us.wmwm.happyschedule.model.Alarm;
 import us.wmwm.happyschedule.model.Station;
+import us.wmwm.happyschedule.model.StationInterval;
 import us.wmwm.happyschedule.model.StationToStation;
 import us.wmwm.happyschedule.model.TrainStatus;
 import android.content.Context;
@@ -33,9 +35,11 @@ public class ScheduleView extends RelativeLayout {
 	TextView depart;
 	View alarm;
 	View trainInfoContainer;
+	TextView connections;
 	RelativeLayout.LayoutParams trainInfoContainerParams;
 
 	static DateFormat TIME = DateFormat.getTimeInstance(DateFormat.SHORT);
+	public static DateFormat times = new SimpleDateFormat("h:mm aa");
 
 	Drawable bg;
 
@@ -51,10 +55,12 @@ public class ScheduleView extends RelativeLayout {
 		timeTillDepart = (TextView) findViewById(R.id.departs_in);
 		duration = (TextView) findViewById(R.id.duration);
 		train = (TextView) findViewById(R.id.trip_id);
+		
 		track = (TextView) findViewById(R.id.track);
 		track2 = (TextView) findViewById(R.id.track2);
 		alarm = findViewById(R.id.alarm);
 		depart = (TextView) findViewById(R.id.depart);
+		connections = depart;
 		lineIndicator = findViewById(R.id.line_indicator);
 		trainInfoContainer = findViewById(R.id.train_info_container);
 		trainInfoContainerParams = (RelativeLayout.LayoutParams) trainInfoContainer.getLayoutParams();
@@ -81,11 +87,6 @@ public class ScheduleView extends RelativeLayout {
 			timeTillDepart.setText("");
 		}
 
-		// if(mins<-5) {
-		// setBackgroundColor(0xFFCCCCCC);
-		// } else {
-		// setBackground(bg);
-		// }
 		if (!TextUtils.isEmpty(sts.tripId)) {
 			train.setText("#" + sts.tripId);
 		} else {
@@ -95,7 +96,134 @@ public class ScheduleView extends RelativeLayout {
 				.getTimeInMillis()) / 60000) + " minutes");
 		
 		this.depart.setText(depart.getName() + " to " + arrive.getName());
+		if(sts instanceof StationInterval) {
+			StationInterval sts2 = (StationInterval) sts;
+			duration.setText(duration(sts2));
+			if (sts2.schedule.transfers.length > 1) {
+				populateConnections(sts2);
+			} else {
+				populateExtraInfo(sts2);
+			}
+		}
 		
+	}
+	
+	private void populateExtraInfo(StationInterval sts) {
+		StringBuilder b = new StringBuilder();
+		if (sts.routeId != null) {
+			b.append(sts.schedule.routeIdToName.get(sts.routeId));
+			b.append(" ");
+		}
+		if (sts.blockId != null && sts.blockId.trim().length() > 0) {
+			b.append("#").append(sts.blockId);
+		}
+		connections.setText(b);
+	}
+	
+	private String duration(StationInterval sts) {
+		StationInterval sts2 = sts;
+		while (sts2.hasNext()) {
+			// TODO: optimize by just jumping to the end...
+			sts2 = sts2.next();
+		}
+		long diff = sts2.arriveTime.getTimeInMillis()
+				- sts.departTime.getTimeInMillis();
+		return "" + diff / 60000 + " minutes";
+	}
+	
+	private void populateConnections(StationInterval sts2) {
+		StringBuilder b = new StringBuilder();
+		boolean added = false;
+		String lastTripId = null;
+		String nextTripId = null;
+		while (sts2.hasNext()) {
+			boolean isTransfer = sts2.isTransfer();
+			nextTripId = sts2.next().tripId;
+			if (isTransfer
+					|| (sts2.tripId != null && sts2.tripId.equals(lastTripId))) {
+				added = false;
+
+			} else {
+				added = true;
+				String depart = times.format(sts2.getDepartTime().getTime())
+						.toLowerCase();
+				depart = depart.substring(0, depart.length() - 1).replace(" ",
+						"");
+				b.append("(");
+				b.append(depart);
+				b.append(")");
+				b.append(" ");
+				b.append(sts2.schedule.stopIdToName.get(sts2.departId));
+				b.append(" ");
+				b.append("↝");
+
+				b.append(" ");
+				if (!(sts2.tripId != null & sts2.tripId.equals(nextTripId))) {
+					String arrive = times.format(sts2.getArriveTime().getTime())
+							.toLowerCase();
+					arrive = arrive.substring(0, arrive.length() - 1).replace(
+							" ", "");
+					b.append("(");
+					b.append(arrive);
+					b.append(")");
+					b.append(" ");
+					b.append(sts2.schedule.stopIdToName.get(sts2.arriveId));
+
+					if (sts2.blockId != null
+							&& sts2.blockId.trim().length() > 0) {
+						b.append(" #");
+						b.append(sts2.blockId);
+					}
+
+				}
+			}
+
+			if (sts2.hasNext()) {
+				lastTripId = sts2.tripId;
+				sts2 = sts2.next();
+				if (added) {
+					b.append(" ");
+					if (sts2.tripId != null && sts2.tripId.equals(lastTripId)) {
+
+					} else {
+						if (sts2.isTransfer()) {
+							b.append("↻\n");
+						} else {
+							b.append("↝\n");
+						}
+					}
+
+				}
+
+			} else {
+				break;
+			}
+		}
+
+		if (sts2.tripId != null && !sts2.tripId.equals(lastTripId)) {
+			String depart = times.format(sts2.getDepartTime().getTime())
+					.toLowerCase();
+			depart = depart.substring(0, depart.length() - 1).replace(" ", "");
+			b.append("(");
+			b.append(depart);
+			b.append(")");
+			b.append(" ");
+			b.append(sts2.schedule.stopIdToName.get(sts2.departId));
+			b.append(" ");
+			b.append("↝");
+			b.append(" ");
+		}
+		b.append("(");
+		String arrive = times.format(sts2.getArriveTime().getTime())
+				.toLowerCase();
+		arrive = arrive.substring(0, arrive.length() - 1).replace(" ", "");
+		b.append(arrive);
+		b.append(") ");
+		b.append(sts2.schedule.stopIdToName.get(sts2.arriveId));
+		if (sts2.blockId != null && sts2.blockId.trim().length() > 0) {
+			b.append(" #").append(sts2.blockId);
+		}
+		connections.setText(b.toString());
 	}
 
 	public void setAlarm(List<Alarm> alarm) {

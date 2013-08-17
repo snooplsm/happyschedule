@@ -6,7 +6,8 @@
 	"ads": [
 	
 		{
-			"webviewUrl":"http://ryangravener.com",
+			"webviewUrl":"http://ryangravener.com/njrails/ad.html",
+			"discardKey":"websitess",
 			"height":"50"
 		}
 		

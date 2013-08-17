@@ -65,6 +65,8 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary, 
 
 	Station station;
 	
+	View empty;
+	
 	StationToStation stationToStation;
 	
 	View erroText;
@@ -147,6 +149,11 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary, 
 				handler.post(new Runnable() {
 					public void run() {
 						adapter.setData(s);
+						if(adapter.getCount()==0) {
+							empty.setVisibility(View.VISIBLE);
+						} else {
+							empty.setVisibility(View.GONE);
+						}
 					}
 				});
 				
@@ -167,6 +174,7 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary, 
 		list = (StickyListHeadersListView) root.findViewById(R.id.list);
 		stationSelect = root.findViewById(R.id.departure);
 		erroText = root.findViewById(R.id.no_internet);
+		empty = root.findViewById(R.id.empty);
 		return root;
 	}
 

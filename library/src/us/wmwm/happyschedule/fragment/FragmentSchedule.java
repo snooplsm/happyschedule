@@ -6,6 +6,8 @@ import org.json.JSONObject;
 
 import us.wmwm.happyschedule.R;
 import us.wmwm.happyschedule.ThreadHelper;
+import us.wmwm.happyschedule.dao.WDb;
+import us.wmwm.happyschedule.fragment.FragmentHappyAd.DiscardListener;
 import us.wmwm.happyschedule.model.Alarm;
 import us.wmwm.happyschedule.model.AppAd;
 import us.wmwm.happyschedule.model.AppConfig;
@@ -151,7 +153,7 @@ public class FragmentSchedule extends Fragment {
 					@Override
 					public void run() {
 						FragmentGoogleAd gad = new FragmentGoogleAd();
-						getFragmentManager().beginTransaction().replace(R.id.fragment_ad, gad);
+						getFragmentManager().beginTransaction().replace(R.id.fragment_ad, gad).commit();
 					}
 				});
 			}
@@ -167,7 +169,14 @@ public class FragmentSchedule extends Fragment {
 						handler.post(new Runnable() {
 							@Override
 							public void run() {
-								FragmentHappyAd fad = FragmentHappyAd.newIntance(ad);
+								final FragmentHappyAd fad = FragmentHappyAd.newIntance(ad);
+								fad.setDiscardListener(new DiscardListener() {
+									@Override
+									public void onDiscard(AppAd ad) {
+										getFragmentManager().beginTransaction().remove(fad).commit();
+										WDb.get().savePreference("discard_"+ad.getDiscardKey(), System.currentTimeMillis()+"");
+									}
+								});
 								getFragmentManager().beginTransaction().replace(R.id.top_ad, fad).commit();
 							}
 						});

@@ -13,6 +13,16 @@ public abstract class FragmentHappyAd extends HappyFragment {
 	protected AppAd ad;
 	protected View root;
 	
+	public interface DiscardListener {
+		void onDiscard(AppAd ad);
+	}
+	
+	protected DiscardListener discardListener;
+	
+	public void setDiscardListener(DiscardListener discardListener) {
+		this.discardListener = discardListener;
+	}
+	
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
@@ -28,6 +38,7 @@ public abstract class FragmentHappyAd extends HappyFragment {
 			}
 		}
 		root.getLayoutParams().height = heightW;
+		root.getParent().requestLayout();
 	}
 	
 	public static FragmentHappyAd newIntance(AppAd ad) {

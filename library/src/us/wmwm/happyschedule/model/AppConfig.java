@@ -7,6 +7,10 @@ import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import us.wmwm.happyschedule.dao.WDb;
+
+import android.text.TextUtils;
+
 public class AppConfig {
 	
 	List<AppAd> ads;
@@ -59,6 +63,9 @@ public class AppConfig {
 			return null;
 		}
 		for(AppAd ad : ads) {
+			if(!ad.isEnabled()) {
+				continue;
+			}
 			Calendar start = ad.getStart();
 			if(start==null || start.before(Calendar.getInstance())) {
 				
@@ -67,10 +74,16 @@ public class AppConfig {
 			}
 			Calendar end = ad.getEnd();
 			if(end==null || end.after(Calendar.getInstance())) {
-				return ad;
+				
 			} else {
 				continue;
 			}
+			if(!TextUtils.isEmpty(ad.getDiscardKey())) {
+				if(WDb.get().getPreference("discard_"+ad.getDiscardKey())!=null) {
+					continue;
+				}
+			}
+			return ad;
 		}
 		return null;
 	}
