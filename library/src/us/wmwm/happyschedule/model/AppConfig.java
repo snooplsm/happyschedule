@@ -8,7 +8,9 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import us.wmwm.happyschedule.dao.WDb;
-
+import android.content.Context;
+import android.content.pm.PackageInfo;
+import android.text.TextUtils;
 import android.text.TextUtils;
 
 public class AppConfig {
@@ -57,7 +59,7 @@ public class AppConfig {
 		return ads;
 	}
 
-	public AppAd getBestAd() {
+	public AppAd getBestAd(Context ctx) {
 		List<AppAd> ads = getAds();
 		if(ads==null) {
 			return null;
@@ -77,6 +79,15 @@ public class AppConfig {
 				
 			} else {
 				continue;
+			}
+			if(ad.getBeforeVersion()!=null) {
+				int version = ad.getBeforeVersion();
+				try {
+					int appVersion = ctx.getPackageManager().getPackageInfo(ctx.getPackageName(), 0).versionCode;
+					if(appVersion >= version) {
+						continue;
+					}
+				} catch (Exception e) {}
 			}
 			if(!TextUtils.isEmpty(ad.getDiscardKey())) {
 				if(WDb.get().getPreference("discard_"+ad.getDiscardKey())!=null) {

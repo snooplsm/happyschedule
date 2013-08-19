@@ -94,7 +94,7 @@ public class FragmentMainAdapter extends FragmentStatePagerAdapter {
 		}
 		Station station = getDepartureVision(pos);
 		FragmentDepartureVision dv = FragmentDepartureVision.newInstance(
-				station, null);
+				station, null,false);
 		dv.setOnStationSelected(onStationSelected);
 		return dv;
 	}

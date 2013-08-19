@@ -15,10 +15,7 @@ public class MainActivity extends HappyActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		getActionBar().setLogo(null);
-		getActionBar().setIcon(null);
-		getActionBar().setDisplayShowHomeEnabled(false);
-		getActionBar().setDisplayUseLogoEnabled(false);
+		//getActionBar().setDisplayShowHomeEnabled(false);
 		if (!FragmentLoad.isUpdated(getApplicationContext())) {
 			getSupportFragmentManager()
 					.beginTransaction()

@@ -74,6 +74,7 @@ public class ScheduleView extends RelativeLayout {
 
 	public void setData(StationToStation sts, Station depart, Station arrive) {
 		this.sts = sts;
+		train.setVisibility(View.VISIBLE);
 		time.setText(shrink(sts.departTime) + " - " + shrink(sts.arriveTime));
 
 		Calendar cal = Calendar.getInstance();
@@ -98,12 +99,16 @@ public class ScheduleView extends RelativeLayout {
 		this.depart.setText(depart.getName() + " to " + arrive.getName());
 		if(sts instanceof StationInterval) {
 			StationInterval sts2 = (StationInterval) sts;
+			train.setVisibility(View.GONE);
 			duration.setText(duration(sts2));
+			time.setText(shrink(sts.departTime) + " - " + shrink(sts2.getArriveTime()));
 			if (sts2.schedule.transfers.length > 1) {
 				populateConnections(sts2);
 			} else {
 				populateExtraInfo(sts2);
 			}
+		} else {
+			time.setText(shrink(sts.departTime) + " - " + shrink(sts.arriveTime));
 		}
 		
 	}
@@ -145,27 +150,30 @@ public class ScheduleView extends RelativeLayout {
 
 			} else {
 				added = true;
-				String depart = times.format(sts2.getDepartTime().getTime())
+				String depart = times.format(sts2.departTime.getTime())
 						.toLowerCase();
 				depart = depart.substring(0, depart.length() - 1).replace(" ",
 						"");
-				b.append("(");
+				if(depart.length()<6) {
+					//b.append("  ");
+				}
 				b.append(depart);
-				b.append(")");
 				b.append(" ");
+				
 				b.append(sts2.schedule.stopIdToName.get(sts2.departId));
 				b.append(" ");
-				b.append("↝");
+				b.append("↝\n");
 
-				b.append(" ");
 				if (!(sts2.tripId != null & sts2.tripId.equals(nextTripId))) {
-					String arrive = times.format(sts2.getArriveTime().getTime())
+					String arrive = times.format(sts2.arriveTime.getTime())
 							.toLowerCase();
 					arrive = arrive.substring(0, arrive.length() - 1).replace(
-							" ", "");
-					b.append("(");
+							" ", "");					
+					
+					if(arrive.length()<6) {
+						//b.append("  ");
+					}
 					b.append(arrive);
-					b.append(")");
 					b.append(" ");
 					b.append(sts2.schedule.stopIdToName.get(sts2.arriveId));
 
@@ -201,24 +209,26 @@ public class ScheduleView extends RelativeLayout {
 		}
 
 		if (sts2.tripId != null && !sts2.tripId.equals(lastTripId)) {
-			String depart = times.format(sts2.getDepartTime().getTime())
+			String depart = times.format(sts2.arriveTime.getTime())
 					.toLowerCase();
 			depart = depart.substring(0, depart.length() - 1).replace(" ", "");
-			b.append("(");
-			b.append(depart);
-			b.append(")");
+			if(depart.length()<6) {
+				//b.append(" ");
+			}
+			b.append(depart);			
 			b.append(" ");
 			b.append(sts2.schedule.stopIdToName.get(sts2.departId));
 			b.append(" ");
-			b.append("↝");
-			b.append(" ");
+			b.append("↝\n");
 		}
-		b.append("(");
 		String arrive = times.format(sts2.getArriveTime().getTime())
 				.toLowerCase();
 		arrive = arrive.substring(0, arrive.length() - 1).replace(" ", "");
+		if(arrive.length()<6) {
+			//b.append(" ");
+		}
 		b.append(arrive);
-		b.append(") ");
+		b.append(" ");
 		b.append(sts2.schedule.stopIdToName.get(sts2.arriveId));
 		if (sts2.blockId != null && sts2.blockId.trim().length() > 0) {
 			b.append(" #").append(sts2.blockId);

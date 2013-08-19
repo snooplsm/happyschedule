@@ -72,7 +72,7 @@ public class AlarmActivity extends HappyActivity {
         scheduleView.setData(sts,from,to);
         getActionBar().setSubtitle(from.getName() + " to " + to.getName());
         if(!TextUtils.isEmpty(from.getDepartureVision())) {
-        	getSupportFragmentManager().beginTransaction().replace(R.id.fragment_depareturevision, FragmentDepartureVision.newInstance(from,sts)).commit();
+        	getSupportFragmentManager().beginTransaction().replace(R.id.fragment_depareturevision, FragmentDepartureVision.newInstance(from,sts,false)).commit();
         }
 	}
 	

@@ -8,7 +8,7 @@ import android.util.TypedValue;
 import android.view.View;
 import android.widget.RelativeLayout.LayoutParams;
 
-public abstract class FragmentHappyAd extends HappyFragment {
+public abstract class FragmentHappyAd extends HappyFragment implements HappyAdListener {
 
 	protected AppAd ad;
 	protected View root;
@@ -24,10 +24,7 @@ public abstract class FragmentHappyAd extends HappyFragment {
 	}
 	
 	@Override
-	public void onActivityCreated(Bundle savedInstanceState) {
-		super.onActivityCreated(savedInstanceState);
-		Bundle args = getArguments();
-		ad = (AppAd) args.getSerializable("ad");
+	public void onAd() {
 		String height = ad.getHeight();
 		int heightW = (int) getResources().getDimension(R.dimen.ad_height);
 		if(height!=null) {
@@ -39,6 +36,22 @@ public abstract class FragmentHappyAd extends HappyFragment {
 		}
 		root.getLayoutParams().height = heightW;
 		root.getParent().requestLayout();
+	}
+	
+	@Override
+	public void onAdFailed(int count, boolean noFill) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	@Override
+	public void onActivityCreated(Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
+		Bundle args = getArguments();
+		ad = (AppAd) args.getSerializable("ad");
+		root.getLayoutParams().height = 0;
+		root.getParent().requestLayout();
+		
 	}
 	
 	public static FragmentHappyAd newIntance(AppAd ad) {

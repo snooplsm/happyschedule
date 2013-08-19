@@ -106,13 +106,14 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary, 
 		}
 	};
 
-	public static FragmentDepartureVision newInstance(Station station, StationToStation sts) {
+	public static FragmentDepartureVision newInstance(Station station, StationToStation sts, boolean isOverlay) {
 		FragmentDepartureVision dv = new FragmentDepartureVision();
 		Bundle b = new Bundle();
 		b.putSerializable("station", station);
 		if(sts!=null) {
 			b.putSerializable("stationToStation", sts);
 		}
+		b.putBoolean("isOverlay", isOverlay);
 		dv.setArguments(b);
 		return dv;
 	}
@@ -220,6 +221,9 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary, 
 		if (item.getItemId() == R.id.menu_remove_station) {
 			deleteCurrentStation();
 		}
+		if(item.getItemId() == android.R.id.home) {
+			getActivity().onBackPressed();
+		}
 		if (item.getItemId() == R.id.menu_refresh) {
 			if (poll != null) {
 				poll.cancel(true);
@@ -238,6 +242,7 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary, 
 		super.onPrepareOptionsMenu(menu);
 		if (station == null) {
 			menu.removeItem(R.id.menu_remove_station);
+		} else {
 		}
 	}
 
@@ -264,9 +269,13 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary, 
 	}
 
 	@Override
-	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {		
-		super.onCreateOptionsMenu(menu, inflater);
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		menu.clear();
 		inflater.inflate(R.menu.departurevision, menu);
+		Bundle args = getArguments();
+		if(!args.getBoolean("isOverlay")) {
+			getActivity().getActionBar().setSubtitle("w/ DepartureVision");
+		}
 	}
 
 	@Override
@@ -311,14 +320,20 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary, 
 				handler.post(new Runnable() {
 					@Override
 					public void run() {
-						FragmentGoogleAd gad = new FragmentGoogleAd();
-						getFragmentManager().beginTransaction().replace(R.id.fragment_ad, gad).commit();
+						try {
+							FragmentGoogleAd gad = new FragmentGoogleAd();
+							getFragmentManager().beginTransaction().replace(R.id.fragment_ad, gad).commit();
+						} catch (Exception e) {
+							
+						}
 					}
 				});
 			}
 		});
 		getFragmentManager().beginTransaction().replace(R.id.fragment_ad, ad).commit();
+		
 	}
+	
 
 	private void loadInitial() {
 		Long time = PreferenceManager
@@ -452,8 +467,8 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary, 
 
 	@Override
 	public void setPrimaryItem() {
-		if(activityCreated) {
-			getActivity().getActionBar().setSubtitle("w/ DepartureVision");
+		if(activityCreated) {			
+			
 			canLoad = true;
 			NetworkInfo info = manager.getActiveNetworkInfo();
 			if(info==null || !info.isConnected()) {

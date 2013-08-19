@@ -176,5 +176,19 @@ public class StationInterval extends StationToStation {
 		}
 		return (int) ((a.getTimeInMillis() - d.getTimeInMillis()) / 60000);
 	}
+	
+	public Calendar getArriveTime() {
+		StationInterval k = this;
+		Calendar d = k.departTime;
+		Calendar a = k.arriveTime;
+		while (k.hasNext()) {
+			k = k.next();
+			a = k.arriveTime;
+		}
+		if(a==null || d == null || !k.arriveId.equals(schedule.arriveId)) {
+			return null;
+		}
+		return a;
+	}
 
 }

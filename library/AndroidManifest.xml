@@ -32,6 +32,7 @@
         <activity
             android:name="us.wmwm.happyschedule.activity.MainActivity"
             android:label="@string/app_name"
+            android:icon="@drawable/ic_launcher"
             android:screenOrientation="nosensor" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -43,9 +44,12 @@
             android:name="us.wmwm.happyschedule.activity.AlarmActivity"
             android:configChanges="orientation|screenSize|keyboardHidden|keyboard|navigation"
             android:excludeFromRecents="true"
-            android:label="@string/app_name"
+            android:label="@string/app_name"            
             android:screenOrientation="nosensor"
             android:showOnLockScreen="true" >
+            
+                
+            
         </activity>
         <activity android:name="com.amazon.device.ads.AdActivity" android:configChanges="keyboardHidden|orientation|screenSize"/>
         <activity android:name="com.google.ads.AdActivity"

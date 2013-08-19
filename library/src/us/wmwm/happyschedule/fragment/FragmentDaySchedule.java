@@ -18,6 +18,7 @@ import us.wmwm.happyschedule.ThreadHelper;
 import us.wmwm.happyschedule.activity.AlarmActivity;
 import us.wmwm.happyschedule.dao.ScheduleDao;
 import us.wmwm.happyschedule.fragment.FragmentAlarmPicker.OnTimerPicked;
+import us.wmwm.happyschedule.fragment.FragmentPickStations.OnGetSchedule;
 import us.wmwm.happyschedule.model.Alarm;
 import us.wmwm.happyschedule.model.Schedule;
 import us.wmwm.happyschedule.model.ScheduleTraverser;
@@ -77,7 +78,13 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 	BaseExpandableListAdapter adapter;
 	AlarmManager alarmManger;
 	boolean canLoad = false;
-	
+
+	OnDepartureVision onDepartureVision;
+
+	public void setOnDepartureVision(OnDepartureVision onDepartureVision) {
+		this.onDepartureVision = onDepartureVision;
+	}
+
 	BroadcastReceiver connectionReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
@@ -106,14 +113,14 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 	Station from;
 
 	Handler handler = new Handler();
-	
+
 	Schedule schedule;
 
 	List<StationToStation> k = null;
 
 	List<TrainStatus> lastStatuses;
-	
-	Map<String, TrainStatus> tripIdToTrainStatus = new HashMap<String,TrainStatus>();
+
+	Map<String, TrainStatus> tripIdToTrainStatus = new HashMap<String, TrainStatus>();
 
 	ExpandableListView list;
 
@@ -126,6 +133,12 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 	List<StationToStation> o = null;
 
 	OnDateChange onDateChange;
+
+	OnGetSchedule onGetSchedule;
+
+	public void setOnGetSchedule(OnGetSchedule onGetSchedule) {
+		this.onGetSchedule = onGetSchedule;
+	}
 
 	Future<?> poll;
 
@@ -147,10 +160,11 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 			progressBar.setVisibility(View.GONE);
 		}
 	};
-	
+
 	Runnable updateEverySixtySeconds = new Runnable() {
 		public void run() {
-			Log.d(FragmentDaySchedule.class.getSimpleName(), "updating schedule view");
+			Log.d(FragmentDaySchedule.class.getSimpleName(),
+					"updating schedule view");
 			handler.post(populateAdpter);
 		};
 	};
@@ -161,10 +175,12 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 		@Override
 		public void run() {
 			try {
-				Log.d(FragmentDaySchedule.class.getSimpleName(), "getting train statuses");
+				Log.d(FragmentDaySchedule.class.getSimpleName(),
+						"getting train statuses");
 				final List<TrainStatus> s = poller.getTrainStatuses(from
 						.getDepartureVision());
-				Log.d(FragmentDaySchedule.class.getSimpleName(), "got train statuses: " + s.size());
+				Log.d(FragmentDaySchedule.class.getSimpleName(),
+						"got train statuses: " + s.size());
 				String key = getKey();
 				if (s != null && !s.isEmpty()) {
 					JSONArray a = new JSONArray();
@@ -182,8 +198,9 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 								.putLong(key + "Time",
 										System.currentTimeMillis()).commit();
 					}
-					for(TrainStatus status : s) {
-						Log.d(FragmentDaySchedule.class.getSimpleName(),status.getTrain() + " : " + status.getStatus());
+					for (TrainStatus status : s) {
+						Log.d(FragmentDaySchedule.class.getSimpleName(),
+								status.getTrain() + " : " + status.getStatus());
 						tripIdToTrainStatus.put(status.getTrain(), status);
 					}
 					lastStatuses = s;
@@ -311,7 +328,7 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 				}
 				updateSchedulePeriodically();
 			}
-			
+
 		};
 		loadScheduleFuture = ThreadHelper.getScheduler().submit(load);
 	}
@@ -459,12 +476,13 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 						}
 
 						@Override
-						public void onTrips(Schedule schedule, StationToStation stationToStation) {
+						public void onTrips(Schedule schedule,
+								StationToStation stationToStation) {
 							controlListener.onTrips(schedule, stationToStation);
 						}
 
 					});
-					v.setData(tripIdToAlarm.get(sts), schedule, sts);					
+					v.setData(tripIdToAlarm.get(sts), schedule, sts);
 					return v;
 				}
 				return null;
@@ -530,7 +548,7 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 					view = new ScheduleView(parent.getContext());
 				}
 				StationToStation sts = getItem(position);
-				view.setData(sts,from,to);
+				view.setData(sts, from, to);
 				view.setAlarm(tripIdToAlarm.get(sts));
 				view.setStatus(tripIdToTrainStatus.get(sts.blockId));
 				return view;
@@ -580,17 +598,17 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 
 	@Override
 	public void onDestroy() {
+		super.onDestroy();
 		handler.removeCallbacks(populateAdpter);
 		if (loadScheduleFuture != null) {
 			loadScheduleFuture.cancel(true);
 		}
-		if(poll!=null) {
+		if (poll != null) {
 			poll.cancel(true);
 		}
-		if(updateScheduleFuture!=null) {
+		if (updateScheduleFuture != null) {
 			updateScheduleFuture.cancel(true);
 		}
-		super.onDestroy();
 
 	}
 
@@ -601,6 +619,13 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 		}
 		if (item.getItemId() == android.R.id.home) {
 			getActivity().onBackPressed();
+			return true;
+		}
+		if (item.getItemId() == R.id.menu_departurevision) {
+			onDepartureVision.onDepartureVision(from);
+		}
+		if (item.getItemId() == R.id.menu_reverse) {
+			onGetSchedule.onGetSchedule(to, from);
 		}
 		return super.onOptionsItemSelected(item);
 	}
@@ -611,7 +636,7 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 		if (poll != null) {
 			poll.cancel(true);
 		}
-		if(updateScheduleFuture!=null) {
+		if (updateScheduleFuture != null) {
 			updateScheduleFuture.cancel(true);
 		}
 	}
@@ -623,9 +648,10 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 			menu.removeItem(R.id.menu_go_to_today);
 		} else {
 			menu.removeItem(R.id.menu_go_to_next_train);
+			menu.removeItem(R.id.menu_departurevision);
 		}
 	}
-	
+
 	Future<?> updateScheduleFuture;
 
 	@Override
@@ -649,12 +675,12 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 					10000, TimeUnit.MILLISECONDS);
 		}
 	}
-	
+
 	private void updateSchedulePeriodically() {
-		if(updateScheduleFuture!=null) {
+		if (updateScheduleFuture != null) {
 			updateScheduleFuture.cancel(true);
 		}
-		if(o==null) {
+		if (o == null) {
 			return;
 		}
 		Calendar now = Calendar.getInstance();
@@ -662,8 +688,13 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 		later.add(Calendar.MINUTE, 1);
 		later.set(Calendar.SECOND, 0);
 		later.set(Calendar.MILLISECOND, 0);
-		Log.d(FragmentDaySchedule.class.getSimpleName(), "updateScheduleFuture delay : " + (later.getTimeInMillis() - now.getTimeInMillis()));
-		updateScheduleFuture = ThreadHelper.getScheduler().scheduleAtFixedRate(updateEverySixtySeconds, later.getTimeInMillis()-now.getTimeInMillis(), 60000, TimeUnit.MILLISECONDS);
+		Log.d(FragmentDaySchedule.class.getSimpleName(),
+				"updateScheduleFuture delay : "
+						+ (later.getTimeInMillis() - now.getTimeInMillis()));
+		updateScheduleFuture = ThreadHelper.getScheduler().scheduleAtFixedRate(
+				updateEverySixtySeconds,
+				later.getTimeInMillis() - now.getTimeInMillis(), 60000,
+				TimeUnit.MILLISECONDS);
 	}
 
 	public void setOnDateChange(OnDateChange onDateChange) {
@@ -682,19 +713,20 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 		if (loadScheduleFuture != null) {
 			loadScheduleFuture.cancel(true);
 		}
-		if(poll!=null) {
+		if (poll != null) {
 			poll.cancel(true);
 		}
-		if(updateScheduleFuture!=null) {
+		if (updateScheduleFuture != null) {
 			updateScheduleFuture.cancel(true);
 		}
 	}
 
 	ScheduleControlListener controlListener;
+
 	public void setScheduleControlListener(
 			ScheduleControlListener controlListener) {
 		this.controlListener = controlListener;
-		
+
 	}
 
 }

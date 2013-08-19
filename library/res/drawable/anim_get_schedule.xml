@@ -1,30 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<animation-list xmlns:android="http://schemas.android.com/apk/res/android"
-    android:oneshot="true" >
+<transition xmlns:android="http://schemas.android.com/apk/res/android" >
 
-    <item
-        android:drawable="@color/get_schedule_11"
-        android:duration="100">
-    </item>
-    <item
-        android:drawable="@color/get_schedule_10"
-        android:duration="100">
-    </item>
-    <item
-        android:drawable="@color/get_schedule_8"
-        android:duration="100">
-    </item>
-    <item
-        android:drawable="@color/get_schedule_6"
-        android:duration="100">
-    </item>
-    <item
-        android:drawable="@color/get_schedule_4"
-        android:duration="100">
-    </item>
-    <item
-        android:drawable="@color/get_schedule_1"
-        android:duration="100">
-    </item>
-
-</animation-list>
+    <item android:drawable="@color/get_schedule_11"/>
+    <item android:drawable="@color/get_schedule_1"/>
+    
+</transition>

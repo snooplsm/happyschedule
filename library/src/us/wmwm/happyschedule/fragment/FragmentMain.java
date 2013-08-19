@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import us.wmwm.happyschedule.R;
+import us.wmwm.happyschedule.ThreadHelper;
+import us.wmwm.happyschedule.dao.WDb;
 import us.wmwm.happyschedule.fragment.FragmentHistory.OnHistoryListener;
 import us.wmwm.happyschedule.fragment.FragmentPickStations.OnGetSchedule;
 import us.wmwm.happyschedule.model.Station;
@@ -12,9 +14,11 @@ import android.app.ActionBar;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager.BackStackEntry;
 import android.support.v4.app.FragmentManager.OnBackStackChangedListener;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -44,7 +48,21 @@ public class FragmentMain extends Fragment {
 						getActivity().invalidateOptionsMenu();
 					};
 				});
-
+			} else {
+				BackStackEntry e = getFragmentManager().getBackStackEntryAt(count-1);
+				final String title;
+				if(!TextUtils.isEmpty(e.getBreadCrumbTitle())) {
+					 title = e.getBreadCrumbTitle().toString();
+				} else {
+					title = null;
+				}
+				handler.post(new Runnable() {
+					public void run() {
+						ActionBar a = getActivity().getActionBar();
+						getActivity().invalidateOptionsMenu();
+						a.setSubtitle(title);
+					};
+				});
 			}
 		}
 	};
@@ -75,7 +93,7 @@ public class FragmentMain extends Fragment {
 			public void run() {
 				final FragmentMainAdapter fma = new FragmentMainAdapter(
 						getFragmentManager());
-				pager.setAdapter(fma);
+				pager.setAdapter(fma);				
 				pager.setCurrentItem(1);
 				fma.setOnGetScheduleListener(onGetSchedule = new OnGetSchedule() {
 
@@ -91,20 +109,37 @@ public class FragmentMain extends Fragment {
 								.beginTransaction();
 						FragmentSchedule fs = FragmentSchedule.newInstance(
 								from, to);
-						t.replace(R.id.fragment_schedule, fs)
-								.addToBackStack(null).commit();
+						fs.setOnGetSchedule(onGetSchedule);
+						if(getFragmentManager().getBackStackEntryCount()==0) {
+						} else {
+							for(int i = getFragmentManager().getBackStackEntryCount()-1; i>=0; i--) {
+								BackStackEntry e = getFragmentManager().getBackStackEntryAt(i);
+								if("schedule".equals(e.getName())) {
+									getFragmentManager().popBackStackImmediate(i, i);
+								}
+							}							
+						}
+						t.addToBackStack("schedule");
+						t.replace(R.id.fragment_schedule, fs).setBreadCrumbTitle((from.getName() + " to " + to.getName())).commit();
 						ActionBar a = getActivity().getActionBar();
 						a.setDisplayHomeAsUpEnabled(true);
 						a.setHomeButtonEnabled(true);
-						getActivity().getActionBar().setSubtitle(
-								(from.getName() + " to " + to.getName()));
+						a.setDisplayUseLogoEnabled(true);
 					}
 				});
 				fma.setOnHistoryListener(new OnHistoryListener() {
 					
 					@Override
-					public void onHistory(Station from, Station to) {
+					public void onHistory(final Station from, final Station to) {						
 						onGetSchedule.onGetSchedule(from, to);
+						ThreadHelper.getScheduler().submit(new Runnable() {
+							@Override
+							public void run() {
+								WDb.get().savePreference("lastDepartId", from.getId());
+								WDb.get().savePreference("lastArriveId", to.getId());
+								WDb.get().saveHistory(from, to);
+							}
+						});
 					}
 				});
 				// fma.setOnStationSelectedListener(new

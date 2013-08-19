@@ -23,6 +23,7 @@ public class AppAd implements Serializable {
 	String height;
 	boolean closeable;
 	boolean enabled;
+	Integer beforeVersion;
 	
 	public boolean isEnabled() {
 		return enabled;
@@ -107,6 +108,14 @@ public class AppAd implements Serializable {
 	public void setDiscardKey(String discardKey) {
 		this.discardKey = discardKey;
 	}
+	
+	public Integer getBeforeVersion() {
+		return beforeVersion;
+	}
+	
+	public void setBeforeVersion(Integer beforeVersion) {
+		this.beforeVersion = beforeVersion;
+	}
 
 	public AppAd(JSONObject o) {
 		url = o.optString("url");
@@ -119,6 +128,9 @@ public class AppAd implements Serializable {
 		height = o.optString("height");
 		closeable = o.optBoolean("closeable");
 		enabled = o.optBoolean("enabled",true);
+		if(o.has("beforeVersion")) {
+			beforeVersion = o.optInt("beforeVersion");
+		}
 		if(o.has("start")) {			
 			Calendar start = Calendar.getInstance();
 			try {

@@ -89,8 +89,12 @@ public class FragmentHistory extends HappyFragment {
 				handler.post(new Runnable() {
 					@Override
 					public void run() {
-						FragmentGoogleAd gad = new FragmentGoogleAd();
-						getFragmentManager().beginTransaction().replace(R.id.fragment_ad, gad).commit();
+						try {
+							FragmentGoogleAd gad = new FragmentGoogleAd();						
+							getFragmentManager().beginTransaction().replace(R.id.fragment_ad, gad).commit();
+						} catch (Exception e) {
+							
+						}
 					}
 				});
 			}
