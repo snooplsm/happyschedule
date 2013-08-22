@@ -82,7 +82,8 @@ public class FragmentHistory extends HappyFragment {
 		FragmentAmazonAd ad = new FragmentAmazonAd();
 		ad.setHappyAdListener(new HappyAdListener() {
 			@Override
-			public void onAd() {				
+			public void onAd() {
+				
 			}
 			@Override
 			public void onAdFailed(int count, boolean noFill) {

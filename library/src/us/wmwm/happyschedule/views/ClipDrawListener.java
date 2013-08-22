@@ -11,21 +11,24 @@ import android.view.View.OnDragListener;
 
 public abstract class ClipDrawListener implements OnDragListener {
 
-	BitmapDrawable bitmap;
+	//BitmapDrawable bitmap;
 	
 	private static final String TAG = ClipDrawListener.class.getSimpleName();
 
 	public ClipDrawListener(View view) {
-		Bitmap b = Bitmap.createBitmap(view.getWidth(), view.getHeight(),
+		Bitmap b = Bitmap.createBitmap(Math.round(view.getWidth()*1.5f), Math.round(view.getHeight()*1.5f),
 				Config.ARGB_4444);
-		Canvas canvas = new Canvas(b);
-		view.draw(canvas);
-		bitmap = new BitmapDrawable(view.getContext().getResources(), b);
+		//Canvas canvas = new Canvas(b);		
+		//view.draw(canvas);
+		//canvas.scale(3f, 3f,b.getWidth()/2.0f,b.getHeight()/2.0f);
+		//canvas.rotate(50);
+		//bitmap = new BitmapDrawable(view.getContext().getResources(), b);
 	}
 	
 	float xStart;
 	
 	protected abstract void onDrop(float xStart, View view, DragEvent event);
+	protected abstract void onStart(float xStart, View view, DragEvent event);
 
 	@Override
 	public boolean onDrag(View v, DragEvent event) {
@@ -36,6 +39,7 @@ public abstract class ClipDrawListener implements OnDragListener {
 			// Do nothing
 			xStart = event.getX();
 			Log.d(TAG,"STARTED");
+			onStart(xStart, v, event);
 			break;
 		case DragEvent.ACTION_DRAG_ENTERED:
 			Log.d(TAG,"ENTERED");

@@ -52,6 +52,7 @@ public class FragmentTrip extends HappyFragment {
 		List<TripInfo.Stop> stops = new ArrayList<TripInfo.Stop>();
 		intervals.push(interval);
 		TripInfo last;
+		StationInterval lastInterval = null;
 		while (!intervals.isEmpty()) {
 			interval = intervals.pop();
 			if (interval.tripId != null) {
@@ -60,13 +61,14 @@ public class FragmentTrip extends HappyFragment {
 						interval.arriveSequence);
 				last = tripInfo;
 				stops.addAll(tripInfo.stops);
+				lastInterval = interval;
 			}
 			if (interval.hasNext()) {
 				intervals.push(interval.next());
 			} else {
 			}
 			// System.out.println(stops);
-			last = ScheduleDao.get().getStationTimesForTripId(interval.tripId,
+			last = ScheduleDao.get().getStationTimesForTripId(lastInterval.tripId,
 					interval.arriveSequence - 1, Integer.MAX_VALUE);
 			// View finalStop = LayoutInflater.from(this).inflate(
 			// R.layout.final_stop, null);

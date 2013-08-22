@@ -18,6 +18,9 @@ public class AppConfig {
 	List<AppAd> ads;
 	List<LineStyle> lines;
 	String departureVision;
+	
+	String shareDay;
+	String shareTrip;
 
 	public AppConfig(JSONObject o) {
 		ads = new ArrayList<AppAd>();
@@ -34,7 +37,20 @@ public class AppConfig {
 				this.lines.add(new LineStyle(lines.optJSONObject(i)));
 			}
 		}
+		JSONObject share = o.optJSONObject("share");
+		if(share!=null) {
+			shareDay = share.optString("day");
+			shareTrip = share.optString("trip");
+		}
 		departureVision = o.optString("departureVision");
+	}
+	
+	public String getShareDay() {
+		return shareDay;
+	}
+	
+	public String getShareTrip() {
+		return shareTrip;
 	}
 	
 	public String getDepartureVision() {

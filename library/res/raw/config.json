@@ -1,0 +1,112 @@
+{
+	"departure_vision": {
+		"url": "http://dv.njtransit.com/mobile/tid-mobile.aspx?sid=$stop_id"
+	},
+	
+	"share": {
+		"day" : "http://www.njtransit.com/sf/sf_servlet.srv?hdnPageAction=TrainSchedulesFrom&selOrigin=:from&selDestination=:to&OriginDescription=:fromName&DestDescription=:toName&datepicker=08/22/2013",
+		"trip" : "http://www.njtransit.com/sf/sf_servlet.srv?hdnPageAction=TripPlannerItineraryResultsEmailTo&StartAddress=:fromName&EndAddress=:toName&TravelFromLatLong=:fromLat,:fromLng&TravelToLatLong=:toLat,:toLng&Date=08/22/2013&ArrDep=D&Hour=:hour&Minute=:minute&AmPm=:ampm&Mode=BCTLXR&Minimize=T&WalkDistance=1.00&Atr=N&KeepThis=true&TB_iframe=true&height=125&width=300"
+	},
+
+	"ads": [
+	
+		{
+			"webviewUrl":"http://ryangravener.com/njrails/ad.html",
+			"discardKey":"websitess",
+			"height":"50",
+			"enabled":false			
+		}
+		
+	],
+
+	"lines": [{
+		"keys": {
+			"njcl": "",
+			"no jersey coast": ""
+		},
+		"color": "#59A2BE",
+		"acronym": "No"
+	}, {
+		"keys": {
+			"septa": ""
+		},
+		"color": "#59A2BE",
+		"acronym": "SEP"
+	}, {
+		"keys": {
+			"amtk": "",
+			"amtrak": "",
+			"carolinian": "",
+			"acela express": "",
+			"keystone": "",
+			"miami": "",
+			"norfolk": "",
+			"silver meteor-r": "",
+			"regional-r": "",
+			"springfield": "",
+			"regional": "",
+			"silver star -r": "",
+			"silver star-r": ""
+		},
+		"color": "#E4C62E",
+		"acronym": "Am"
+	}, {
+		"keys": {
+			"nec": "",
+			"northeast corrdr": ""
+		},
+		"color": "#F16364",
+		"acronym": "NEC"
+	}, {
+		"keys": {
+			"raritan valley": ""
+		},
+		"color": "#F58559",
+		"acronym": "RAV"
+	}, {
+		"keys": {
+			"pascack valley": ""
+		},
+		"color": "#000000",
+		"acronym": "PV"
+	}, {
+		"keys": {
+			"main line": ""
+		},
+		"color": "#000000",
+		"acronym": "ML"
+	}, {
+		"keys": {
+			"bergen co. line": ""
+		},
+		"color": "#000000",
+		"acronym": "BL"
+	}, {
+	"keys": {
+			"meadowlands rail": ""
+		},
+		"color": "#000000",
+		"acronym": "MDW"
+	}, {
+		"keys": {
+			"mnbtn": "",
+			"montclair-boonton": ""
+		},
+		"color": "#F58559",
+		"acronym": "MB"
+	}, {
+		"keys": {
+			"m&e": "",
+			"morristown line": ""
+		},
+		"color": "#67BF74",
+		"acronym": "M&E"
+	}, {
+		"keys": {
+			"acrl": "",
+			"atl. city line": ""
+		},
+		"color": "#6495ed",
+		"acronym": "AC"
+	}]
+}

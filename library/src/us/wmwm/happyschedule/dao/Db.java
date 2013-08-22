@@ -27,12 +27,12 @@ public class Db {
 		if(departureVisionOnly) {
 			return db
 					.rawQuery(
-							"select stop_id as _id, stop_id, name|| ' ('||departure_vision||')', departure_vision from stop where departure_vision is not null order by name asc",
+							"select stop_id as _id, stop_id, name|| ' ('||departure_vision||')', departure_vision, alternate_id, lat, lon from stop where departure_vision is not null order by name asc",
 							null);
 		} else {
 		return db
 				.rawQuery(
-						"select stop_id as _id, stop_id, name, departure_vision from stop order by name asc",
+						"select stop_id as _id, stop_id, name, departure_vision, alternate_id, lat, lon from stop order by name asc",
 						null);
 		}
 	}
@@ -40,7 +40,7 @@ public class Db {
 	public Station getStop(String id) {
 		Cursor c = db
 				.rawQuery(
-						"select stop_id as _id,  stop_id, name, departure_vision from stop where _id=?",
+						"select stop_id as _id,  stop_id, name, departure_vision, alternate_id, lat, lon from stop where _id=?",
 						new String[] { id });
 		try {
 			if (c.moveToNext()) {

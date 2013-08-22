@@ -3,15 +3,16 @@ package us.wmwm.happyschedule.application;
 import java.util.Calendar;
 import java.util.List;
 
-import com.amazon.device.ads.AdRegistration;
-import com.flurry.android.FlurryAgent;
-
 import us.wmwm.happyschedule.Alarms;
 import us.wmwm.happyschedule.R;
 import us.wmwm.happyschedule.ThreadHelper;
 import us.wmwm.happyschedule.model.Alarm;
-
+import us.wmwm.happyschedule.service.HappyScheduleService;
 import android.app.Application;
+import android.content.Intent;
+
+import com.amazon.device.ads.AdRegistration;
+import com.flurry.android.FlurryAgent;
 
 public class HappyApplication extends Application {
 
@@ -46,6 +47,7 @@ public class HappyApplication extends Application {
 				
 			}
 		});
+		startService(new Intent(this,HappyScheduleService.class));
 	}
 	
 	public static HappyApplication get() {

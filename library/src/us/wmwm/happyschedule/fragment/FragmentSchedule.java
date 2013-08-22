@@ -79,7 +79,7 @@ public class FragmentSchedule extends Fragment {
 			FragmentTrip t = FragmentTrip.newInstance(from, to,
 					stationToStation, schedule);
 			getFragmentManager().beginTransaction()
-					.replace(R.id.fragment_date_picker, t).addToBackStack(null)
+					.replace(R.id.fragment_date_picker, t).addToBackStack(null).setBreadCrumbTitle(from.getName() + " to " + to.getName())
 					.commit();
 		}
 
@@ -142,10 +142,11 @@ public class FragmentSchedule extends Fragment {
 
 				@Override
 				public void onDateSelected(Date date) {
-					FragmentTransaction ft = getFragmentManager()
-							.beginTransaction();
-					ft.remove(picker);
-					ft.commit();
+					getFragmentManager().popBackStack();
+//					FragmentTransaction ft = getFragmentManager()
+//							.beginTransaction();
+//					ft.remove(picker);
+//					ft.commit();
 					pager.setCurrentItem(adapter.getPositionFor(date));
 				}
 			});
@@ -207,9 +208,7 @@ public class FragmentSchedule extends Fragment {
 			@Override
 			public void run() {
 				try {
-					AppConfig config = new AppConfig(new JSONObject(Streams
-							.readFully(getActivity().getResources()
-									.openRawResource(R.raw.lines))));
+					AppConfig config = new AppConfig(new JSONObject(Streams.readFully(Streams.getStream("config.json"))));
 					final AppAd ad = config.getBestAd(getActivity());
 					if (ad != null) {
 						handler.post(new Runnable() {

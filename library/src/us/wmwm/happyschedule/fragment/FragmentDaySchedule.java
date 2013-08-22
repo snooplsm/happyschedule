@@ -11,6 +11,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 import us.wmwm.happyschedule.Alarms;
 import us.wmwm.happyschedule.R;
@@ -20,6 +21,7 @@ import us.wmwm.happyschedule.dao.ScheduleDao;
 import us.wmwm.happyschedule.fragment.FragmentAlarmPicker.OnTimerPicked;
 import us.wmwm.happyschedule.fragment.FragmentPickStations.OnGetSchedule;
 import us.wmwm.happyschedule.model.Alarm;
+import us.wmwm.happyschedule.model.AppConfig;
 import us.wmwm.happyschedule.model.Schedule;
 import us.wmwm.happyschedule.model.ScheduleTraverser;
 import us.wmwm.happyschedule.model.Station;
@@ -27,6 +29,8 @@ import us.wmwm.happyschedule.model.StationToStation;
 import us.wmwm.happyschedule.model.TrainStatus;
 import us.wmwm.happyschedule.model.Type;
 import us.wmwm.happyschedule.service.DeparturePoller;
+import us.wmwm.happyschedule.util.Share;
+import us.wmwm.happyschedule.util.Streams;
 import us.wmwm.happyschedule.views.ScheduleControlsView;
 import us.wmwm.happyschedule.views.ScheduleControlsView.ScheduleControlListener;
 import us.wmwm.happyschedule.views.ScheduleView;
@@ -78,7 +82,8 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 	BaseExpandableListAdapter adapter;
 	AlarmManager alarmManger;
 	boolean canLoad = false;
-
+	AppConfig appConfig;
+	
 	OnDepartureVision onDepartureVision;
 
 	public void setOnDepartureVision(OnDepartureVision onDepartureVision) {
@@ -327,6 +332,11 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 					}
 				}
 				updateSchedulePeriodically();
+				try {
+					appConfig = new AppConfig(new JSONObject(Streams.readFully(Streams.getStream("config.json"))));
+				} catch (Exception e) {
+					Log.e(TAG, "can't parse appConfig",e);
+				}
 			}
 
 		};
@@ -626,6 +636,9 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 		}
 		if (item.getItemId() == R.id.menu_reverse) {
 			onGetSchedule.onGetSchedule(to, from);
+		}
+		if(item.getItemId()==R.id.menu_share) {
+			startActivity(Intent.createChooser(Share.intent(appConfig, this.getActivity(), from, to, day), "Share"));
 		}
 		return super.onOptionsItemSelected(item);
 	}

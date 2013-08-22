@@ -17,5 +17,9 @@
     <item
         android:id="@+id/menu_departurevision"
         android:title="Departure Vision"/>
+    
+    <item
+        android:id="@+id/menu_share"
+        android:title="Share"/>
 
 </menu>

@@ -6,20 +6,18 @@ import java.util.Map;
 import us.wmwm.happyschedule.R;
 import us.wmwm.happyschedule.ThreadHelper;
 import us.wmwm.happyschedule.activity.ActivityPickStation;
-import us.wmwm.happyschedule.application.HappyApplication;
 import us.wmwm.happyschedule.dao.Db;
 import us.wmwm.happyschedule.dao.ScheduleDao;
 import us.wmwm.happyschedule.dao.WDb;
 import us.wmwm.happyschedule.model.Station;
 import us.wmwm.happyschedule.views.ClipDrawListener;
+import us.wmwm.happyschedule.views.HappyShadowBuilder;
 import us.wmwm.happyschedule.views.StationButton;
 import android.app.Activity;
 import android.content.ClipData;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
-import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.DragEvent;
@@ -31,11 +29,10 @@ import android.view.View;
 import android.view.View.DragShadowBuilder;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
-import android.view.ViewGroup.MarginLayoutParams;
 import android.view.ViewGroup;
+import android.view.ViewGroup.MarginLayoutParams;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 public class FragmentPickStations extends Fragment implements IPrimary {
@@ -46,6 +43,7 @@ public class FragmentPickStations extends Fragment implements IPrimary {
 	FragmentStationPicker picker;
 	View reverseButton;
 	View reverseButtonContainer;
+	View reverseHolder;
 	TextView fare;
 
 	Handler handler = new Handler();
@@ -80,6 +78,7 @@ public class FragmentPickStations extends Fragment implements IPrimary {
 		getScheduleButton = root.findViewById(R.id.get_schedule);
 		reverseButton = root.findViewById(R.id.reverse);
 		reverseButtonContainer = root.findViewById(R.id.reverse_container);
+		reverseHolder = root.findViewById(R.id.reverse_holder);
 		fare = (TextView) root.findViewById(R.id.fare);
 		return root;
 	}
@@ -140,26 +139,26 @@ public class FragmentPickStations extends Fragment implements IPrimary {
 		boolean canShowReverse = arrivalButton.getStation() != null
 				&& departureButton.getStation() != null;
 		if (!canShowReverse) {
-			//reverseButton.setVisibility(View.GONE);
-
+			reverseButton.setVisibility(View.GONE);
 		} else {
 			reverseButton.setVisibility(View.VISIBLE);			
 		}
 		ThreadHelper.getScheduler().submit(new Runnable() {
 			@Override
 			public void run() {
-				String percentLeft = WDb.get().getPreference(WDb.REVERSE_BUTTON_MARGIN_LEFT_PERCENTAGE);
-				if(percentLeft==null) {
+				String percentL = WDb.get().getPreference(WDb.REVERSE_BUTTON_MARGIN_LEFT_PERCENTAGE);
+				if(percentL==null) {
 					return;
 				}
-				final Float left = Float.parseFloat(percentLeft);
+				final Float percentLeft = Float.parseFloat(percentL);
 				handler.post(new Runnable() {
 					@Override
 					public void run() {
 						//MarginLayoutParams lp = (MarginLayoutParams) reverseButtonContainer.getLayoutParams();
 						//lp.leftMargin = (int)(reverseButtonContainer.getWidth()*left) - reverseButton.getWidth();
-						int leftPadding =  (int)(reverseButtonContainer.getWidth()*left) - reverseButton.getWidth();
-						reverseButton.setPadding(leftPadding, reverseButton.getPaddingTop(), reverseButton.getPaddingRight(), reverseButton.getPaddingBottom());
+						MarginLayoutParams lp = (MarginLayoutParams) reverseHolder.getLayoutParams();
+						lp.leftMargin = (int) (percentLeft * reverseButtonContainer.getWidth());
+						reverseHolder.setLayoutParams(lp);
 						//reverseButtonContainer.setLayoutParams(lp);	
 					}
 				});
@@ -249,19 +248,23 @@ public class FragmentPickStations extends Fragment implements IPrimary {
 			@Override
 			public boolean onLongClick(View view) {
 				ClipData data = ClipData.newPlainText("", "");
-				DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(
-						view);
+				DragShadowBuilder shadowBuilder = new HappyShadowBuilder(view);
+				
 				
 				ClipDrawListener c = new ClipDrawListener(view) {
+					
+					protected void onStart(float xStart, View view, DragEvent event) {
+						reverseButton.setVisibility(View.INVISIBLE);
+					}
+					
 					@Override
 					protected void onDrop(float xStart, View view, DragEvent event) {
-						System.out.println(event.getX());
+						reverseButton.setVisibility(View.VISIBLE);
 						int left = (int)event.getX() - reverseButton.getWidth()/2;
-						reverseButton.setPadding(left, reverseButton.getPaddingTop(), reverseButton.getPaddingRight(), reverseButton.getPaddingBottom());
 						final Float percentLeft = left / (float)reverseButtonContainer.getWidth();
-						System.out.println("percent left " + percentLeft + "  " + reverseButtonContainer.getWidth());
-						
-						System.out.println(view.getClass());
+						MarginLayoutParams lp = (MarginLayoutParams) reverseHolder.getLayoutParams();
+						lp.leftMargin = (int) (percentLeft * reverseButtonContainer.getWidth());
+						reverseHolder.setLayoutParams(lp);
 						ThreadHelper.getScheduler().submit(new Runnable() {
 							@Override
 							public void run() {

@@ -39,6 +39,8 @@ public class FragmentAmazonAd extends HappyFragment implements AdListener {
 	Handler handler = new Handler();
 	
 	private HappyAdListener happyAdListener;
+	
+	private static final String TAG = FragmentAmazonAd.class.getSimpleName();
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -209,8 +211,10 @@ public class FragmentAmazonAd extends HappyFragment implements AdListener {
 	}
 
 	private void SwapCurrentAd() {
+		Log.d(TAG,"SWAP CURRENT AD");
 		Activity a = getActivity();
 		if(a==null) {
+			Log.d(getClass().getSimpleName(), "activity is null, returning");
 			return;
 		}
 		Animation slideDown = AnimationUtils.loadAnimation(
@@ -234,6 +238,7 @@ public class FragmentAmazonAd extends HappyFragment implements AdListener {
 	}
 
 	private void ShowNextAd() {
+		adViewContainer.removeAllViews();
 		adViewContainer.removeView(currentAdView);
 		AdLayout tmp = currentAdView;
 		currentAdView = nextAdView;
@@ -244,6 +249,7 @@ public class FragmentAmazonAd extends HappyFragment implements AdListener {
 	private void ShowCurrentAd() {
 		Activity a = getActivity();
 		if(a==null) {
+			Log.d(getClass().getSimpleName(), "activity is null, returning");
 			return;
 		}
 		adViewContainer.addView(currentAdView);

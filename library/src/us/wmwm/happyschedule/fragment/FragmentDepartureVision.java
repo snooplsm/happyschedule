@@ -370,7 +370,7 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary, 
 					return;
 				}				
 				try {					
-					AppConfig config = new AppConfig(new JSONObject(Streams.readFully(a.getResources().openRawResource(R.raw.lines))));
+					AppConfig config = new AppConfig(new JSONObject(Streams.readFully(Streams.getStream("config.json"))));
 					final Map<String, LineStyle> keyToColor = new HashMap<String, LineStyle>();
 					for (LineStyle l : config.getLines()) {						
 						Iterator<String> keys = l.keys.keySet().iterator();
