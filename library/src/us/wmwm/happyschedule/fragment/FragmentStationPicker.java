@@ -37,6 +37,7 @@ public class FragmentStationPicker extends HappyFragment {
 		View root = inflater.inflate(R.layout.fragment_station_picker, container, false);
 		list = (StickyListHeadersListView) root.findViewById(R.id.list);
 		jumper = (JumpView ) root.findViewById(R.id.jumper);
+		jumper.setColorStateList(inflater.getContext().getResources().getColorStateList(R.drawable.selector_jumper));
 		return root;
 	}
 	
