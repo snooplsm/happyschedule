@@ -13,6 +13,3 @@
 [submodule "libraries/MicrowaveTimePicker"]
 	path = libraries/MicrowaveTimePicker
 	url = git@github.com:snooplsm/MicrowaveTimePicker.git
-[submodule "libraries/jumper"]
-	path = libraries/jumper
-	url = git@github.com:snooplsm/jumper.git
