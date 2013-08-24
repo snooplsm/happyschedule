@@ -7,6 +7,9 @@ import us.wmwm.happyschedule.views.OnStationSelectedListener;
 import us.wmwm.happyschedule.views.StationView;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -32,12 +35,39 @@ public class FragmentStationPicker extends HappyFragment {
 	}
 	
 	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setHasOptionsMenu(true);
+	}
+	
+	@Override
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		menu.clear();
+		inflater.inflate(R.menu.menu_station_picker, menu);
+		if(jumper.getVisibility()==View.VISIBLE) {
+			menu.findItem(R.id.menu_jumper).setVisible(false);
+		} else {
+			menu.findItem(R.id.menu_jumper).setVisible(true);
+		}
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		if(item.getItemId()==R.id.menu_jumper) {
+			jumper.setVisibility(View.VISIBLE);
+		}
+		return super.onOptionsItemSelected(item);
+		
+	}
+	
+	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		View root = inflater.inflate(R.layout.fragment_station_picker, container, false);
 		list = (StickyListHeadersListView) root.findViewById(R.id.list);
 		jumper = (JumpView ) root.findViewById(R.id.jumper);
 		jumper.setColorStateList(inflater.getContext().getResources().getColorStateList(R.drawable.selector_jumper));
+		jumper.initializeViews();
 		return root;
 	}
 	
@@ -73,6 +103,7 @@ public class FragmentStationPicker extends HappyFragment {
 					}
 				}
 				jumper.setVisibility(View.GONE);
+				getActivity().invalidateOptionsMenu();
 			}
 		});
 		jumper.setVisibility(View.VISIBLE);

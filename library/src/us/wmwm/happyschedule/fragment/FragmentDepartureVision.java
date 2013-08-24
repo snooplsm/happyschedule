@@ -211,8 +211,7 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary, 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		if (item.getItemId() == R.id.menu_change_station) {
-			startActivityForResult(new Intent(getActivity(),
-					ActivityPickStation.class), 100);
+			startActivityForResult(new Intent(ActivityPickStation.from(getActivity(), true)), 100);
 		}
 		if (item.getItemId() == R.id.menu_add_station) {
 			startActivityForResult(new Intent(getActivity(),

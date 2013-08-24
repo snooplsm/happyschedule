@@ -209,7 +209,7 @@ public class ScheduleView extends RelativeLayout {
 		}
 
 		if (sts2.tripId != null && !sts2.tripId.equals(lastTripId)) {
-			String depart = times.format(sts2.arriveTime.getTime())
+			String depart = times.format(sts2.departTime.getTime())
 					.toLowerCase();
 			depart = depart.substring(0, depart.length() - 1).replace(" ", "");
 			if(depart.length()<6) {
