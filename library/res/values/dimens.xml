@@ -9,5 +9,8 @@
     <dimen name="header_margin">6dp</dimen>
     <dimen name="logo_padding">20dp</dimen>
     <dimen name="ad_height">50dp</dimen>
+    <dimen name="view_station_button_marginLeft">8dp</dimen>
+    <dimen name="view_station_button_marginRight">8dp</dimen>
+    <dimen name="view_station_button_textSize">27sp</dimen>
 
 </resources>

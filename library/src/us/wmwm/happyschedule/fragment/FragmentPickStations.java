@@ -85,7 +85,7 @@ public class FragmentPickStations extends Fragment implements IPrimary {
 
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		super.onCreateOptionsMenu(menu, inflater);
+		menu.clear();
 		inflater.inflate(R.menu.menu_pick_stations, menu);
 	}
 
@@ -101,6 +101,7 @@ public class FragmentPickStations extends Fragment implements IPrimary {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		if (item.getItemId() == R.id.menu_reverse) {
 			reverse();
+			return true;
 		}
 		return super.onOptionsItemSelected(item);
 	}
@@ -148,7 +149,7 @@ public class FragmentPickStations extends Fragment implements IPrimary {
 			public void run() {
 				String percentL = WDb.get().getPreference(WDb.REVERSE_BUTTON_MARGIN_LEFT_PERCENTAGE);
 				if(percentL==null) {
-					return;
+					percentL = ".05";
 				}
 				final Float percentLeft = Float.parseFloat(percentL);
 				handler.post(new Runnable() {

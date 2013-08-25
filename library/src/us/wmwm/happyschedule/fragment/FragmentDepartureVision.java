@@ -36,6 +36,7 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -46,12 +47,15 @@ import android.view.ViewGroup;
 
 import com.emilsjolander.components.stickylistheaders.StickyListHeadersListView;
 
-public class FragmentDepartureVision extends HappyFragment implements IPrimary, ISecondary {
+public class FragmentDepartureVision extends HappyFragment implements IPrimary,
+		ISecondary {
 
 	StickyListHeadersListView list;
 	View stationSelect;
 
 	Future<?> poll;
+
+	Future<?> refresh;
 
 	DeparturePoller poller;
 
@@ -64,19 +68,24 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary, 
 	List<TrainStatus> lastStatuses;
 
 	Station station;
-	
+
 	View empty;
-	
+
+	private static final String TAG = FragmentDepartureVision.class
+			.getSimpleName();
+
 	StationToStation stationToStation;
-	
+
 	View erroText;
 
 	long lastStatusesReceived;
 
+	AppConfig appConfig;
+
 	OnStationSelectedListener onStationSelected;
-	
+
 	boolean canLoad;
-	
+
 	boolean activityCreated;
 
 	public void setOnStationSelected(OnStationSelectedListener onStationSelected) {
@@ -86,10 +95,12 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary, 
 	BroadcastReceiver connectionReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
-
 			NetworkInfo info = manager.getActiveNetworkInfo();
-			if(info==null || !info.isConnected()) {
+			if (info == null || !info.isConnected()) {
 				erroText.setVisibility(View.VISIBLE);
+			}
+			if (!canLoad) {
+				return;
 			}
 			if (info != null && info.isConnected()) {
 				erroText.setVisibility(View.GONE);
@@ -106,11 +117,12 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary, 
 		}
 	};
 
-	public static FragmentDepartureVision newInstance(Station station, StationToStation sts, boolean isOverlay) {
+	public static FragmentDepartureVision newInstance(Station station,
+			StationToStation sts, boolean isOverlay) {
 		FragmentDepartureVision dv = new FragmentDepartureVision();
 		Bundle b = new Bundle();
 		b.putSerializable("station", station);
-		if(sts!=null) {
+		if (sts != null) {
 			b.putSerializable("stationToStation", sts);
 		}
 		b.putBoolean("isOverlay", isOverlay);
@@ -126,8 +138,8 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary, 
 		@Override
 		public void run() {
 			try {
-				final List<TrainStatus> s = poller.getTrainStatuses(station
-						.getDepartureVision());
+				final List<TrainStatus> s = poller.getTrainStatuses(appConfig,
+						station.getDepartureVision());
 				String key = getKey();
 				if (s != null && !s.isEmpty()) {
 					JSONArray a = new JSONArray();
@@ -140,29 +152,27 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary, 
 								.edit()
 								.putString("lastStation", station.getId())
 								.putString(key, a.toString())
-								.putString("lastStatuses", lastStatuses.toString())
+								.putString("lastStatuses",
+										lastStatuses.toString())
 								.putLong(key + "Time",
 										System.currentTimeMillis()).commit();
 					}
-					
+
 					lastStatuses = s;
 				}
 				handler.post(new Runnable() {
 					public void run() {
 						adapter.setData(s);
-						if(adapter.getCount()==0) {
+						if (adapter.getCount() == 0) {
 							empty.setVisibility(View.VISIBLE);
 						} else {
 							empty.setVisibility(View.GONE);
 						}
 					}
 				});
-				
-				
-				System.out.println(s.size());
+
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				Log.e(TAG,"error with polling", e);
 			}
 		}
 	};
@@ -202,7 +212,7 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary, 
 		super.onCreate(savedInstanceState);
 		Bundle args = getArguments();
 		boolean showControls = true;
-		if(args!=null) {
+		if (args != null) {
 			showControls = !args.containsKey("stationToStation");
 		}
 		setHasOptionsMenu(showControls);
@@ -211,7 +221,9 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary, 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		if (item.getItemId() == R.id.menu_change_station) {
-			startActivityForResult(new Intent(ActivityPickStation.from(getActivity(), true)), 100);
+			startActivityForResult(
+					new Intent(ActivityPickStation.from(getActivity(), true)),
+					100);
 		}
 		if (item.getItemId() == R.id.menu_add_station) {
 			startActivityForResult(new Intent(getActivity(),
@@ -220,18 +232,16 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary, 
 		if (item.getItemId() == R.id.menu_remove_station) {
 			deleteCurrentStation();
 		}
-		if(item.getItemId() == android.R.id.home) {
+		if (item.getItemId() == android.R.id.home) {
 			getActivity().onBackPressed();
 		}
 		if (item.getItemId() == R.id.menu_refresh) {
-			if (poll != null) {
-				poll.cancel(true);
+			// canLoad = true;
+			if (refresh != null) {
+				refresh.cancel(true);
 			}
-			NetworkInfo i = manager.getActiveNetworkInfo();
-			if (i != null && i.isConnected()) {
-				poll = ThreadHelper.getScheduler().scheduleAtFixedRate(r, 100,
-						10000, TimeUnit.MILLISECONDS);
-			}
+
+			refresh = ThreadHelper.getScheduler().submit(r);
 		}
 		return super.onOptionsItemSelected(item);
 	}
@@ -272,7 +282,7 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary, 
 		menu.clear();
 		inflater.inflate(R.menu.departurevision, menu);
 		Bundle args = getArguments();
-		if(!args.getBoolean("isOverlay")) {
+		if (!args.getBoolean("isOverlay")) {
 			getActivity().getActionBar().setSubtitle("w/ DepartureVision");
 		}
 	}
@@ -284,12 +294,16 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary, 
 		Bundle arguments = getArguments();
 		if (arguments != null) {
 			station = (Station) arguments.getSerializable("station");
-			stationToStation = (StationToStation) arguments.getSerializable("stationToStation");
+			stationToStation = (StationToStation) arguments
+					.getSerializable("stationToStation");
+			canLoad = arguments.getBoolean("isOverlay");
 		}
-		if(stationToStation==null) {
+
+		if (stationToStation == null) {
 			list.setAdapter(adapter = new DepartureVisionAdapter());
 		} else {
-			list.setAdapter(adapter = new DepartureVisionAdapter(station, stationToStation));
+			list.setAdapter(adapter = new DepartureVisionAdapter(station,
+					stationToStation));
 		}
 
 		manager = (ConnectivityManager) getActivity().getSystemService(
@@ -301,7 +315,8 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary, 
 
 				@Override
 				public void onClick(View v) {
-					startActivityForResult(ActivityPickStation.from(getActivity(), true), 100);
+					startActivityForResult(
+							ActivityPickStation.from(getActivity(), true), 100);
 				}
 			});
 			return;
@@ -312,8 +327,9 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary, 
 		FragmentAmazonAd ad = new FragmentAmazonAd();
 		ad.setHappyAdListener(new HappyAdListener() {
 			@Override
-			public void onAd() {				
+			public void onAd() {
 			}
+
 			@Override
 			public void onAdFailed(int count, boolean noFill) {
 				handler.post(new Runnable() {
@@ -321,18 +337,19 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary, 
 					public void run() {
 						try {
 							FragmentGoogleAd gad = new FragmentGoogleAd();
-							getFragmentManager().beginTransaction().replace(R.id.fragment_ad, gad).commit();
+							getFragmentManager().beginTransaction()
+									.replace(R.id.fragment_ad, gad).commit();
 						} catch (Exception e) {
-							
+
 						}
 					}
 				});
 			}
 		});
-		getFragmentManager().beginTransaction().replace(R.id.fragment_ad, ad).commit();
-		
+		getFragmentManager().beginTransaction().replace(R.id.fragment_ad, ad)
+				.commit();
+		activityCreated = true;
 	}
-	
 
 	private void loadInitial() {
 		Long time = PreferenceManager
@@ -367,11 +384,12 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary, 
 				Activity a = getActivity();
 				if (a == null) {
 					return;
-				}				
-				try {					
-					AppConfig config = new AppConfig(new JSONObject(Streams.readFully(Streams.getStream("config.json"))));
+				}
+				try {
+					appConfig = new AppConfig(new JSONObject(Streams
+							.readFully(Streams.getStream("config.json"))));
 					final Map<String, LineStyle> keyToColor = new HashMap<String, LineStyle>();
-					for (LineStyle l : config.getLines()) {						
+					for (LineStyle l : appConfig.getLines()) {
 						Iterator<String> keys = l.keys.keySet().iterator();
 						while (keys.hasNext()) {
 							keyToColor.put(keys.next(), l);
@@ -398,7 +416,7 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary, 
 				connectionReceiver,
 				new IntentFilter(
 						android.net.ConnectivityManager.CONNECTIVITY_ACTION));
-		if(station==null) {
+		if (station == null) {
 			return;
 		}
 		NetworkInfo i = manager.getActiveNetworkInfo();
@@ -450,9 +468,9 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary, 
 				if (poll != null) {
 					poll.cancel(true);
 				}
-				if(canLoad && station!=null) {
-					poll = ThreadHelper.getScheduler().scheduleAtFixedRate(r, 100,
-							10000, TimeUnit.MILLISECONDS);
+				if (canLoad && station != null) {
+					poll = ThreadHelper.getScheduler().scheduleAtFixedRate(r,
+							100, 10000, TimeUnit.MILLISECONDS);
 				}
 				List<TrainStatus> ks = Collections.emptyList();
 				adapter.setData(ks);
@@ -466,32 +484,36 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary, 
 
 	@Override
 	public void setPrimaryItem() {
-		if(activityCreated) {			
-			
+		if (activityCreated) {
+
 			canLoad = true;
 			NetworkInfo info = manager.getActiveNetworkInfo();
-			if(info==null || !info.isConnected()) {
+			if (info == null || !info.isConnected()) {
 				erroText.setVisibility(View.VISIBLE);
 			}
 			if (info != null && info.isConnected()) {
 				erroText.setVisibility(View.GONE);
-				if ((poll == null || poll.isCancelled()) && station!=null) {
-					poll = ThreadHelper.getScheduler().scheduleAtFixedRate(r,
-							100, 10000, TimeUnit.MILLISECONDS);
-				}
 			} else {
-				if (poll != null) {
-					poll.cancel(true);
-				}
+
+			}
+			if (poll != null) {
+				poll.cancel(true);
+			}
+			if ((poll == null || poll.isCancelled()) && station != null) {
+				Log.d(TAG, "Polling!");
+				poll = ThreadHelper.getScheduler().scheduleAtFixedRate(r, 100,
+						10000, TimeUnit.MILLISECONDS);
+			} else {
+				Log.d(TAG, "Not Polling!");
 			}
 		}
-		
+
 	}
-	
+
 	@Override
 	public void setSecondary() {
 		canLoad = false;
-		if(poll!=null) {
+		if (poll != null) {
 			poll.cancel(true);
 		}
 	}

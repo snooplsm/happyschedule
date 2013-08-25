@@ -8,13 +8,12 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/fragment_ad"
-         >
-        
+        android:layout_above="@+id/fragment_ad" >
 
         <TextView
             android:id="@+id/no_internet"
             android:layout_width="match_parent"
+            android:visibility="gone"
             android:layout_height="wrap_content"
             android:background="@color/error_background"
             android:padding="@dimen/activity_horizontal_margin"
@@ -43,12 +42,12 @@
             android:layout_height="match_parent"
             android:visibility="gone" />
     </RelativeLayout>
-    
-    <FrameLayout 
+
+    <FrameLayout
+        android:id="@id/fragment_ad"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@id/fragment_ad"
-        android:layout_alignParentBottom="true"
-        ></FrameLayout>
+        android:layout_alignParentBottom="true" >
+    </FrameLayout>
 
 </RelativeLayout>

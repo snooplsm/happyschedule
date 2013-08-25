@@ -31,6 +31,7 @@ import us.wmwm.happyschedule.model.Type;
 import us.wmwm.happyschedule.service.DeparturePoller;
 import us.wmwm.happyschedule.util.Share;
 import us.wmwm.happyschedule.util.Streams;
+import us.wmwm.happyschedule.views.EmptyView;
 import us.wmwm.happyschedule.views.ScheduleControlsView;
 import us.wmwm.happyschedule.views.ScheduleControlsView.ScheduleControlListener;
 import us.wmwm.happyschedule.views.ScheduleView;
@@ -47,6 +48,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -57,6 +59,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListView;
+import android.widget.RelativeLayout;
 
 public class FragmentDaySchedule extends Fragment implements IPrimary,
 		ISecondary {
@@ -95,8 +98,10 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 			if (info != null && info.isConnected()) {
 				// erroText.setVisibility(View.GONE);
 				if (poll == null || poll.isCancelled()) {
-					poll = ThreadHelper.getScheduler().scheduleAtFixedRate(r,
-							100, 10000, TimeUnit.MILLISECONDS);
+					if(!TextUtils.isEmpty(from.getDepartureVision()) && DateUtils.isToday(day.getTime())) {
+						poll = ThreadHelper.getScheduler().scheduleAtFixedRate(r,
+								100, 10000, TimeUnit.MILLISECONDS);
+					}
 				}
 			} else {
 				if (poll != null) {
@@ -152,9 +157,20 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 			adapter.notifyDataSetChanged();
 			if (DateUtils.isToday(day.getTime())) {
 				moveToNextTrain();
+			} else {
+				list.setVisibility(View.VISIBLE);
 			}
-			progressBar.setVisibility(View.GONE);
+			if(adapter.getGroupCount()==0) {
+				EmptyView v = new EmptyView(activity);
+				root.addView(v);
+			}			
 		}
+	};
+	
+	Runnable hideProgress = new Runnable() {
+		public void run() {
+			progressBar.setVisibility(View.GONE);
+		};
 	};
 
 	View progressBar;
@@ -165,7 +181,7 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 			try {
 				Log.d(FragmentDaySchedule.class.getSimpleName(),
 						"getting train statuses");
-				final List<TrainStatus> s = poller.getTrainStatuses(from
+				final List<TrainStatus> s = poller.getTrainStatuses(appConfig,from
 						.getDepartureVision());
 				Log.d(FragmentDaySchedule.class.getSimpleName(),
 						"got train statuses: " + s.size());
@@ -236,112 +252,128 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 	private String getKey() {
 		return "lastStatuses" + from.getId();
 	}
+	
+	Runnable load = new Runnable() {
+		@Override
+		public void run() {
+			Log.d(TAG, "IN LOAD");
+			List<Alarm> alarms = Alarms.getAlarms(getActivity());
+			tripIdToAlarm = new HashMap<StationToStation, List<Alarm>>();
+			for (Alarm a : alarms) {
+				addAlarm(a);
+			}
+			Calendar date = Calendar.getInstance();
+			date.setTime(day);
+			final Calendar tomorrow = Calendar.getInstance();
+			tomorrow.setTime(day);
+			tomorrow.add(Calendar.DAY_OF_YEAR, 1);
+			try {
+				schedule = ScheduleDao.get().getSchedule(from.getId(),
+						to.getId(), day, day);
+				final Calendar limit = Calendar.getInstance();
+				limit.setTime(schedule.end);
+				Calendar start = Calendar.getInstance();
+				start.setTime(schedule.start);
+				final boolean isToday = DateUtils.isToday(start
+						.getTimeInMillis());
+				if (isToday) {
+					limit.add(Calendar.DAY_OF_YEAR, 1);
+				} else {
+					limit.add(Calendar.DAY_OF_YEAR, 0);
+					limit.set(Calendar.HOUR_OF_DAY, 0);
+					limit.set(Calendar.MINUTE, 0);
+					limit.set(Calendar.SECOND, 0);
+					limit.set(Calendar.MILLISECOND, 0);
+				}
+
+				final Calendar priorLimit = Calendar.getInstance();
+				priorLimit.setTime(day);
+				// priorLimit.add(Calendar.HOUR_OF_DAY, -2);
+				k = new ArrayList<StationToStation>();
+				schedule.inOrderTraversal(new ScheduleTraverser() {
+
+					@Override
+					public void populateItem(int index,
+							StationToStation stationToStation, int total) {
+						// k.add(stationToStation);
+						if (!isToday) {
+							if (!stationToStation.departTime.before(limit)
+									&& !stationToStation.departTime
+											.after(tomorrow)) {
+								// System.out.println(stationToStation.departTime.getTime());
+								k.add(stationToStation);
+							}
+						} else {
+							if (!stationToStation.departTime
+									.before(priorLimit)
+									&& !stationToStation.departTime
+											.after(limit))
+								k.add(stationToStation);
+
+						}
+
+					}
+				});
+				handler.post(populateAdpter);
+				Log.i(TAG, "SUCCESSFUL SCHEDULE");
+			} catch (Exception e) {
+				Log.e(TAG, "UNSUCCESSFUL SCHEDULE", e);
+			}
+
+			Iterator<Map.Entry<StationToStation, List<Alarm>>> ak = tripIdToAlarm
+					.entrySet().iterator();
+			while (ak.hasNext()) {
+				Map.Entry<StationToStation, List<Alarm>> entry = ak.next();
+				Activity activity = getActivity();
+				if (activity != null) {
+					Iterator<Alarm> aks = entry.getValue().iterator();
+					while (aks.hasNext()) {
+						Alarm alarm = aks.next();
+						if (alarm.getTime().before(Calendar.getInstance())) {
+							activity.startService(Alarms.newDismissIntent(
+									activity, alarm));
+							aks.remove();
+						}
+						if (entry.getValue().isEmpty()) {
+							ak.remove();
+						}
+					}
+
+				}
+			}
+			
+			try {
+				String str = Streams.readFully(Streams.getStream("config.json"));
+				//Log.d(TAG, str);
+				appConfig = new AppConfig(new JSONObject(str));
+			} catch (Exception e) {
+				appConfig = AppConfig.DEFAULT;
+				Log.e(TAG, "can't parse appConfig",e);
+			}
+			handler.post(hideProgress);
+			updateSchedulePeriodically();
+		}
+		
+
+	};
 
 	private void loadSchedule() {
 		if (loadScheduleFuture != null) {
-			loadScheduleFuture.cancel(true);
+			return;
 		}
-		Runnable load = new Runnable() {
-			@Override
-			public void run() {
-				List<Alarm> alarms = Alarms.getAlarms(getActivity());
-				tripIdToAlarm = new HashMap<StationToStation, List<Alarm>>();
-				for (Alarm a : alarms) {
-					addAlarm(a);
-				}
-				Calendar date = Calendar.getInstance();
-				date.setTime(day);
-				final Calendar tomorrow = Calendar.getInstance();
-				tomorrow.setTime(day);
-				tomorrow.add(Calendar.DAY_OF_YEAR, 1);
-				try {
-					schedule = ScheduleDao.get().getSchedule(from.getId(),
-							to.getId(), day, day);
-					final Calendar limit = Calendar.getInstance();
-					limit.setTime(schedule.end);
-					Calendar start = Calendar.getInstance();
-					start.setTime(schedule.start);
-					final boolean isToday = DateUtils.isToday(start
-							.getTimeInMillis());
-					if (isToday) {
-						limit.add(Calendar.DAY_OF_YEAR, 1);
-					} else {
-						limit.add(Calendar.DAY_OF_YEAR, 0);
-						limit.set(Calendar.HOUR_OF_DAY, 0);
-						limit.set(Calendar.MINUTE, 0);
-						limit.set(Calendar.SECOND, 0);
-						limit.set(Calendar.MILLISECOND, 0);
-					}
-
-					final Calendar priorLimit = Calendar.getInstance();
-					priorLimit.setTime(day);
-					// priorLimit.add(Calendar.HOUR_OF_DAY, -2);
-					k = new ArrayList<StationToStation>();
-					schedule.inOrderTraversal(new ScheduleTraverser() {
-
-						@Override
-						public void populateItem(int index,
-								StationToStation stationToStation, int total) {
-							// k.add(stationToStation);
-							if (!isToday) {
-								if (!stationToStation.departTime.before(limit)
-										&& !stationToStation.departTime
-												.after(tomorrow)) {
-									// System.out.println(stationToStation.departTime.getTime());
-									k.add(stationToStation);
-								}
-							} else {
-								if (!stationToStation.departTime
-										.before(priorLimit)
-										&& !stationToStation.departTime
-												.after(limit))
-									k.add(stationToStation);
-
-							}
-
-						}
-					});
-					handler.post(populateAdpter);
-					Log.i(TAG, "SUCCESSFUL SCHEDULE");
-				} catch (Exception e) {
-					Log.e(TAG, "UNSUCCESSFUL SCHEDULE", e);
-				}
-
-				Iterator<Map.Entry<StationToStation, List<Alarm>>> ak = tripIdToAlarm
-						.entrySet().iterator();
-				while (ak.hasNext()) {
-					Map.Entry<StationToStation, List<Alarm>> entry = ak.next();
-					Activity activity = getActivity();
-					if (activity != null) {
-						Iterator<Alarm> aks = entry.getValue().iterator();
-						while (aks.hasNext()) {
-							Alarm alarm = aks.next();
-							if (alarm.getTime().before(Calendar.getInstance())) {
-								activity.startService(Alarms.newDismissIntent(
-										activity, alarm));
-								aks.remove();
-							}
-							if (entry.getValue().isEmpty()) {
-								ak.remove();
-							}
-						}
-
-					}
-				}
-				updateSchedulePeriodically();
-				try {
-					appConfig = new AppConfig(new JSONObject(Streams.readFully(Streams.getStream("config.json"))));
-				} catch (Exception e) {
-					Log.e(TAG, "can't parse appConfig",e);
-				}
-			}
-
-		};
-		loadScheduleFuture = ThreadHelper.getScheduler().submit(load);
+		Log.d(TAG, "SCHEDULING!!");
+		loadScheduleFuture = ThreadHelper.getScheduler().schedule(load, 100, TimeUnit.MILLISECONDS);
 	}
+	
+	Future<?> moveToNext;
 
 	private void moveToNextTrain() {
-		ThreadHelper.getScheduler().submit(new Runnable() {
+		Log.d(TAG, "moveToNextTrain");
+		if(moveToNext!=null) {
+			moveToNext.cancel(true);
+		}
+		moveToNext = null;
+		moveToNext = ThreadHelper.getScheduler().submit(new Runnable() {
 			@Override
 			public void run() {
 				Calendar now = Calendar.getInstance();
@@ -360,7 +392,8 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 				handler.post(new Runnable() {
 					@Override
 					public void run() {
-						list.setSelectionFromTop(pos, 0);	
+						list.setSelectionFromTop(pos, 0);
+						list.setVisibility(View.VISIBLE);
 					}
 				});
 			}
@@ -383,6 +416,7 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 		from = (Station) b.getSerializable("from");
 		to = (Station) b.getSerializable("to");
 		day = (Date) b.getSerializable("date");
+		list.setVisibility(View.INVISIBLE);
 		adapter = new BaseExpandableListAdapter() {
 
 			int TYPE_CONTROLS = 0;
@@ -595,37 +629,51 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-//		if (!isVisible() || !isAdded()) {
-//			return;
-//		}
+		if (!isVisible() || !isAdded()) {
+			return;
+		}
 		menu.clear();
 		inflater.inflate(R.menu.menu_schedule_day, menu);
 	};
 
+	RelativeLayout root;
+	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		View view = inflater.inflate(R.layout.fragment_day_schedule, container,
+		root = (RelativeLayout) inflater.inflate(R.layout.fragment_day_schedule, container,
 				false);
-		list = (ExpandableListView) view.findViewById(R.id.list2);
-		progressBar = view.findViewById(R.id.progress);
-		return view;
+		list = (ExpandableListView) root.findViewById(R.id.list2);
+		progressBar = root.findViewById(R.id.progress);
+		return root;
 	}
 
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		handler.removeCallbacks(populateAdpter);
+		Log.d(TAG, "onDestroy");
+		try {
+			getActivity().unregisterReceiver(connectionReceiver);
+		} catch (Exception e) {
+			
+		}
 		if (loadScheduleFuture != null) {
 			loadScheduleFuture.cancel(true);
 		}
+		loadScheduleFuture = null;
 		if (poll != null) {
 			poll.cancel(true);
 		}
+		poll = null;
 		if (updateScheduleFuture != null) {
-			updateScheduleFuture.cancel(true);
+			Log.d(TAG, "cancel updateSched: " + updateScheduleFuture.cancel(true));
 		}
-
+		updateScheduleFuture = null;
+		if(moveToNext!=null) {
+			moveToNext.cancel(true);
+		}
+		moveToNext = null;
+		 
 	}
 
 	@Override
@@ -653,10 +701,16 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 		super.onPause();
 		getActivity().unregisterReceiver(connectionReceiver);
 		if (poll != null) {
-			poll.cancel(true);
+			if (poll != null) {
+				Log.d(TAG, "cancel poll: " + poll.cancel(true));
+			}
+			poll = null;
 		}
 		if (updateScheduleFuture != null) {
-			updateScheduleFuture.cancel(true);
+			if (updateScheduleFuture != null) {
+				Log.d(TAG, "cancel updateSched: " + updateScheduleFuture.cancel(true));
+			}
+			updateScheduleFuture = null;
 		}
 	}
 
@@ -687,7 +741,7 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 			updateSchedulePeriodically();
 		}
 		NetworkInfo i = manager.getActiveNetworkInfo();
-		if (i != null && i.isConnected() && canLoad) {
+		if (i != null && i.isConnected() && canLoad && !TextUtils.isEmpty(from.getDepartureVision())) {
 			poll = ThreadHelper.getScheduler().scheduleAtFixedRate(r, 100,
 					10000, TimeUnit.MILLISECONDS);
 		}
@@ -704,10 +758,14 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 	public void setOnGetSchedule(OnGetSchedule onGetSchedule) {
 		this.onGetSchedule = onGetSchedule;
 	}
+	
+	int loadingAttempt = 0;
 
 	@Override
 	public void setPrimaryItem() {
 		if (activityCreated && o == null) {
+			loadingAttempt++;
+			Log.d(TAG, "LoadingSchedule attepmt " + loadingAttempt);			
 			loadSchedule();
 		}
 	}
@@ -720,15 +778,19 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 
 	@Override
 	public void setSecondary() {
+		Log.d(TAG, "SETTING SECONDARY");
 		if (loadScheduleFuture != null) {
 			loadScheduleFuture.cancel(true);
 		}
+		loadScheduleFuture=null;
 		if (poll != null) {
 			poll.cancel(true);
 		}
+		poll = null;
 		if (updateScheduleFuture != null) {
 			updateScheduleFuture.cancel(true);
 		}
+		updateScheduleFuture = null;
 	}
 
 	private void updateSchedulePeriodically() {

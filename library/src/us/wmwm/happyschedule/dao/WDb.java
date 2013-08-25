@@ -76,4 +76,12 @@ public class WDb {
 		}
 	}
 
+	public void delete(Station from, Station to, long time) {
+		db.delete("history", "depart_id=? and arrive_id=? and time=?", new String[] {from.getId(), to.getId(), String.valueOf(time)});		
+	}
+	
+	public void deleteAllHistory() {
+		db.delete("history", null, null);
+	}
+
 }

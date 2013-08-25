@@ -15,7 +15,10 @@ public class Share {
 	
 	static SimpleDateFormat HOUR = new SimpleDateFormat("h");
 	static SimpleDateFormat MINUTE = new SimpleDateFormat("mm");
+	static SimpleDateFormat MONTH = new SimpleDateFormat("MM");
+	static SimpleDateFormat DAY = new SimpleDateFormat("dd");
 	static SimpleDateFormat AMPM = new SimpleDateFormat("a");
+	static SimpleDateFormat YEAR = new SimpleDateFormat("yyyy");
 	static SimpleDateFormat DATE = new SimpleDateFormat("MM/dd/yyyy");
 
 	public static Intent intent(Context ctx, StationInterval sts) {
@@ -34,7 +37,7 @@ public class Share {
 		try {
 			String url = null;
 			if(from.getAlternateId()==null || to.getAlternateId()==null) {
-				url = config.getShareTrip().replaceAll(":fromName", URLEncoder.encode(from.getName(),"utf-8")).replaceAll(":toName", URLEncoder.encode(to.getName(),"utf-8")).replaceAll(":fromLat", from.getLat()).replaceAll(":fromLng", from.getLng()).replaceAll(":toLat", from.getLat()).replaceAll(":toLng", from.getLng()).replaceAll(":hour", HOUR.format(day)).replaceAll(":minute", MINUTE.format(day)).replaceAll(":ampm", AMPM.format(day)); 
+				url = config.getShareTrip().replaceAll(":fromName", URLEncoder.encode(from.getName(),"utf-8")).replaceAll(":toName", URLEncoder.encode(to.getName(),"utf-8")).replaceAll(":fromLat", from.getLat()).replaceAll(":fromLng", from.getLng()).replaceAll(":toLat", from.getLat()).replaceAll(":toLng", from.getLng()).replaceAll(":hour", HOUR.format(day)).replaceAll(":minute", MINUTE.format(day)).replaceAll(":ampm", AMPM.format(day)).replaceAll(":month", MONTH.format(day)).replaceAll(":day", DAY.format(day)).replaceAll(":year", YEAR.format(day)).replaceAll(":datepicker", DATE.format(day)); 
 			} else { 
 				url = config.getShareDay().replaceAll(":fromName", URLEncoder.encode(from.getName(),"utf-8")).replaceAll(":toName", URLEncoder.encode(to.getName(),"utf-8")).replaceAll(":from", from.getAlternateId()).replaceAll(":to", to.getAlternateId());
 			}

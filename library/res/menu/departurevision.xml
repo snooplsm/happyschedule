@@ -21,8 +21,9 @@
     <item
         android:id="@+id/menu_refresh"
         android:orderInCategory="100"
-        android:showAsAction="never"
+        android:showAsAction="always"
+        android:icon="@drawable/ic_action_refresh"
         android:title="Refresh"
-        android:visible="false"/>
+        android:visible="true"/>
 
 </menu>

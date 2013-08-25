@@ -5,7 +5,7 @@
 	
 	"share": {
 		"day" : "http://www.njtransit.com/sf/sf_servlet.srv?hdnPageAction=TrainSchedulesFrom&selOrigin=:from&selDestination=:to&OriginDescription=:fromName&DestDescription=:toName&datepicker=:day",
-		"trip" : "http://www.njtransit.com/sf/sf_servlet.srv?hdnPageAction=TripPlannerItineraryResultsEmailTo&StartAddress=:fromName&EndAddress=:toName&TravelFromLatLong=:fromLat,:fromLng&TravelToLatLong=:toLat,:toLng&Date=:day&ArrDep=D&Hour=:hour&Minute=:minute&AmPm=:ampm&Mode=BCTLXR&Minimize=T&WalkDistance=1.00&Atr=N&KeepThis=true&TB_iframe=true&height=125&width=300"
+		"trip" : "http://ryangravener.com/njrails/share.php#starting_street_address=:fromName&dest_street_address=:toName&TravelFromLatLong=:fromLat,:fromLng&TravelToLatLong=:toLat,:toLng&datepicker=:datepicker&time=D&Hour=:hour&Minute=:minute&Time=:hour::minute&Year=:year&Day=:day&Month=:month&Suffix=:ampm&Mode=BCTLXR&min=T&Walk=1.00"
 	},
 
 	"ads": [

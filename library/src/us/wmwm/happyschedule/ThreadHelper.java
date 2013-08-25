@@ -1,38 +1,40 @@
 package us.wmwm.happyschedule;
+
 import java.util.concurrent.Executors;
 
 import java.util.concurrent.ScheduledExecutorService;
 
-
+import android.util.Log;
 
 public class ThreadHelper {
 
+	private static ScheduledExecutorService POOL = Executors
+			.newScheduledThreadPool(10);
+	static int THREADS = 0;
 
-private static ScheduledExecutorService POOL = Executors.newScheduledThreadPool(2);
+	public static ScheduledExecutorService getScheduler() {
 
+		if (POOL.isShutdown() || POOL.isTerminated()) {
 
-public static ScheduledExecutorService getScheduler() {
+			POOL = Executors.newScheduledThreadPool(10);
 
-if(POOL.isShutdown() || POOL.isTerminated()){
+		}
+		
+		THREADS++;
+		Log.d("ThreadHelper", "thread count :" + THREADS);
 
-POOL = Executors.newScheduledThreadPool(2);
+		return POOL;
 
-}
+	}
 
-return POOL;
+	public static void cleanUp() {
 
-}
+		if (POOL != null && !POOL.isShutdown()) {
 
+			POOL.shutdownNow();
 
+		}
 
-public static void cleanUp(){
-
-if(POOL!=null && !POOL.isShutdown()){
-
-POOL.shutdownNow();
-
-}
-
-}
+	}
 
 }

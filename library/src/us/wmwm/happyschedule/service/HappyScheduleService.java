@@ -1,9 +1,15 @@
 package us.wmwm.happyschedule.service;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.concurrent.Future;
+
+import org.json.JSONObject;
 
 import us.wmwm.happyschedule.Alarms;
 import us.wmwm.happyschedule.ThreadHelper;
@@ -26,6 +32,8 @@ public class HappyScheduleService extends Service {
 	NotificationManager notifs;
 	AlarmManager alarmManager;
 	
+	SimpleDateFormat RFC = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
+	
 	@Override
 	public void onCreate() {
 		super.onCreate();
@@ -42,6 +50,14 @@ public class HappyScheduleService extends Service {
 	public IBinder onBind(Intent arg0) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	Future<?> linesFuture;
+	
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		linesFuture.cancel(true);
 	}
 	
 	@Override
@@ -67,19 +83,32 @@ public class HappyScheduleService extends Service {
 					}
 				}
 				if("lines".equals(type)) {
-					ThreadHelper.getScheduler().submit(new Runnable() {
+					if(linesFuture!=null) {
+						linesFuture.cancel(true);
+					}
+					linesFuture = ThreadHelper.getScheduler().submit(new Runnable() {
 						@Override
 						public void run() {
 							OkHttpClient client = new OkHttpClient();
 							HttpURLConnection conn = null;
 							InputStream in = null;
+							File config = new File(getApplication().getFilesDir(),"config.json");
 							FileOutputStream fos = null;
 							try {
 								conn = client.open(new URL("http://ryangravener.com/njrails/config.json"));
-								String txt = Streams.readFully(in = conn.getInputStream());
-								if(txt!=null) {
-									fos = openFileOutput("config.json", Context.MODE_PRIVATE);
-									fos.write(txt.getBytes());									
+								if(config.exists()) {
+									Date d = new Date(config.lastModified());
+									conn.addRequestProperty("If-Modified-Since", RFC.format(d));
+								}
+								if(conn.getResponseCode()==200) {
+									String txt = Streams.readFully(in = conn.getInputStream());
+									JSONObject t = new JSONObject(txt);
+									if(txt!=null) {
+										fos = openFileOutput("config.json", Context.MODE_PRIVATE);
+										fos.write(txt.getBytes());									
+									}
+								} else {
+									Streams.readFully(in = conn.getInputStream());
 								}
 							} catch (Exception e) {
 								

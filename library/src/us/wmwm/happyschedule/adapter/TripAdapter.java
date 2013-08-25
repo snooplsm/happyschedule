@@ -1,5 +1,6 @@
 package us.wmwm.happyschedule.adapter;
 
+import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.List;
 
@@ -22,6 +23,8 @@ private Schedule schedule;
 	private Calendar startCal;
 	
 	List<TripInfo.Stop> stops;
+	
+	DateFormat TIME = DateFormat.getTimeInstance(DateFormat.SHORT);
 	
 	public TripAdapter(Context context) {
 		super();
@@ -75,15 +78,12 @@ private Schedule schedule;
 		aCal.add(Calendar.DAY_OF_YEAR, arriveCalendar.get(Calendar.DAY_OF_YEAR)-1);
 		aCal.add(Calendar.HOUR_OF_DAY, arriveCalendar.get(Calendar.HOUR_OF_DAY));
 		aCal.add(Calendar.MINUTE, arriveCalendar.get(Calendar.MINUTE));
-		System.out.println(departCalendar.getTime() + " vs " + dCal.getTime());
-		System.out.println(arriveCalendar.getTime() + " vs " + aCal.getTime());
 //		long arrive = sts.arrive.getTimeInMillis();
 		if(dCal.getTimeInMillis()>System.currentTimeMillis()) {
 			progress.setPercent(0);
 		} else {
 			long max = aCal.getTimeInMillis()-dCal.getTimeInMillis();
 			long curr = aCal.getTimeInMillis() - System.currentTimeMillis();
-			System.out.println("max:"+max+",cur"+curr);
 			float percent = 1;
 			if(curr<=0) {
 				percent = 1;
@@ -94,7 +94,7 @@ private Schedule schedule;
 		}
 		TextView time = (TextView)v.findViewById(R.id.time);
 		time.setText(sts.name);
-		String dpt = sts.depart.getTime().toString();
+		String dpt = TIME.format(sts.depart.getTime());
 		TextView timeDescriptor = (TextView)v.findViewById(R.id.time_descriptor);
 		timeDescriptor.setText(dpt);
 		return v;

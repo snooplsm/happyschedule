@@ -4,11 +4,15 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 import us.wmwm.happyschedule.R;
+import us.wmwm.happyschedule.ThreadHelper;
 import us.wmwm.happyschedule.dao.WDb;
 import us.wmwm.happyschedule.model.Station;
 import us.wmwm.happyschedule.views.DepartureVisionHeader;
 import us.wmwm.happyschedule.views.HistoryView;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
@@ -16,11 +20,13 @@ import android.support.v4.widget.CursorAdapter;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
 
 import com.emilsjolander.components.stickylistheaders.StickyListHeadersAdapter;
 import com.emilsjolander.components.stickylistheaders.StickyListHeadersListView;
@@ -58,6 +64,42 @@ public class FragmentHistory extends HappyFragment {
 	}
 	
 	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		if(item.getItemId()==R.id.menu_delete_all) {
+			AlertDialog.Builder b = new AlertDialog.Builder(getActivity());
+			b.setTitle("Delete All History");
+			b.setMessage("Are you sure?");
+			b.setPositiveButton("Discard", new OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {					
+					ThreadHelper.getScheduler().submit(new Runnable() {
+						@Override
+						public void run() {
+							WDb.get().deleteAllHistory();
+							handler.post(new Runnable() {
+								@Override
+								public void run() {
+									adapter.swap();
+									empty.setVisibility(View.VISIBLE);
+								}
+							});
+						}
+					});
+					dialog.dismiss();
+				}
+			})
+			.setNegativeButton("Cancel", new OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					dialog.dismiss();
+				}
+			})
+			.create().show();
+		}
+		return super.onOptionsItemSelected(item);
+	}
+	
+	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.fragment_station_picker, container,false);
@@ -70,6 +112,49 @@ public class FragmentHistory extends HappyFragment {
 				HistoryView v = (HistoryView) arg1;
 				onHistoryListener.onHistory(v.getFromStation(), v.getToStation());
 			}
+		});
+		list.setOnItemLongClickListener(new OnItemLongClickListener() {
+			
+			@Override
+			public boolean onItemLongClick(AdapterView<?> arg0, View arg1,
+					int arg2, long arg3) {
+				
+				final HistoryView v = new HistoryView(arg1.getContext());
+				v.setData(adapter.getItem(arg2));
+				AlertDialog.Builder b = new AlertDialog.Builder(getActivity());
+				b.setTitle("Delete History Item");
+				b.setMessage("Are you sure?");
+				b.setPositiveButton("Discard", new OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						final Station from = v.getFromStation();
+						final Station to = v.getToStation();
+						final long time = v.getTimetime();
+						ThreadHelper.getScheduler().submit(new Runnable() {
+							@Override
+							public void run() {
+								WDb.get().delete(from,to,time);
+								handler.post(new Runnable() {
+									@Override
+									public void run() {
+										adapter.swap();
+									}
+								});
+							}
+						});
+						dialog.dismiss();
+					}
+				})
+				.setNegativeButton("Cancel", new OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.dismiss();
+					}
+				})
+				.create().show();
+				return false;
+			}
+			
 		});
 		empty = view.findViewById(R.id.empty);
 		return view;
@@ -122,6 +207,10 @@ public class FragmentHistory extends HappyFragment {
 		public HistoryAdapter(Context ctx) {
 			super(ctx, null,true);
 			DATE = new SimpleDateFormat("MMMM dd");
+			swapCursor(WDb.get().getHistory());
+		}
+		
+		public void swap() {
 			swapCursor(WDb.get().getHistory());
 		}
 		

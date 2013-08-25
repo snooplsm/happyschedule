@@ -2,6 +2,7 @@ package us.wmwm.happyschedule.model;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
 
 import org.json.JSONArray;
@@ -14,51 +15,68 @@ import android.text.TextUtils;
 import android.text.TextUtils;
 
 public class AppConfig {
-	
+
 	List<AppAd> ads;
 	List<LineStyle> lines;
 	String departureVision;
-	
+
 	String shareDay;
 	String shareTrip;
 
 	public AppConfig(JSONObject o) {
 		ads = new ArrayList<AppAd>();
-		if(o.has("ads")) {
+		if (o.has("ads")) {
 			JSONArray ads = o.optJSONArray("ads");
-			for(int i = 0; i < ads.length(); i++) {
+			for (int i = 0; i < ads.length(); i++) {
 				this.ads.add(new AppAd(ads.optJSONObject(i)));
 			}
 		}
 		lines = new ArrayList<LineStyle>();
-		if(o.has("lines")) {
+		if (o.has("lines")) {
 			JSONArray lines = o.optJSONArray("lines");
-			for(int i = 0; i < lines.length(); i++) {
+			for (int i = 0; i < lines.length(); i++) {
 				this.lines.add(new LineStyle(lines.optJSONObject(i)));
 			}
 		}
 		JSONObject share = o.optJSONObject("share");
-		if(share!=null) {
+		if (share != null) {
 			shareDay = share.optString("day");
 			shareTrip = share.optString("trip");
 		}
-		departureVision = o.optString("departureVision");
+		JSONObject departureVision = o.optJSONObject("departure_vision");
+		if (departureVision != null) {
+			this.departureVision = departureVision.optString("url");
+		}
+
 	}
-	
+
+	public AppConfig() {
+		ads = Collections.emptyList();
+		lines = Collections.emptyList();
+		departureVision = "http://dv.njtransit.com/mobile/tid-mobile.aspx?sid=$stop_id";
+		shareDay = "http://www.njtransit.com/sf/sf_servlet.srv?hdnPageAction=TrainSchedulesFrom&selOrigin=:from&selDestination=:to&OriginDescription=:fromName&DestDescription=:toName&datepicker=:day";
+		shareTrip = "http://www.njtransit.com/sf/sf_servlet.srv?hdnPageAction=TripPlannerItineraryResultsEmailTo&StartAddress=:fromName&EndAddress=:toName&TravelFromLatLong=:fromLat,:fromLng&TravelToLatLong=:toLat,:toLng&Date=:day&ArrDep=D&Hour=:hour&Minute=:minute&AmPm=:ampm&Mode=BCTLXR&Minimize=T&WalkDistance=1.00&Atr=N&KeepThis=true&TB_iframe=true&height=125&width=300";
+	}
+
+	public static final AppConfig DEFAULT;
+
+	static {
+		DEFAULT = new AppConfig();
+
+	}
+
 	public String getShareDay() {
 		return shareDay;
 	}
-	
+
 	public String getShareTrip() {
 		return shareTrip;
 	}
-	
+
 	public String getDepartureVision() {
 		return departureVision;
 	}
-	
-	public AppConfig() {}
-	
+
 	public List<LineStyle> getLines() {
 		return lines;
 	}
@@ -77,36 +95,46 @@ public class AppConfig {
 
 	public AppAd getBestAd(Context ctx) {
 		List<AppAd> ads = getAds();
-		if(ads==null) {
+		if (ads == null) {
 			return null;
 		}
-		for(AppAd ad : ads) {
-			if(!ad.isEnabled()) {
+		for (AppAd ad : ads) {
+			if (!ad.isEnabled()) {
 				continue;
 			}
 			Calendar start = ad.getStart();
-			if(start==null || start.before(Calendar.getInstance())) {
-				
+			if (start == null || start.before(Calendar.getInstance())) {
+
 			} else {
 				continue;
 			}
 			Calendar end = ad.getEnd();
-			if(end==null || end.after(Calendar.getInstance())) {
-				
+			if (end == null || end.after(Calendar.getInstance())) {
+
 			} else {
 				continue;
 			}
-			if(ad.getBeforeVersion()!=null) {
-				int version = ad.getBeforeVersion();
-				try {
-					int appVersion = ctx.getPackageManager().getPackageInfo(ctx.getPackageName(), 0).versionCode;
-					if(appVersion >= version) {
-						continue;
-					}
-				} catch (Exception e) {}
+			int appVersion = 0;
+			try {
+				appVersion = ctx.getPackageManager().getPackageInfo(
+						ctx.getPackageName(), 0).versionCode;
+			} catch (Exception e) {
+
 			}
-			if(!TextUtils.isEmpty(ad.getDiscardKey())) {
-				if(WDb.get().getPreference("discard_"+ad.getDiscardKey())!=null) {
+			if (ad.getBeforeVersion() != null) {
+				int version = ad.getBeforeVersion();
+				if (appVersion >= version) {
+					continue;
+				}
+			}
+			if (ad.getAfterVersion() != null) {
+				int version = ad.getAfterVersion();
+				if(appVersion <= version) {
+					continue;
+				}
+			}
+			if (!TextUtils.isEmpty(ad.getDiscardKey())) {
+				if (WDb.get().getPreference("discard_" + ad.getDiscardKey()) != null) {
 					continue;
 				}
 			}
@@ -114,5 +142,5 @@ public class AppConfig {
 		}
 		return null;
 	}
-	
+
 }

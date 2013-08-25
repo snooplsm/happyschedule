@@ -7,5 +7,7 @@
 
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
-
+    <dimen name="view_station_button_marginLeft">16dp</dimen>
+    <dimen name="view_station_button_marginRight">16dp</dimen>
+    <dimen name="view_station_button_textSize">33sp</dimen>
 </resources>

@@ -5,13 +5,13 @@
     android:layout_height="match_parent" >
 
     <TextView
-        android:layout_marginLeft="6dp"
-        android:layout_marginRight="6dp"
+        android:layout_marginLeft="@dimen/view_station_button_marginLeft"
+        android:layout_marginRight="@dimen/view_station_button_marginRight"
         android:id="@+id/departure_id"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center_vertical"
-        android:textSize="27dp"
+        android:textSize="@dimen/view_station_button_textSize"
         android:text="Departure" />
 
 </RelativeLayout>

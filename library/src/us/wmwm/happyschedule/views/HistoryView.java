@@ -21,6 +21,7 @@ public class HistoryView extends RelativeLayout {
 	
 	Station fromStation;
 	Station toStation;
+	long timetime;
 	
 	public HistoryView(Context ctx) {
 		super(ctx);
@@ -45,13 +46,18 @@ public class HistoryView extends RelativeLayout {
 		}
 		
 		Calendar cal = Calendar.getInstance();
-		cal.setTimeInMillis(cursor.getLong(2));
+		timetime = cursor.getLong(2);
+		cal.setTimeInMillis(timetime);		
 		time.setText(TIME.format(cal.getTime()));
 		
 	}
 	
 	public Station getFromStation() {
 		return fromStation;
+	}
+	
+	public long getTimetime() {
+		return timetime;
 	}
 	
 	public Station getToStation() {

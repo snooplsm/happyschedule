@@ -17,6 +17,9 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import android.util.Log;
+
+import us.wmwm.happyschedule.model.AppConfig;
 import us.wmwm.happyschedule.model.TrainStatus;
 
 /**
@@ -32,17 +35,21 @@ public class DeparturePoller {
 	private static final String TO = "TO";
 	private static final String DEPARTS = "DEP";
 	
-	public List<TrainStatus> getTrainStatuses(String station) throws IOException {
+	public List<TrainStatus> getTrainStatuses(AppConfig config, String station) throws IOException {
 		URL url = null;
 		try {
-			url = new URL("http://dv.njtransit.com/mobile/tid-mobile.aspx?sid="+station);
+			Log.d("DeparturePoller", config+"");
+			Log.d("DeparturePoller", config.getDepartureVision());
+			String u = config.getDepartureVision().replaceAll("\\$stop_id", station);
+			Log.d("DeparturePoller", u);
+			url = new URL(u);
 		} catch (MalformedURLException e) {
 			throw new IllegalArgumentException(e);
 		}
 		HttpURLConnection conn = null;
 		try {
 			conn = (HttpURLConnection) url.openConnection();
-			conn.setReadTimeout(20000);
+			conn.setReadTimeout(10000);
 			conn.setRequestProperty("User-Agent", "Mozilla/5.0 (iPhone; CPU iPhone OS 5_0 like Mac OS X) AppleWebKit/534.46 (KHTML, like Gecko) Version/5.1 Mobile/9A334 Safari/7534.48.3");
 			if(conn.getResponseCode()!=200) {
 				return Collections.emptyList();

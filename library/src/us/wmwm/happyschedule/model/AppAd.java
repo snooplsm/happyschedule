@@ -24,6 +24,7 @@ public class AppAd implements Serializable {
 	boolean closeable;
 	boolean enabled;
 	Integer beforeVersion;
+	Integer afterVersion;
 	
 	public boolean isEnabled() {
 		return enabled;
@@ -131,6 +132,9 @@ public class AppAd implements Serializable {
 		if(o.has("beforeVersion")) {
 			beforeVersion = o.optInt("beforeVersion");
 		}
+		if(o.has("afterVersion")) {
+			afterVersion = o.optInt("afterVersion");
+		}
 		if(o.has("start")) {			
 			Calendar start = Calendar.getInstance();
 			try {
@@ -162,6 +166,10 @@ public class AppAd implements Serializable {
 			this.end = end;
 		}
 		
+	}
+	
+	public Integer getAfterVersion() {
+		return afterVersion;
 	}
 	
 }

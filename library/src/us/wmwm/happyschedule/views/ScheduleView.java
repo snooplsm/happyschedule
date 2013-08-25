@@ -252,21 +252,26 @@ public class ScheduleView extends RelativeLayout {
 
 	public void setStatus(TrainStatus trainStatus) {
 		track.setVisibility(View.GONE);
+		track2.setVisibility(View.GONE);
 		status.setVisibility(View.GONE);
-		trainInfoContainerParams.addRule(RelativeLayout.BELOW, R.id.train_info);
 		if (trainStatus != null) {
 			if(!TextUtils.isEmpty(trainStatus.getStatus())) {
 				status.setVisibility(View.VISIBLE);
 				status.setText(trainStatus.getStatus());
-				trainInfoContainerParams.addRule(RelativeLayout.BELOW, R.id.train_info);
 			} else {
 				status.setVisibility(View.GONE);
-				trainInfoContainerParams.addRule(RelativeLayout.BELOW, R.id.track);
 			}
 			
 			if(!TextUtils.isEmpty(trainStatus.getTrack()) ) {
-				track.setVisibility(View.VISIBLE);
+				if(!TextUtils.isEmpty(trainStatus.getStatus())) {
+					track.setVisibility(View.GONE);
+					track2.setVisibility(View.VISIBLE);
+				} else {
+					track2.setVisibility(View.GONE);
+					track.setVisibility(View.VISIBLE);
+				}
 				track.setText(trainStatus.getTrack().trim());
+				track2.setText(trainStatus.getTrack().trim());
 			} else {
 				track.setVisibility(View.INVISIBLE);
 			}

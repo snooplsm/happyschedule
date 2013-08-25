@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import us.wmwm.happyschedule.R;
-import us.wmwm.happyschedule.ThreadHelper;
 import us.wmwm.happyschedule.dao.WDb;
 import us.wmwm.happyschedule.fragment.FragmentHistory.OnHistoryListener;
 import us.wmwm.happyschedule.fragment.FragmentPickStations.OnGetSchedule;
@@ -132,14 +131,18 @@ public class FragmentMain extends Fragment {
 					@Override
 					public void onHistory(final Station from, final Station to) {						
 						onGetSchedule.onGetSchedule(from, to);
-						ThreadHelper.getScheduler().submit(new Runnable() {
+						new Thread() {
 							@Override
 							public void run() {
-								WDb.get().savePreference("lastDepartId", from.getId());
-								WDb.get().savePreference("lastArriveId", to.getId());
-								WDb.get().saveHistory(from, to);
+								try {
+									WDb.get().savePreference("lastDepartId", from.getId());
+									WDb.get().savePreference("lastArriveId", to.getId());
+									WDb.get().saveHistory(from, to);
+								} catch (Exception e) {
+									
+								}
 							}
-						});
+						}.start();
 					}
 				});
 				// fma.setOnStationSelectedListener(new
