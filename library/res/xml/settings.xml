@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <PreferenceCategory android:title="@string/settings_category_departure_vision" >
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="@string/settings_departure_vision_key_on"
+            android:summary="@string/settings_summary_departure_vision"
+            android:title="@string/settings_title_departure_vision" />
+
+        <ListPreference
+            android:defaultValue="@string/settings_departure_vision_entry_value_period_10"
+            android:dependency="@string/settings_departure_vision_key_on"
+            android:summary="@string/settings_summary_departure_vision_period"
+            android:entries="@array/settings_departure_vision_entries"
+            android:entryValues="@array/settings_departure_vision_entry_values"
+            android:key="@string/settings_departure_vision_key_period"
+            android:title="@string/settings_title_departure_vision_period" >
+        </ListPreference>
+    </PreferenceCategory>
+
+</PreferenceScreen>

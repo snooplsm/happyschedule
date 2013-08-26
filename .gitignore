@@ -1,2 +1,6 @@
 library/bin
 library/gen
+NJRail/bin
+NJRail/gen
+NJTransit/bin
+NJTransit/gen

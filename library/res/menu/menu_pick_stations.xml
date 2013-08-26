@@ -4,7 +4,11 @@
     <item
         android:id="@+id/menu_reverse"
         android:icon="@drawable/ic_action_import_export"
-        android:title="Reverse"
-        android:showAsAction="always"/>
+        android:showAsAction="always"
+        android:title="Reverse"/>
+    <item
+        android:id="@+id/menu_settings"
+        android:showAsAction="never"
+        android:title="Settings"/>
 
 </menu>

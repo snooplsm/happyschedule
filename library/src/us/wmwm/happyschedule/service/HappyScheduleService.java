@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.Future;
 
@@ -77,9 +78,7 @@ public class HappyScheduleService extends Service {
 							PendingIntent pi = PendingIntent.getActivity(this, 0, i, 0);
 							alarmManager.cancel(pi);
 							Alarms.removeAlarm(this, alarm);
-						}
-						System.out.println("notif cancel: " + id);
-						
+						}						
 					}
 				}
 				if("lines".equals(type)) {
@@ -97,8 +96,14 @@ public class HappyScheduleService extends Service {
 							try {
 								conn = client.open(new URL("http://ryangravener.com/njrails/config.json"));
 								if(config.exists()) {
-									Date d = new Date(config.lastModified());
-									conn.addRequestProperty("If-Modified-Since", RFC.format(d));
+									Calendar c = Calendar.getInstance();
+									c.setTimeInMillis(config.lastModified());
+									Calendar later = (Calendar) c.clone();
+									later.add(Calendar.HOUR_OF_DAY, 3);
+									if(!Calendar.getInstance().after(later)) {
+										return;
+									}
+									conn.addRequestProperty("If-Modified-Since", RFC.format(c.getTime()));
 								}
 								if(conn.getResponseCode()==200) {
 									String txt = Streams.readFully(in = conn.getInputStream());

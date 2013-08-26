@@ -164,28 +164,28 @@ public class FragmentHistory extends HappyFragment {
 	public void onActivityCreated(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onActivityCreated(savedInstanceState);
-		FragmentAmazonAd ad = new FragmentAmazonAd();
-		ad.setHappyAdListener(new HappyAdListener() {
-			@Override
-			public void onAd() {
-				
-			}
-			@Override
-			public void onAdFailed(int count, boolean noFill) {
-				handler.post(new Runnable() {
-					@Override
-					public void run() {
-						try {
-							FragmentGoogleAd gad = new FragmentGoogleAd();						
-							getFragmentManager().beginTransaction().replace(R.id.fragment_ad, gad).commit();
-						} catch (Exception e) {
-							
-						}
-					}
-				});
-			}
-		});
-		getFragmentManager().beginTransaction().replace(R.id.fragment_ad, ad).commit();
+//		FragmentAmazonAd ad = new FragmentAmazonAd();
+//		ad.setHappyAdListener(new HappyAdListener() {
+//			@Override
+//			public void onAd() {
+//				
+//			}
+//			@Override
+//			public void onAdFailed(int count, boolean noFill) {
+//				handler.post(new Runnable() {
+//					@Override
+//					public void run() {
+//						try {
+//							FragmentGoogleAd gad = new FragmentGoogleAd();						
+//							getFragmentManager().beginTransaction().replace(R.id.fragment_ad, gad).commit();
+//						} catch (Exception e) {
+//							
+//						}
+//					}
+//				});
+//			}
+//		});
+//		getFragmentManager().beginTransaction().replace(R.id.fragment_ad, ad).commit();
 	}
 	
 	@Override

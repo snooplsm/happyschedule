@@ -6,6 +6,7 @@ import java.util.Map;
 import us.wmwm.happyschedule.R;
 import us.wmwm.happyschedule.ThreadHelper;
 import us.wmwm.happyschedule.activity.ActivityPickStation;
+import us.wmwm.happyschedule.activity.SettingsActivity;
 import us.wmwm.happyschedule.dao.Db;
 import us.wmwm.happyschedule.dao.ScheduleDao;
 import us.wmwm.happyschedule.dao.WDb;
@@ -102,6 +103,9 @@ public class FragmentPickStations extends Fragment implements IPrimary {
 		if (item.getItemId() == R.id.menu_reverse) {
 			reverse();
 			return true;
+		}
+		if(item.getItemId()==R.id.menu_settings) {
+			startActivity(new Intent(getActivity(), SettingsActivity.class));
 		}
 		return super.onOptionsItemSelected(item);
 	}

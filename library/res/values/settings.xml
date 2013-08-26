@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="settings_category_departure_vision">Departure Vision</string>
+    <string name="settings_title_departure_vision">Use Departure Vision</string>
+    <string name="settings_title_departure_vision_period">Refresh Interval</string>
+    <string name="settings_summary_departure_vision">Enables live tracking of train statuses and the track at which they will depart.</string>
+    <string name="settings_summary_departure_vision_period">How often we lookup the train staus.</string>
+    <string name="settings_departure_vision_key_on">use_departurevision</string>
+    <string name="settings_departure_vision_key_period">departurevision_interval</string>
+    <string name="settings_departure_vision_entry_period_5">5 seconds</string>
+    <string name="settings_departure_vision_entry_period_10">10 seconds</string>
+    <string name="settings_departure_vision_entry_period_15">15 seconds</string>
+    <string name="settings_departure_vision_entry_period_30">30 seconds</string>
+    <string name="settings_departure_vision_entry_period_45">45 seconds</string>
+    <string name="settings_departure_vision_entry_period_60">60 seconds</string>
+    <string name="settings_departure_vision_entry_value_period_5">5</string>
+    <string name="settings_departure_vision_entry_value_period_10">10</string>
+    <string name="settings_departure_vision_entry_value_period_15">15</string>
+    <string name="settings_departure_vision_entry_value_period_30">30</string>
+    <string name="settings_departure_vision_entry_value_period_45">45</string>
+    <string name="settings_departure_vision_entry_value_period_60">60</string>
+
+    <string-array name="settings_departure_vision_entries">
+        <item>@string/settings_departure_vision_entry_period_5</item>
+        <item>@string/settings_departure_vision_entry_period_10</item>
+        <item>@string/settings_departure_vision_entry_period_15</item>
+        <item>@string/settings_departure_vision_entry_period_30</item>
+        <item>@string/settings_departure_vision_entry_period_45</item>
+        <item>@string/settings_departure_vision_entry_period_60</item>
+    </string-array>
+    <string-array name="settings_departure_vision_entry_values">
+        <item>@string/settings_departure_vision_entry_value_period_5</item>
+        <item>@string/settings_departure_vision_entry_value_period_10</item>
+        <item>@string/settings_departure_vision_entry_value_period_15</item>
+        <item>@string/settings_departure_vision_entry_value_period_30</item>
+        <item>@string/settings_departure_vision_entry_value_period_45</item>
+        <item>@string/settings_departure_vision_entry_value_period_60</item>
+    </string-array>
+
+</resources>
