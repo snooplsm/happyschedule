@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -23,6 +24,8 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.IBinder;
 
@@ -94,7 +97,16 @@ public class HappyScheduleService extends Service {
 							File config = new File(getApplication().getFilesDir(),"config.json");
 							FileOutputStream fos = null;
 							try {
-								conn = client.open(new URL("http://ryangravener.com/njrails/config.json"));
+								String version = "";
+								try {
+									PackageManager pm = getPackageManager();
+									PackageInfo pinfo = pm.getPackageInfo(getPackageName(), 0);
+									version = pinfo.versionName;
+									version = URLEncoder.encode(version,"utf-8");
+								} catch (Exception e) {
+									
+								}
+								conn = client.open(new URL("http://ryangravener.com/njrails/config.json?appVersion="+version));
 								if(config.exists()) {
 									Calendar c = Calendar.getInstance();
 									c.setTimeInMillis(config.lastModified());

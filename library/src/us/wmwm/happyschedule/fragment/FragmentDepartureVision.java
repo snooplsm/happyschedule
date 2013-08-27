@@ -106,7 +106,7 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary,
 				erroText.setVisibility(View.GONE);
 				if (poll == null || poll.isCancelled()) {
 					poll = ThreadHelper.getScheduler().scheduleAtFixedRate(r,
-							100, 10000, TimeUnit.MILLISECONDS);
+							100, SettingsFragment.getPollMilliseconds(), TimeUnit.MILLISECONDS);
 				}
 			} else {
 				if (poll != null) {
@@ -422,7 +422,7 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary,
 		NetworkInfo i = manager.getActiveNetworkInfo();
 		if (i != null && i.isConnected() && canLoad) {
 			poll = ThreadHelper.getScheduler().scheduleAtFixedRate(r, 100,
-					10000, TimeUnit.MILLISECONDS);
+					SettingsFragment.getPollMilliseconds(), TimeUnit.MILLISECONDS);
 		}
 	}
 
@@ -470,7 +470,7 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary,
 				}
 				if (canLoad && station != null) {
 					poll = ThreadHelper.getScheduler().scheduleAtFixedRate(r,
-							100, 10000, TimeUnit.MILLISECONDS);
+							100, SettingsFragment.getPollMilliseconds(), TimeUnit.MILLISECONDS);
 				}
 				List<TrainStatus> ks = Collections.emptyList();
 				adapter.setData(ks);
@@ -502,7 +502,7 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary,
 			if ((poll == null || poll.isCancelled()) && station != null) {
 				Log.d(TAG, "Polling!");
 				poll = ThreadHelper.getScheduler().scheduleAtFixedRate(r, 100,
-						10000, TimeUnit.MILLISECONDS);
+						SettingsFragment.getPollMilliseconds(), TimeUnit.MILLISECONDS);
 			} else {
 				Log.d(TAG, "Not Polling!");
 			}

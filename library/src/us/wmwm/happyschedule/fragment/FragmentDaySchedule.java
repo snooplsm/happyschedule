@@ -14,6 +14,8 @@ import java.util.concurrent.TimeUnit;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.flurry.android.FlurryAgent;
+
 import us.wmwm.happyschedule.Alarms;
 import us.wmwm.happyschedule.R;
 import us.wmwm.happyschedule.ThreadHelper;
@@ -234,6 +236,13 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 
 	Runnable updateEverySixtySeconds = new Runnable() {
 		public void run() {
+			Map<String,String> args = new HashMap<String,String>();
+			args.put("day", day.toString());
+			args.put("from_id", from.getId());
+			args.put("from_name", from.getName());
+			args.put("to_id", to.getId());
+			args.put("to_name", to.getName());
+			FlurryAgent.logEvent("UpdateSchedule",args);
 			Log.d(FragmentDaySchedule.class.getSimpleName(),
 					"updating schedule view");
 			handler.post(populateAdpter);
@@ -259,16 +268,25 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 		@Override
 		public void run() {
 			Log.d(TAG, "IN LOAD");
+			Map<String,String> args = new HashMap<String,String>();
+			
 			List<Alarm> alarms = Alarms.getAlarms(getActivity());
 			tripIdToAlarm = new HashMap<StationToStation, List<Alarm>>();
 			for (Alarm a : alarms) {
 				addAlarm(a);
 			}
+			
 			Calendar date = Calendar.getInstance();
 			date.setTime(day);
 			final Calendar tomorrow = Calendar.getInstance();
 			tomorrow.setTime(day);
 			tomorrow.add(Calendar.DAY_OF_YEAR, 1);
+			args.put("day", day.toString());
+			args.put("from_id", from.getId());
+			args.put("from_name", from.getName());
+			args.put("to_id", to.getId());
+			args.put("to_name", to.getName());
+			FlurryAgent.logEvent("LoadSchedule", args, true);
 			try {
 				schedule = ScheduleDao.get().getSchedule(from.getId(),
 						to.getId(), day, day);
@@ -321,7 +339,7 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 			} catch (Exception e) {
 				Log.e(TAG, "UNSUCCESSFUL SCHEDULE", e);
 			}
-
+			FlurryAgent.endTimedEvent("LoadSchedule");
 			Iterator<Map.Entry<StationToStation, List<Alarm>>> ak = tripIdToAlarm
 					.entrySet().iterator();
 			while (ak.hasNext()) {
