@@ -44,7 +44,7 @@ public class FragmentStationPicker extends HappyFragment {
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		menu.clear();
 		inflater.inflate(R.menu.menu_station_picker, menu);
-		if(jumper.getVisibility()==View.VISIBLE) {
+		if(jumper==null || jumper.getVisibility()==View.VISIBLE) {
 			menu.findItem(R.id.menu_jumper).setVisible(false);
 		} else {
 			menu.findItem(R.id.menu_jumper).setVisible(true);

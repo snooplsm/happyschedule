@@ -10,6 +10,6 @@
 	<classpathentry kind="lib" path="libs/amazon-ads-5.1.14.jar"/>
 	<classpathentry kind="lib" path="libs/okhttp-1.1.1.jar"/>
 	<classpathentry kind="lib" path="libs/GoogleAdMobAdsSdk-6.4.1.jar"/>
-	<classpathentry kind="lib" path="libs/Flurry_3.2.1.jar"/>
+	<classpathentry kind="lib" path="libs/FlurryAgent.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

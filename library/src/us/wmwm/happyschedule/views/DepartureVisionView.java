@@ -23,10 +23,11 @@ public class DepartureVisionView extends RelativeLayout {
 	TextView track;
 	View trackContainer;
 	TextView time;
-	
+
 	public DepartureVisionView(Context context) {
 		super(context);
-		LayoutInflater.from(context).inflate(R.layout.view_departurevision,this);
+		LayoutInflater.from(context).inflate(R.layout.view_departurevision,
+				this);
 		lineIndicator = findViewById(R.id.line_indicator);
 		destination = (TextView) findViewById(R.id.destination);
 		acronym = (TextView) findViewById(R.id.acronym);
@@ -34,12 +35,18 @@ public class DepartureVisionView extends RelativeLayout {
 		trackContainer = findViewById(R.id.track_container);
 		time = (TextView) findViewById(R.id.time);
 	}
-	
+
 	public void setData(TrainStatus status, Map<String,LineStyle> keyToColor) {
 		LineStyle line = keyToColor.get(status.getLine().toLowerCase());
 		if(line!=null) {
 			lineIndicator.setBackgroundColor(line.color);
 			acronym.setText(line.acronym);
+		} else {
+			try {
+			acronym.setText(status.getLine().substring(0, Math.min(status.getLine().length(), 3)));
+			} catch (Exception e) {
+				
+			}
 		}
 		
 		destination.setText(status.getDest());
@@ -53,6 +60,4 @@ public class DepartureVisionView extends RelativeLayout {
 		
 	};
 
-	
-	
 }

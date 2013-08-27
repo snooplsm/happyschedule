@@ -1,5 +1,6 @@
 package us.wmwm.happyschedule.fragment;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -56,6 +57,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListView;
@@ -351,6 +353,11 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 				Log.e(TAG, "can't parse appConfig",e);
 			}
 			handler.post(hideProgress);
+			handler.postDelayed(new Runnable() {
+				public void run() {
+					getActivity().invalidateOptionsMenu();
+				};
+			},50);
 			updateSchedulePeriodically();
 		}
 		
@@ -405,6 +412,7 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
+		
 		poller = new DeparturePoller();
 		alarmManger = (AlarmManager) getActivity().getSystemService(
 				Context.ALARM_SERVICE);
@@ -618,13 +626,14 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 			}
 		};
 		list.setAdapter(adapter);
+		setHasOptionsMenu(true);
 		activityCreated = true;
 	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setHasOptionsMenu(true);
+		super.onCreate(savedInstanceState);	
+
 	}
 
 	@Override
