@@ -6,17 +6,32 @@
             android:defaultValue="true"
             android:key="@string/settings_departure_vision_key_on"
             android:summary="@string/settings_summary_departure_vision"
-            android:title="@string/settings_title_departure_vision" />
+            android:title="@string/settings_title_departure_vision" >
+        </CheckBoxPreference>
 
         <ListPreference
             android:defaultValue="@string/settings_departure_vision_entry_value_period_10"
             android:dependency="@string/settings_departure_vision_key_on"
-            android:summary="@string/settings_summary_departure_vision_period"
             android:entries="@array/settings_departure_vision_entries"
             android:entryValues="@array/settings_departure_vision_entry_values"
             android:key="@string/settings_departure_vision_key_period"
+            android:summary="@string/settings_summary_departure_vision_period"
             android:title="@string/settings_title_departure_vision_period" >
         </ListPreference>
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/settings_category_notifications" >
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="@string/settings_key_push_on"
+            android:summary="@string/settings_summary_notifications"
+            android:title="@string/settings_title_notifications_enable" >
+        </CheckBoxPreference>
+        <Preference
+            android:title="Rail Lines"
+            android:key="@string/settings_key_rail_lines"
+            android:dependency="@string/settings_key_push_on"
+            android:summary="@string/settings_summary_rail_lines"
+            />
     </PreferenceCategory>
 
 </PreferenceScreen>

@@ -4,6 +4,7 @@ package us.wmwm.happyschedule.views;
 import java.util.List;
 
 import us.wmwm.happyschedule.R;
+import us.wmwm.happyschedule.dao.WDb;
 import us.wmwm.happyschedule.model.Alarm;
 import us.wmwm.happyschedule.model.Schedule;
 import us.wmwm.happyschedule.model.StationToStation;
@@ -72,6 +73,10 @@ public class ScheduleControlsView extends LinearLayout {
 			alarmView.setListener(listener);
 			this.alarms.addView(alarmView);
 			alarmView.setData(alarm);
+		}
+		boolean notifs = WDb.get().hasNotification(sts.blockId);
+		if(notifs) {
+			//pin.setI
 		}
 	}
 	

@@ -1,5 +1,7 @@
 package us.wmwm.happyschedule.dao;
 
+import java.util.List;
+
 import us.wmwm.happyschedule.application.HappyApplication;
 import us.wmwm.happyschedule.model.Station;
 import android.content.ContentValues;
@@ -8,7 +10,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 public class WDb {
-	
+
 	public static final String REVERSE_BUTTON_MARGIN_LEFT_PERCENTAGE = "reverseButtonMarginLeftPercentage";
 
 	SQLiteDatabase db;
@@ -61,7 +63,7 @@ public class WDb {
 
 	private static class OpenHelper extends SQLiteOpenHelper {
 		public OpenHelper(String name) {
-			super(HappyApplication.get(), name, null, 1);
+			super(HappyApplication.get(), name, null, 2);
 		}
 
 		@Override
@@ -72,14 +74,44 @@ public class WDb {
 
 		@Override
 		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
+			db.execSQL("create table if not exists notification(block_id varchar(100) unique, created integer)");
 		}
+	}
+	
+	public boolean hasNotification(String block) {
+		Cursor c = db.rawQuery("select count(*) from notification where block_id=?", new String[]{block});
+		c.moveToNext();
+		int count = c.getInt(0);
+		c.close();
+		return count!=0;
+	}
+
+	public boolean addOrDeleteNotification(boolean enable, List<String> blocks) {
+		boolean has;
+//		Cursor c = db.rawQuery(
+//				"select count(*) from notification where block_id=?",
+//				new String[] { blockid });
+//		has = c.getInt(0) != 0;
+//		c.close();
+		for (String blockid : blocks) {
+			if (!enable) {
+				db.delete("notification", "block_id=?",
+						new String[] { blockid });
+			} else {
+				ContentValues cv = new ContentValues();
+				cv.put("block_id", blockid);
+				cv.put("created", System.currentTimeMillis());
+				db.insert("notification", null, cv);
+			}
+		}
+		return !enable;
 	}
 
 	public void delete(Station from, Station to, long time) {
-		db.delete("history", "depart_id=? and arrive_id=? and time=?", new String[] {from.getId(), to.getId(), String.valueOf(time)});		
+		db.delete("history", "depart_id=? and arrive_id=? and time=?",
+				new String[] { from.getId(), to.getId(), String.valueOf(time) });
 	}
-	
+
 	public void deleteAllHistory() {
 		db.delete("history", null, null);
 	}

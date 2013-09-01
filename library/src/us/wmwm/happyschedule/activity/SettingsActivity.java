@@ -10,6 +10,9 @@ public class SettingsActivity extends Activity {
 	protected void onCreate(Bundle arg0) {
 		super.onCreate(arg0);
 		setContentView(R.layout.activity_settings);
+		getActionBar().setSubtitle(getString(R.string.activity_name_settings));
+		getActionBar().setHomeButtonEnabled(true);
+		getActionBar().setDisplayHomeAsUpEnabled(true);
 	}
 	
 }

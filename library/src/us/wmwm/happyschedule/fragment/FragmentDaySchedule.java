@@ -21,6 +21,7 @@ import us.wmwm.happyschedule.R;
 import us.wmwm.happyschedule.ThreadHelper;
 import us.wmwm.happyschedule.activity.AlarmActivity;
 import us.wmwm.happyschedule.dao.ScheduleDao;
+import us.wmwm.happyschedule.dao.WDb;
 import us.wmwm.happyschedule.fragment.FragmentAlarmPicker.OnTimerPicked;
 import us.wmwm.happyschedule.fragment.FragmentPickStations.OnGetSchedule;
 import us.wmwm.happyschedule.model.Alarm;
@@ -28,6 +29,7 @@ import us.wmwm.happyschedule.model.AppConfig;
 import us.wmwm.happyschedule.model.Schedule;
 import us.wmwm.happyschedule.model.ScheduleTraverser;
 import us.wmwm.happyschedule.model.Station;
+import us.wmwm.happyschedule.model.StationInterval;
 import us.wmwm.happyschedule.model.StationToStation;
 import us.wmwm.happyschedule.model.TrainStatus;
 import us.wmwm.happyschedule.model.Type;
@@ -499,7 +501,18 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 
 						@Override
 						public void onPin() {
-
+							ArrayList<String> blocks = new ArrayList<String>();
+							if(sts instanceof StationInterval) {
+								StationInterval si = (StationInterval)sts;
+								while(si.hasNext()) {
+									if(si.blockId!=null) {
+										blocks.add(si.blockId);
+									}
+								}
+							} else {
+								blocks.add(sts.blockId);
+							}
+							WDb.get().addOrDeleteNotification(true, blocks);
 						}
 
 						@Override

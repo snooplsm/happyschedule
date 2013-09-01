@@ -6,6 +6,7 @@ import com.flurry.android.FlurryAgent;
 
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.view.MenuItem;
 
 public class HappyActivity extends FragmentActivity {
 
@@ -20,6 +21,14 @@ public class HappyActivity extends FragmentActivity {
 	protected void onDestroy() {
 		super.onDestroy();
 		FlurryAgent.onEndSession(this);
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		if(item.getItemId()==android.R.id.home) {
+			finish();
+		}
+		return super.onOptionsItemSelected(item);
 	}
 	
 }

@@ -21,6 +21,7 @@ public class HappyApplication extends Application {
 	@Override
 	public void onCreate() {
 		INSTANCE = this;
+		
 		super.onCreate();
 		FlurryAgent.setReportLocation(false);
 		try {

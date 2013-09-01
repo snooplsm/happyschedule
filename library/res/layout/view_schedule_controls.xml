@@ -39,11 +39,11 @@
                 android:id="@+id/pin"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:visibility="gone"
                 android:layout_gravity="center"
                 android:layout_weight="1"
-                app1:src="@drawable/ic_download_pin" />
+                app1:src="@drawable/pin" />
 
+            
             <us.wmwm.happyschedule.views.ScheduleControlButton
                 android:id="@+id/trips"
                 android:layout_width="0dp"

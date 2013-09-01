@@ -38,4 +38,12 @@
         <item>@string/settings_departure_vision_entry_value_period_60</item>
     </string-array>
 
+    <string name="settings_category_notifications">Alerts</string>
+    <string name="settings_title_notifications_enable">Enable Alerts</string>
+    <string name="settings_summary_notifications">Alerts are dispatched when train abnormalities arise.</string>
+    <string name="settings_key_push_on">push_notifications_enabled</string>
+    <string name="settings_key_rail_lines">push_notifications_rail_lines</string>
+    <string name="settings_summary_rail_lines">Select which rail lines you want to receive alerts on.</string>
+
+    
 </resources>

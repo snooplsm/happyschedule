@@ -3,6 +3,7 @@ package us.wmwm.happyschedule.views;
 import us.wmwm.happyschedule.R;
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.widget.ImageView;
@@ -31,6 +32,10 @@ public class ScheduleControlButton extends RelativeLayout {
 
 	public ScheduleControlButton(Context context) {
 		this(context, null);
+	}
+	
+	public void setDrawable(Drawable d) {
+		icon.setImageDrawable(d);
 	}
 
 }

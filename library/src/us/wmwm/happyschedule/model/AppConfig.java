@@ -10,8 +10,6 @@ import org.json.JSONObject;
 
 import us.wmwm.happyschedule.dao.WDb;
 import android.content.Context;
-import android.content.pm.PackageInfo;
-import android.text.TextUtils;
 import android.text.TextUtils;
 
 public class AppConfig {
@@ -22,6 +20,8 @@ public class AppConfig {
 
 	String shareDay;
 	String shareTrip;
+
+	List<AppRailLine> railLines;
 
 	public AppConfig(JSONObject o) {
 		ads = new ArrayList<AppAd>();
@@ -47,7 +47,16 @@ public class AppConfig {
 		if (departureVision != null) {
 			this.departureVision = departureVision.optString("url");
 		}
+		railLines = new ArrayList<AppRailLine>();
+		if (o.has("rail_lines")) {
+			JSONArray railLines = o.optJSONArray("rail_lines");
+			for (int i = 0; i < railLines.length(); i++) {
+				AppRailLine r = new AppRailLine(railLines.optJSONObject(i));
+				this.railLines.add(r);
+			}
+			Collections.sort(this.railLines);
 
+		}
 	}
 
 	public AppConfig() {
@@ -129,7 +138,7 @@ public class AppConfig {
 			}
 			if (ad.getAfterVersion() != null) {
 				int version = ad.getAfterVersion();
-				if(appVersion <= version) {
+				if (appVersion <= version) {
 					continue;
 				}
 			}
@@ -141,6 +150,10 @@ public class AppConfig {
 			return ad;
 		}
 		return null;
+	}
+	
+	public List<AppRailLine> getRailLines() {
+		return railLines;
 	}
 
 }
