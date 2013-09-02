@@ -84,17 +84,20 @@ public class FragmentMainAdapter extends FragmentStatePagerAdapter {
 		int count = getCount();
 		if (pos == 0) {
 			FragmentHistory history = new FragmentHistory();
+			history.setRetainInstance(false);
 			history.setOnHistoryListener(onHistoryListener);
 			return history;
 		}
 		if (pos == 1) {
 			FragmentPickStations pick = new FragmentPickStations();
+			pick.setRetainInstance(false);
 			pick.setOnGetSchedule(onGetSchedule);
 			return pick;
 		}
 		Station station = getDepartureVision(pos);
 		FragmentDepartureVision dv = FragmentDepartureVision.newInstance(
 				station, null,false);
+		dv.setRetainInstance(false);
 		dv.setOnStationSelected(onStationSelected);
 		return dv;
 	}

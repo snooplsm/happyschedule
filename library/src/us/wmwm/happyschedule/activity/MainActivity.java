@@ -50,25 +50,9 @@ public class MainActivity extends HappyActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		checkPlayServices();
-	}
+		//checkPlayServices();
+	}	
 	
-	private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
-	
-	private boolean checkPlayServices() {
-	    int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
-	    if (resultCode != ConnectionResult.SUCCESS) {
-	        if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
-	            GooglePlayServicesUtil.getErrorDialog(resultCode, this,
-	                    PLAY_SERVICES_RESOLUTION_REQUEST).show();
-	        } else {
-	            Log.i("MainActivity", "This device is not supported.");
-	            finish();
-	        }
-	        return false;
-	    }
-	    return true;
-	}
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {

@@ -3,20 +3,15 @@ package us.wmwm.happyschedule.adapter;
 import java.util.ArrayList;
 import java.util.List;
 
-import us.wmwm.happyschedule.R;
-import us.wmwm.happyschedule.R.dimen;
 import us.wmwm.happyschedule.dao.Db;
+import us.wmwm.happyschedule.views.StationHeader;
 import us.wmwm.happyschedule.views.StationView;
-
 import android.content.Context;
-import android.content.res.Resources;
 import android.database.Cursor;
-import android.graphics.Color;
 import android.support.v4.widget.CursorAdapter;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
-import android.widget.TextView;
 
 import com.emilsjolander.components.stickylistheaders.StickyListHeadersAdapter;
 
@@ -26,15 +21,15 @@ public class StationAdapter extends CursorAdapter implements StickyListHeadersAd
 	
 	public StationAdapter(Context context, boolean departureVisionOnly) {
 		super(context, null, true);
-		char A = 'A';
-		int AIND = (int)A;
-		int max = ((int)A) + 26;
-		for(int i = 0; i < 26; i++) {
-			A = (char)(((int)AIND) + (i));
-			for(int j = 0; j < 10; j++) {
-				letters.add(String.valueOf(A));
-			}
-		}
+//		char A = 'A';
+//		int AIND = (int)A;
+//		int max = ((int)A) + 26;
+//		for(int i = 0; i < 26; i++) {
+//			A = (char)(((int)AIND) + (i));
+//			for(int j = 0; j < 10; j++) {
+//				letters.add(String.valueOf(A));
+//			}
+//		}
 		swapCursor(Db.get().getStops(departureVisionOnly));
 	}
 
@@ -67,16 +62,16 @@ public class StationAdapter extends CursorAdapter implements StickyListHeadersAd
 
 	@Override
 	public View getHeaderView(int position, View convertView, ViewGroup parent) {
-		Context c = parent.getContext();
-		TextView tv = new TextView(c);
-		tv.setText(getName(getItem(position)).charAt(0)+"");
-		tv.setBackgroundColor(Color.GRAY);
-		Resources r = c.getResources();
-		tv.setTextSize(r.getDimension(R.dimen.header_text_size));
-		ViewGroup.LayoutParams lp;
-		tv.setLayoutParams(lp = new ViewGroup.LayoutParams(LayoutParams.MATCH_PARENT, (int) r.getDimension(R.dimen.header_height)));
-		tv.setPadding((int)r.getDimension(R.dimen.header_margin), tv.getPaddingTop(), tv.getPaddingRight(), tv.getPaddingBottom());
-		return tv;
+		StationHeader h;
+		if (convertView == null) {
+			h = new StationHeader(parent.getContext());
+			h.setLayoutParams(new ViewGroup.LayoutParams(
+					LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+		} else {
+			h = (StationHeader) convertView;
+		}
+		h.setData(String.valueOf(getItem(position).getString(2).charAt(0)));
+		return h;
 	}
 
 	@Override

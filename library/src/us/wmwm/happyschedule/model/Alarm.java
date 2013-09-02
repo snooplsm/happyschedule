@@ -27,6 +27,7 @@ public class Alarm implements Serializable {
 		Calendar c = Calendar.getInstance();
 		c.setTimeInMillis(o.optLong("time"));
 		id = o.optString("id");
+		System.out.println(id);
 		time = c;
 		stationToStation = new StationToStation(o.optJSONObject("stationToStation"));		
 	}
@@ -35,6 +36,7 @@ public class Alarm implements Serializable {
 		JSONObject o = new JSONObject();
 		try {
 			o.put("type", type.name());
+			System.out.println(id);
 			o.put("id", id);
 			o.put("time", time.getTimeInMillis());
 			o.put("stationToStation", new JSONObject(stationToStation.toJSON()));
@@ -49,6 +51,7 @@ public class Alarm implements Serializable {
 	}
 	
 	public void setId(String id) {
+		System.out.println(id);
 		this.id = id;
 	}
 

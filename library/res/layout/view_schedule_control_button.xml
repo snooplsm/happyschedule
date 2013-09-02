@@ -5,6 +5,7 @@
     android:padding="5dp" >
 
     <ImageView
+        android:background="@android:drawable/list_selector_background"
         android:id="@+id/icon"
         android:layout_width="40dp"
         android:layout_height="40dp"

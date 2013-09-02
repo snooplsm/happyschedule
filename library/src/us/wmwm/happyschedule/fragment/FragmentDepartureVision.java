@@ -46,6 +46,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 
 import com.emilsjolander.components.stickylistheaders.StickyListHeadersListView;
+import com.flurry.android.FlurryAgent;
 
 public class FragmentDepartureVision extends HappyFragment implements IPrimary,
 		ISecondary {
@@ -142,6 +143,11 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary,
 						station.getDepartureVision());
 				String key = getKey();
 				if (s != null && !s.isEmpty()) {
+					count++;
+					Map<String,String> k = new HashMap<String,String>();
+					k.put("station_id", station.getId());
+					k.put("station_name", station.getName());
+					FlurryAgent.logEvent("DepartureVision",k);
 					JSONArray a = new JSONArray();
 					if (lastStatuses != null) {
 						for (int i = 0; i < lastStatuses.size(); i++) {
@@ -481,6 +487,10 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary,
 		}
 		super.onActivityResult(requestCode, resultCode, data);
 	}
+	
+	boolean logged = false;
+	
+	int count;
 
 	@Override
 	public void setPrimaryItem() {
@@ -505,6 +515,14 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary,
 						SettingsFragment.getPollMilliseconds(), TimeUnit.MILLISECONDS);
 			} else {
 				Log.d(TAG, "Not Polling!");
+			}
+			if(!logged) {
+				Map<String,String> k = new HashMap<String,String>();
+				if(station!=null) {
+					k.put("station_id", station.getId());
+					k.put("station_name", station.getName());
+				}
+				FlurryAgent.logEvent("FragmentDepartureVision",k);
 			}
 		}
 

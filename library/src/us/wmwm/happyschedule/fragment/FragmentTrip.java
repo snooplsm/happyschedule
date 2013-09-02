@@ -2,7 +2,9 @@ package us.wmwm.happyschedule.fragment;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 
 import us.wmwm.happyschedule.R;
@@ -18,6 +20,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+
+import com.flurry.android.FlurryAgent;
 
 public class FragmentTrip extends HappyFragment {
 
@@ -53,6 +57,12 @@ public class FragmentTrip extends HappyFragment {
 		intervals.push(interval);
 		TripInfo last;
 		StationInterval lastInterval = null;
+		Map<String,String> k = new HashMap<String,String>();
+		k.put("from_id", depart.getId());
+		k.put("to_id", arrive.getId());
+		k.put("from_name", depart.getName());
+		k.put("to_name", arrive.getName());
+		k.put("trip", id);
 		while (!intervals.isEmpty()) {
 			interval = intervals.pop();
 			if (interval.tripId != null) {
@@ -83,6 +93,8 @@ public class FragmentTrip extends HappyFragment {
 			adapter = new TripAdapter(getActivity(), stops, schedule, startCal);
 			list.setAdapter(adapter);
 		}
+		
+		FlurryAgent.logEvent("ViewTrip",k);
 
 	}
 	

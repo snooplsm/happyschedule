@@ -74,10 +74,10 @@ public class ScheduleControlsView extends LinearLayout {
 			this.alarms.addView(alarmView);
 			alarmView.setData(alarm);
 		}
-		boolean notifs = WDb.get().hasNotification(sts.blockId);
-		if(notifs) {
-			//pin.setI
-		}
+//		boolean notifs = WDb.get().hasNotification(sts.blockId);
+//		if(notifs) {
+//			//pin.setI
+//		}
 	}
 	
 	public void setListener(ScheduleControlListener listener) {

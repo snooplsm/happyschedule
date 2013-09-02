@@ -63,8 +63,6 @@ public abstract class ClipDrawListener implements OnDragListener {
 			break;
 		case DragEvent.ACTION_DRAG_ENDED:
 			Log.d(TAG,"ENDED");
-			//v.setBackground(null);
-			//v.setVisibility(View.VISIBLE);
 		default:
 			break;
 		}

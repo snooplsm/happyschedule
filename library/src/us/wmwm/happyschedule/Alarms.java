@@ -86,7 +86,7 @@ public class Alarms {
 		AlarmManager alarmManger = (AlarmManager)ctx.getSystemService(Context.ALARM_SERVICE);
 		NotificationManager notifs = (NotificationManager) ctx.getSystemService(Context.NOTIFICATION_SERVICE);
 		Alarms.saveAlarm(ctx, alarm);
-		PendingIntent pi = PendingIntent.getActivity(ctx, 0, AlarmActivity.from(ctx, alarm.getStationToStation(), alarm.getTime(), alarm.getType()) , 0);
+		PendingIntent pi = PendingIntent.getActivity(ctx, 0, AlarmActivity.from(ctx, alarm.getStationToStation(), alarm.getTime(), alarm.getType(), alarm.getId()) , 0);
 		PendingIntent dismiss = PendingIntent.getService(ctx, 0, Alarms.newDismissIntent(ctx, alarm), 0);
 		NotificationCompat.Builder b = new NotificationCompat.Builder(ctx);
 		NotificationCompat.BigTextStyle bs = new NotificationCompat.BigTextStyle(b);

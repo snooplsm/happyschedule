@@ -29,6 +29,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.flurry.android.FlurryAgent;
 import com.squareup.timessquare.CalendarPickerView.OnDateSelectedListener;
 
 public class FragmentSchedule extends Fragment {
@@ -167,7 +168,6 @@ public class FragmentSchedule extends Fragment {
 		Bundle b = getArguments();
 		from = (Station) b.getSerializable("from");
 		to = (Station) b.getSerializable("to");
-
 		handler.post(new Runnable() {
 			@Override
 			public void run() {

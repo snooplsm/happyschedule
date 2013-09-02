@@ -53,16 +53,18 @@ public class AlarmActivity extends HappyActivity {
         setContentView(R.layout.activity_alarm);
         scheduleView = (ScheduleView) findViewById(R.id.schedule_view);
         dismiss = findViewById(R.id.dismiss);
+        final Alarm alarm = (Alarm) getIntent().getSerializableExtra("alarm");
         dismiss.setOnClickListener(new OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
 				dismiss.setVisibility(View.GONE);
+				startService(Alarms.newDismissIntent(v.getContext(), alarm));
 			}
 		});        
         getActionBar().setTitle(getString(R.string.activity_alarm_title));
         getActionBar().setDisplayHomeAsUpEnabled(true);
-        Alarm alarm = (Alarm) getIntent().getSerializableExtra("alarm");
+        
         Alarms.removeAlarm(this, alarm);
         notifs.cancel(alarm.getId().hashCode());
         StationToStation sts = alarm.getStationToStation();
@@ -84,9 +86,9 @@ public class AlarmActivity extends HappyActivity {
 		return super.onOptionsItemSelected(item);
 	}
 	
-	public static Intent from(Context ctx, StationToStation stationToStation, Calendar time, Type type) {
+	public static Intent from(Context ctx, StationToStation stationToStation, Calendar time, Type type, String id) {
 		Alarm alarm = new Alarm();
-		alarm.setId(UUID.randomUUID().toString());
+		alarm.setId(id);
 		alarm.setStationToStation(stationToStation);
 		alarm.setType(type);
 		alarm.setTime(time);

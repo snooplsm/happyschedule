@@ -41,6 +41,7 @@
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
                 android:layout_weight="1"
+                android:visibility="gone"
                 app1:src="@drawable/pin" />
 
             

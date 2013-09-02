@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
@@ -532,7 +533,7 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 													Intent i = AlarmActivity
 															.from(getActivity(),
 																	stationToStation,
-																	cal, type);
+																	cal, type, UUID.randomUUID().toString());
 													Alarm alarm = (Alarm) i
 															.getSerializableExtra("alarm");
 													addAlarm(alarm);
@@ -723,7 +724,7 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 		}
 		if (item.getItemId() == android.R.id.home) {
 			getActivity().onBackPressed();
-			return true;
+			return false;
 		}
 		if (item.getItemId() == R.id.menu_departurevision) {
 			onDepartureVision.onDepartureVision(from);

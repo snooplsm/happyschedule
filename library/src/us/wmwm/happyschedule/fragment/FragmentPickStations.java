@@ -3,6 +3,8 @@ package us.wmwm.happyschedule.fragment;
 import java.text.DecimalFormat;
 import java.util.Map;
 
+import com.flurry.android.FlurryAgent;
+
 import us.wmwm.happyschedule.R;
 import us.wmwm.happyschedule.ThreadHelper;
 import us.wmwm.happyschedule.activity.ActivityPickStation;
@@ -101,6 +103,7 @@ public class FragmentPickStations extends Fragment implements IPrimary {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		if (item.getItemId() == R.id.menu_reverse) {
+			FlurryAgent.logEvent("RevsereMenuOptionClicked");
 			reverse();
 			return true;
 		}
@@ -231,6 +234,7 @@ public class FragmentPickStations extends Fragment implements IPrimary {
 
 			@Override
 			public void onClick(View v) {
+				FlurryAgent.logEvent("RevserButtonClicked");
 				reverse();
 			}
 		};
@@ -252,6 +256,7 @@ public class FragmentPickStations extends Fragment implements IPrimary {
 
 			@Override
 			public boolean onLongClick(View view) {
+				FlurryAgent.logEvent("ReverseButtonLongClick");
 				ClipData data = ClipData.newPlainText("", "");
 				DragShadowBuilder shadowBuilder = new HappyShadowBuilder(view);
 				
@@ -259,11 +264,13 @@ public class FragmentPickStations extends Fragment implements IPrimary {
 				ClipDrawListener c = new ClipDrawListener(view) {
 					
 					protected void onStart(float xStart, View view, DragEvent event) {
+						FlurryAgent.logEvent("ReverseButtonDrag",true);
 						reverseButton.setVisibility(View.INVISIBLE);
 					}
 					
 					@Override
 					protected void onDrop(float xStart, View view, DragEvent event) {
+						FlurryAgent.endTimedEvent("ReverseButtonDrag");
 						reverseButton.setVisibility(View.VISIBLE);
 						int left = (int)event.getX() - reverseButton.getWidth()/2;
 						final Float percentLeft = left / (float)reverseButtonContainer.getWidth();

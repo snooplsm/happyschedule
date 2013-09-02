@@ -1,24 +1,38 @@
 package us.wmwm.happyschedule.fragment;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import us.wmwm.happyschedule.R;
 import us.wmwm.happyschedule.activity.RailLinesActivity;
 import us.wmwm.happyschedule.application.HappyApplication;
 import us.wmwm.happyschedule.dao.WDb;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Bundle;
+import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+import android.util.Log;
+
+import com.flurry.android.FlurryAgent;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 
 public class SettingsFragment extends PreferenceFragment {
 
 	ListPreference refreshInterval;
 	Preference railLine;
+	CheckBoxPreference pushNotifications;
+	
+
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -26,12 +40,45 @@ public class SettingsFragment extends PreferenceFragment {
 		addPreferencesFromResource(R.xml.settings);
 		refreshInterval = (ListPreference) findPreference(getString(R.string.settings_departure_vision_key_period));
 		railLine = (Preference) findPreference(getString(R.string.settings_key_rail_lines));
+		pushNotifications = (CheckBoxPreference) findPreference(getString(R.string.settings_key_push_on));
 		railLine.setIntent(new Intent(getActivity(), RailLinesActivity.class));
 		refreshInterval.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
 			
 			@Override
 			public boolean onPreferenceChange(Preference preference, Object newValue) {
 				updateRefreshInterval(refreshInterval.findIndexOfValue(String.valueOf(newValue)));
+								
+				return true;
+			}
+		});
+		pushNotifications.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
+			@Override
+			public boolean onPreferenceChange(Preference preference,
+					Object newValue) {
+				if(Boolean.TRUE.equals(newValue)) {
+					boolean isPlayInstalled = checkPlayServices(true);
+					if(!isPlayInstalled) {
+						packageInstalledReceiver = new BroadcastReceiver() {
+							@Override
+							public void onReceive(Context context, Intent intent) {
+								boolean installed = checkPlayServices(false);
+								if(installed) {
+									getActivity().unregisterReceiver(this);
+									packageInstalledReceiver = null;
+									pushNotifications.setChecked(true);
+									//PreferenceManager.getDefaultSharedPreferences(getActivity()).edit().putBoolean(pushNotifications.getKey(), Boolean.TRUE).commit();
+								}
+							}
+						};
+						IntentFilter it = new IntentFilter();
+						it.addAction(Intent.ACTION_PACKAGE_ADDED);
+						it.addAction(Intent.ACTION_PACKAGE_REPLACED);
+						it.addAction(Intent.ACTION_PACKAGE_CHANGED);
+						it.addDataScheme("package");
+						getActivity().registerReceiver(packageInstalledReceiver, it);
+					}
+					return isPlayInstalled;
+				}
 				return true;
 			}
 		});
@@ -39,8 +86,39 @@ public class SettingsFragment extends PreferenceFragment {
 		updateRefreshInterval(pos);
 	}
 	
+	BroadcastReceiver packageInstalledReceiver;
+	
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		if(packageInstalledReceiver!=null) {
+			getActivity().unregisterReceiver(packageInstalledReceiver);
+		}
+	}
+	
+	private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
+	
+	private boolean checkPlayServices(boolean showDialog) {
+	    int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(getActivity());
+	    if (resultCode != ConnectionResult.SUCCESS) {
+	    	if(showDialog) {
+		        if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
+		            GooglePlayServicesUtil.getErrorDialog(resultCode, getActivity(),
+		                    PLAY_SERVICES_RESOLUTION_REQUEST).show();
+		        } else {
+		            Log.i("MainActivity", "This device is not supported.");
+		        }
+	    	}
+	        return false;
+	    }
+	    return true;
+	}
+	
 	private void updateRefreshInterval(int valuePos) {
 		refreshInterval.setTitle(getString(R.string.settings_title_departure_vision_period) + " (" + refreshInterval.getEntries()[valuePos]+")");
+		Map<String,String> k = new HashMap<String,String>();
+		k.put("interval", String.valueOf(refreshInterval.getEntries()[valuePos]));
+		FlurryAgent.logEvent("DepartureVisionRefreshInterval",k);
 	}
 	
 	public static int getPollMilliseconds() {

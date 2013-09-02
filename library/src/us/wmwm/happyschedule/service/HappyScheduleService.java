@@ -17,6 +17,7 @@ import us.wmwm.happyschedule.Alarms;
 import us.wmwm.happyschedule.R;
 import us.wmwm.happyschedule.ThreadHelper;
 import us.wmwm.happyschedule.activity.AlarmActivity;
+import us.wmwm.happyschedule.dao.WDb;
 import us.wmwm.happyschedule.fragment.SettingsFragment;
 import us.wmwm.happyschedule.model.Alarm;
 import us.wmwm.happyschedule.util.Streams;
@@ -98,10 +99,13 @@ public class HappyScheduleService extends Service {
 	
 	Future<?> linesFuture;
 	
+	Future<?> pushFuture;
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		linesFuture.cancel(true);
+		if(linesFuture!=null) {
+			linesFuture.cancel(true);
+		}
 	}
 	
 	@Override
@@ -117,12 +121,15 @@ public class HappyScheduleService extends Service {
 					if("dismiss".equals(action)) {
 						notifs.cancel(id.hashCode());
 						if(alarm!=null) {
-							Intent i = AlarmActivity.from(this, alarm.getStationToStation(), alarm.getTime(), alarm.getType());
+							Intent i = AlarmActivity.from(this, alarm.getStationToStation(), alarm.getTime(), alarm.getType(), alarm.getId());
 							PendingIntent pi = PendingIntent.getActivity(this, 0, i, 0);
 							alarmManager.cancel(pi);
 							Alarms.removeAlarm(this, alarm);
 						}						
 					}
+				}
+				if("push".equals(type)) {
+					
 				}
 				if("lines".equals(type)) {
 					if(linesFuture!=null) {
@@ -146,15 +153,26 @@ public class HappyScheduleService extends Service {
 								} catch (Exception e) {
 									
 								}
-								conn = client.open(new URL("http://ryangravener.com/njrails/config2.json?appVersion="+version));
+								Calendar c = null;
 								if(config.exists()) {
-									Calendar c = Calendar.getInstance();
-									c.setTimeInMillis(config.lastModified());
+									c = Calendar.getInstance();
+									String lastModded = WDb.get().getPreference("config_last_modified");
+									if(lastModded!=null) {
+										try {
+											c.setTimeInMillis(Long.parseLong(lastModded));
+										} catch (Exception e) {
+											
+										}
+									}
 									Calendar later = (Calendar) c.clone();
-									later.add(Calendar.HOUR_OF_DAY, 3);
-//									if(!Calendar.getInstance().after(later)) {
-//										return;
-//									}
+									later.add(Calendar.HOUR_OF_DAY, 5);
+									if(!Calendar.getInstance().after(later)) {
+										return;
+									}									
+								}
+								
+								conn = client.open(new URL("http://ryangravener.com/njrails/config.json?v="+URLEncoder.encode(version,"utf-8")));
+								if(c!=null) {
 									conn.addRequestProperty("If-Modified-Since", RFC.format(c.getTime()));
 								}
 								if(conn.getResponseCode()==200) {
@@ -164,6 +182,7 @@ public class HappyScheduleService extends Service {
 										fos = openFileOutput("config.json", Context.MODE_PRIVATE);
 										fos.write(txt.getBytes());
 										Log.d(TAG, "saved config");
+										WDb.get().savePreference("config_last_modified", String.valueOf(System.currentTimeMillis()));
 									}
 								} else {
 									Streams.readFully(in = conn.getInputStream());
