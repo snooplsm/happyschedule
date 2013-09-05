@@ -76,6 +76,9 @@ public class RailPushMatrix {
 		JSONObject o = new JSONObject();
 		for (Map.Entry<String, Map<Integer, Set<Integer>>> ee : railToDays
 				.entrySet()) {
+			if(ee.getKey().length()==0) {
+				continue;
+			}
 			JSONObject d = new JSONObject();
 			for (Map.Entry<Integer, Set<Integer>> e2 : ee.getValue().entrySet()) {
 				JSONArray a = new JSONArray();

@@ -102,7 +102,7 @@ public class AppConfig {
 		return ads;
 	}
 
-	public AppAd getBestAd(Context ctx) {
+	public AppAd getBestAd(Context ctx, Class<?> forClass) {
 		List<AppAd> ads = getAds();
 		if (ads == null) {
 			return null;
@@ -144,6 +144,13 @@ public class AppConfig {
 			}
 			if (!TextUtils.isEmpty(ad.getDiscardKey())) {
 				if (WDb.get().getPreference("discard_" + ad.getDiscardKey()) != null) {
+					continue;
+				}
+			}
+			if(!TextUtils.isEmpty(ad.getFragment())) {
+				String name = ad.getFragment();
+				String simpelName = forClass.getSimpleName();
+				if(!name.equals(simpelName)) {
 					continue;
 				}
 			}

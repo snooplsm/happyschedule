@@ -28,7 +28,7 @@
         android:gravity="center"
         android:text="DISMISS"
         android:background="@color/transparent_blck"
-        android:textColor="@color/clock_white"
+        android:textColor="@drawable/selector_jumper"
         style="@style/medium_bold"
         />
 

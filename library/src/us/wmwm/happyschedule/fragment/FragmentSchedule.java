@@ -107,6 +107,8 @@ public class FragmentSchedule extends Fragment {
 			// TODO Auto-generated method stub
 
 		}
+		
+		public void onShare(Schedule schedule, StationToStation stationToStation) {};
 	};
 
 	private static final String TAG = FragmentSchedule.class.getSimpleName();
@@ -208,7 +210,7 @@ public class FragmentSchedule extends Fragment {
 			public void run() {
 				try {
 					AppConfig config = new AppConfig(new JSONObject(Streams.readFully(Streams.getStream("config.json"))));
-					final AppAd ad = config.getBestAd(getActivity());
+					final AppAd ad = config.getBestAd(getActivity(),FragmentSchedule.class);
 					if (ad != null) {
 						handler.post(new Runnable() {
 							@Override

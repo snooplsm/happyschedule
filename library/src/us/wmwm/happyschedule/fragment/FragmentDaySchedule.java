@@ -3,6 +3,7 @@ package us.wmwm.happyschedule.fragment;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -54,6 +55,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.ShareCompat;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.util.Log;
@@ -571,6 +573,12 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 							controlListener.onTrips(schedule, stationToStation);
 						}
 
+						@Override
+						public void onShare(Schedule schedule,
+								StationToStation stationToStation) {							
+							startActivity(Intent.createChooser(Share.intent(getActivity(), (StationInterval) stationToStation), "Share"));
+						}
+
 					});
 					v.setData(tripIdToAlarm.get(sts), schedule, sts);
 					return v;
@@ -724,7 +732,7 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 		}
 		if (item.getItemId() == android.R.id.home) {
 			getActivity().onBackPressed();
-			return false;
+			return true;
 		}
 		if (item.getItemId() == R.id.menu_departurevision) {
 			onDepartureVision.onDepartureVision(from);
@@ -733,6 +741,13 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 			onGetSchedule.onGetSchedule(to, from);
 		}
 		if(item.getItemId()==R.id.menu_share) {
+			Map<String,String> k = new HashMap<String,String>();
+			k.put("from_id", from.getId());
+			k.put("to_id", to.getId());
+			k.put("from_name", from.getName());
+			k.put("to_name", to.getName());
+			k.put("date", new Date().toString());
+			FlurryAgent.logEvent("ShareSchedule", k);
 			startActivity(Intent.createChooser(Share.intent(appConfig, this.getActivity(), from, to, day), "Share"));
 		}
 		return super.onOptionsItemSelected(item);

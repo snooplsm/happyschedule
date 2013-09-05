@@ -114,7 +114,14 @@ public class FragmentAlarmPicker extends DialogFragment {
 			} else if ("second".equals(tag)) {
 				field = Calendar.SECOND;
 			}
-			cal.add(field, val);
+			Calendar nc = (Calendar) cal.clone();
+			nc.add(field, val);
+			final Calendar time = Calendar.getInstance();
+			if(nc.before(time)) {
+				cal = (Calendar) time.clone();
+			} else {
+				cal.add(field, val);
+			}
 			populateValues();
 		}
 	};
@@ -255,18 +262,32 @@ public class FragmentAlarmPicker extends DialogFragment {
 		diff = diff % 60000;
 		long seconds = diff / 1000;
 		StringBuilder b = new StringBuilder();
+		boolean neg = false;
+		if(hours<0) {
+			neg = true;
+		}
+		if(mins<0) {
+			neg=true;
+		}
+		if(seconds<0) {
+			neg = true;
+		}
+		if(neg) {
+			b.append("-");
+		}
 		if (hours != 0) {
 			b.append(hours).append("h");
 		}
 		if (mins != 0) {
-			b.append(mins).append("m");
+			b.append(Math.abs(mins)).append("m");
 		}
 		if (seconds != 0) {
-			if (seconds / 10.0 < 1) {
+			if (Math.abs(seconds) / 10.0 < 1) {
 				b.append("0");
 			}
-			b.append(seconds).append("s");
+			b.append(Math.abs(seconds)).append("s");
 		}
+		
 		return b;
 	}
 

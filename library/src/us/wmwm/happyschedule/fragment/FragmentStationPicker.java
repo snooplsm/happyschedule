@@ -13,7 +13,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
 
 import com.emilsjolander.components.stickylistheaders.StickyListHeadersListView;
 import com.happytap.jumper.JumpListener;
@@ -89,6 +91,15 @@ public class FragmentStationPicker extends HappyFragment {
 					onStationSelectedListener.onStation(Db.get().getStop(v.getStationId()));
 				}
 				
+			}
+		});
+		list.setOnItemLongClickListener(new OnItemLongClickListener() {
+			@Override
+			public boolean onItemLongClick(AdapterView<?> arg0, View arg1,
+					int arg2, long arg3) {
+				StationView v = (StationView)arg1;
+				Toast.makeText(arg1.getContext(), v.getStationId(), Toast.LENGTH_SHORT).show();
+				return false;
 			}
 		});
 		jumper.setJumpListener(new JumpListener() {

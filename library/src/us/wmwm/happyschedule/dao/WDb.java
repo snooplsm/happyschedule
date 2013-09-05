@@ -70,11 +70,14 @@ public class WDb {
 		public void onCreate(SQLiteDatabase db) {
 			db.execSQL("create table if not exists history(depart_id varchar(255), arrive_id varchar(255), time integer)");
 			db.execSQL("create table if not exists preference(key varchar(255) unique, value text)");
+			db.execSQL("create table if not exists notification(block_id varchar(100) unique, created integer)");
+			db.execSQL("create table if not exists push_notification(created_at integer, created_str varchar(100), id integer, text text, source varchar(100), user_id integer, user_name varchar(100), user_screen_name varchar(100), json text)");
 		}
 
 		@Override
 		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 			db.execSQL("create table if not exists notification(block_id varchar(100) unique, created integer)");
+			db.execSQL("create table if not exists push_notification(created_at integer, created_str varchar(100), id integer, text text, source varchar(100), user_id integer, user_name varchar(100), user_screen_name varchar(100), json text)");
 		}
 	}
 	

@@ -1,1 +1,140 @@
-{"departure_vision":{"url":"http://dv.njtransit.com/mobile/tid-mobile.aspx?sid=$stop_id"},"share":{"day":"http://www.njtransit.com/sf/sf_servlet.srv?hdnPageAction=TrainSchedulesFrom&selOrigin=:from&selDestination=:to&OriginDescription=:fromName&DestDescription=:toName&datepicker=:day","trip":"http://ryangravener.com/njrails/share.php#starting_street_address=:fromName&dest_street_address=:toName&TravelFromLatLong=:fromLat,:fromLng&TravelToLatLong=:toLat,:toLng&datepicker=:datepicker&time=D&Hour=:hour&Minute=:minute&Time=:hour::minute&Year=:year&Day=:day&Month=:month&Suffix=:ampm&Mode=BCTLXR&min=T&Walk=1.00"},"ads":[{"webviewUrl":"http://ryangravener.com/njrails/ad.html","discardKey":"websitess","height":"50","enabled":false}],"lines":[{"keys":{"njcl":"","no jersey coast":""},"color":"#59A2BE","acronym":"No"},{"keys":{"septa":""},"color":"#59A2BE","acronym":"SEP"},{"keys":{"amtk":"","amtrak":"","carolinian":"","acela express":"","keystone":"","miami":"","norfolk":"","silver meteor-r":"","regional-r":"","springfield":"","regional":"","silver star -r":"","silver star-r":""},"color":"#E4C62E","acronym":"Am"},{"keys":{"nec":"","northeast corrdr":""},"color":"#F16364","acronym":"NEC"},{"keys":{"raritan valley":""},"color":"#F58559","acronym":"RAV"},{"keys":{"pascack valley":""},"color":"#000000","acronym":"PV"},{"keys":{"main line":""},"color":"#000000","acronym":"ML"},{"keys":{"bergen co. line":""},"color":"#000000","acronym":"BL"},{"keys":{"meadowlands rail":""},"color":"#000000","acronym":"MDW"},{"keys":{"mnbtn":"","montclair-boonton":""},"color":"#F58559","acronym":"MB"},{"keys":{"m&e":"","morristown line":""},"color":"#67BF74","acronym":"M&E"},{"keys":{"acrl":"","atl. city line":""},"color":"#6495ed","acronym":"AC"}],"rail_lines":[{"name":"Newark Light Rail","screenname":"NJTRANSIT_NLR"},{"name":"Hudson-Bergen Light Rail","screenname":"NJTRANSIT_HBLR"},{"name":"Atlantic City Rail Line","screenname":"NJTRANSIT_ACRL"},{"name":"Raritan Valley Line","screenname":"NJTRANSIT_RVL"},{"name":"River Line","screenname":"NJTRANSIT_RL"},{"name":"Pascack Valley Line","screename":"NJTRANSIT_PVL"},{"name":"North Jersey Coast Line","screenname":"NJTRANSIT_NJCL"},{"name":"Northeast Corridor","screenname":"NJTRANSIT_NEC"},{"name":"Main-Bergen County Line","screenname":"NJTRANSIT_MBPJ"},{"name":"Montclair-Boonton Line","screenname":"NJTRANSIT_MOBO"},{"name":"NJ Transit","screenname":"NJ_TRANSIT"}]}
+{
+	"departure_vision": {
+		"url": "http://dv.njtransit.com/mobile/tid-mobile.aspx?sid=$stop_id"
+	},
+	"share": {
+		"day": "http://www.njtransit.com/sf/sf_servlet.srv?hdnPageAction=TrainSchedulesFrom&selOrigin=:from&selDestination=:to&OriginDescription=:fromName&DestDescription=:toName&datepicker=:day",
+		"trip": "http://ryangravener.com/njrails/share.php#starting_street_address=:fromName&dest_street_address=:toName&TravelFromLatLong=:fromLat,:fromLng&TravelToLatLong=:toLat,:toLng&datepicker=:datepicker&time=D&Hour=:hour&Minute=:minute&Time=:hour::minute&Year=:year&Day=:day&Month=:month&Suffix=:ampm&Mode=BCTLXR&min=T&Walk=1.00"
+	},
+	"ads": [{
+		"webviewUrl": "http://ryangravener.com/njrails/ad.html",
+		"discardKey": "websitess",
+		"height": "50",
+		"enabled": true,
+		"fragment":"FragmentMain"
+	}],
+	"lines": [{
+		"keys": {
+			"njcl": "",
+			"no jersey coast": ""
+		},
+		"color": "#59A2BE",
+		"acronym": "No"
+	}, {
+		"keys": {
+			"septa": ""
+		},
+		"color": "#59A2BE",
+		"acronym": "SEP"
+	}, {
+		"keys": {
+			"amtk": "",
+			"amtrak": "",
+			"carolinian": "",
+			"acela express": "",
+			"keystone": "",
+			"miami": "",
+			"norfolk": "",
+			"silver meteor-r": "",
+			"regional-r": "",
+			"springfield": "",
+			"regional": "",
+			"silver star -r": "",
+			"silver star-r": ""
+		},
+		"color": "#E4C62E",
+		"acronym": "Am"
+	}, {
+		"keys": {
+			"nec": "",
+			"northeast corrdr": ""
+		},
+		"color": "#F16364",
+		"acronym": "NEC"
+	}, {
+		"keys": {
+			"raritan valley": ""
+		},
+		"color": "#F58559",
+		"acronym": "RAV"
+	}, {
+		"keys": {
+			"pascack valley": ""
+		},
+		"color": "#000000",
+		"acronym": "PV"
+	}, {
+		"keys": {
+			"main line": ""
+		},
+		"color": "#000000",
+		"acronym": "ML"
+	}, {
+		"keys": {
+			"bergen co. line": ""
+		},
+		"color": "#000000",
+		"acronym": "BL"
+	}, {
+		"keys": {
+			"meadowlands rail": ""
+		},
+		"color": "#000000",
+		"acronym": "MDW"
+	}, {
+		"keys": {
+			"mnbtn": "",
+			"montclair-boonton": ""
+		},
+		"color": "#F58559",
+		"acronym": "MB"
+	}, {
+		"keys": {
+			"m&e": "",
+			"morristown line": ""
+		},
+		"color": "#67BF74",
+		"acronym": "M&E"
+	}, {
+		"keys": {
+			"acrl": "",
+			"atl. city line": ""
+		},
+		"color": "#6495ed",
+		"acronym": "AC"
+	}],
+	"rail_lines": [{
+		"name": "Newark Light Rail",
+		"screenname": "NJTRANSIT_NLR"
+	}, {
+		"name": "Hudson-Bergen Light Rail",
+		"screenname": "NJTRANSIT_HBLR"
+	}, {
+		"name": "Atlantic City Rail Line",
+		"screenname": "NJTRANSIT_ACRL"
+	}, {
+		"name": "Raritan Valley Line",
+		"screenname": "NJTRANSIT_RVL"
+	}, {
+		"name": "River Line",
+		"screenname": "NJTRANSIT_RL"
+	}, {
+		"name": "Pascack Valley Line",
+		"screename": "NJTRANSIT_PVL"
+	}, {
+		"name": "North Jersey Coast Line",
+		"screenname": "NJTRANSIT_NJCL"
+	}, {
+		"name": "Northeast Corridor",
+		"screenname": "NJTRANSIT_NEC"
+	}, {
+		"name": "Main-Bergen County Line",
+		"screenname": "NJTRANSIT_MBPJ"
+	}, {
+		"name": "Montclair-Boonton Line",
+		"screenname": "NJTRANSIT_MOBO"
+	}, {
+		"name": "NJ Transit",
+		"screenname": "NJ_TRANSIT"
+	}]
+}

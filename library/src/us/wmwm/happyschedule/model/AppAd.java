@@ -23,6 +23,7 @@ public class AppAd implements Serializable {
 	String height;
 	boolean closeable;
 	boolean enabled;
+	String fragment;
 	Integer beforeVersion;
 	Integer afterVersion;
 	
@@ -118,6 +119,14 @@ public class AppAd implements Serializable {
 		this.beforeVersion = beforeVersion;
 	}
 
+	public String getFragment() {
+		return fragment;
+	}
+	
+	public void setFragment(String fragment) {
+		this.fragment = fragment;
+	}
+	
 	public AppAd(JSONObject o) {
 		url = o.optString("url");
 		imageUrl = o.optString("imageUrl");
@@ -127,6 +136,7 @@ public class AppAd implements Serializable {
 		alignment = o.optString("alignment","top");
 		discardKey = o.optString("discardKey");
 		height = o.optString("height");
+		fragment = o.optString("fragment");
 		closeable = o.optBoolean("closeable");
 		enabled = o.optBoolean("enabled",true);
 		if(o.has("beforeVersion")) {

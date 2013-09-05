@@ -26,12 +26,25 @@
             android:summary="@string/settings_summary_notifications"
             android:title="@string/settings_title_notifications_enable" >
         </CheckBoxPreference>
+
         <Preference
-            android:title="Rail Lines"
-            android:key="@string/settings_key_rail_lines"
             android:dependency="@string/settings_key_push_on"
+            android:key="@string/settings_key_rail_lines"
             android:summary="@string/settings_summary_rail_lines"
-            />
+            android:title="Rail Lines" />
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="@string/settings_key_push_vibrate"
+            android:summary="@string/settings_description_push_vibrate"
+            android:title="@string/settings_title_push_vibrate" >
+        </CheckBoxPreference>
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="@string/settings_key_push_audio"
+            android:summary="@string/settings_description_sound"
+            android:title="@string/settings_title_push_sound" >
+        </CheckBoxPreference>
     </PreferenceCategory>
 
 </PreferenceScreen>

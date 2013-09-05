@@ -1,9 +1,10 @@
 package us.wmwm.happyschedule.fragment;
 
 import java.text.DecimalFormat;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
-
-import com.flurry.android.FlurryAgent;
 
 import us.wmwm.happyschedule.R;
 import us.wmwm.happyschedule.ThreadHelper;
@@ -13,6 +14,7 @@ import us.wmwm.happyschedule.dao.Db;
 import us.wmwm.happyschedule.dao.ScheduleDao;
 import us.wmwm.happyschedule.dao.WDb;
 import us.wmwm.happyschedule.model.Station;
+import us.wmwm.happyschedule.util.Share;
 import us.wmwm.happyschedule.views.ClipDrawListener;
 import us.wmwm.happyschedule.views.HappyShadowBuilder;
 import us.wmwm.happyschedule.views.StationButton;
@@ -37,6 +39,8 @@ import android.view.ViewGroup.MarginLayoutParams;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.TextView;
+
+import com.flurry.android.FlurryAgent;
 
 public class FragmentPickStations extends Fragment implements IPrimary {
 
@@ -98,17 +102,24 @@ public class FragmentPickStations extends Fragment implements IPrimary {
 		if (reverseButton.getVisibility() != View.VISIBLE) {
 			menu.removeItem(R.id.menu_reverse);
 		}
+		//ShareCompat.configureMenuItem(menu, R.id.menu_share, Share.intent(getActivity()));
 	}
+	
+	
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		if (item.getItemId() == R.id.menu_reverse) {
-			FlurryAgent.logEvent("RevsereMenuOptionClicked");
+			FlurryAgent.logEvent("RevsereMenuOptionClicked",Collections.singletonMap("time", new Date().toString()));
 			reverse();
 			return true;
 		}
 		if(item.getItemId()==R.id.menu_settings) {
 			startActivity(new Intent(getActivity(), SettingsActivity.class));
+		}
+		if(item.getItemId()==R.id.menu_share_pick) {
+			FlurryAgent.logEvent("ShareApp", Collections.singletonMap("time", new Date().toString()));
+			startActivity(Intent.createChooser(Share.intent(getActivity()),"Share"));
 		}
 		return super.onOptionsItemSelected(item);
 	}
@@ -127,11 +138,18 @@ public class FragmentPickStations extends Fragment implements IPrimary {
 				Map<String, Double> fares = ScheduleDao.get().getFairs(
 						departureButton.getStation().getId(),
 						arrivalButton.getStation().getId());
+				Map<String,String> k = new HashMap<String,String>();
+				k.put("from_id", departureButton.getStation().getId());
+				k.put("to_id", arrivalButton.getStation().getId());
+				k.put("from_name", departureButton.getStation().getName());
+				k.put("to_name", arrivalButton.getStation().getName());
 				if (fares == null) {
+					FlurryAgent.logEvent("FareNotFound",k);
 					return;
 				}
 				final String adult = DecimalFormat.getCurrencyInstance()
 						.format(fares.get("Adult"));
+				FlurryAgent.logEvent("FareFound",k);
 				handler.post(new Runnable() {
 					@Override
 					public void run() {
@@ -157,6 +175,9 @@ public class FragmentPickStations extends Fragment implements IPrimary {
 				String percentL = WDb.get().getPreference(WDb.REVERSE_BUTTON_MARGIN_LEFT_PERCENTAGE);
 				if(percentL==null) {
 					percentL = ".05";
+				}
+				if(!".05".equals(percentL)) {
+					FlurryAgent.logEvent("ReverseButtonPosition", Collections.singletonMap("percent", percentL));
 				}
 				final Float percentLeft = Float.parseFloat(percentL);
 				handler.post(new Runnable() {

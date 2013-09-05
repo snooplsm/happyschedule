@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -106,6 +107,9 @@ public class HappyScheduleService extends Service {
 		if(linesFuture!=null) {
 			linesFuture.cancel(true);
 		}
+		if(pushFuture!=null) {
+			pushFuture.cancel(true);
+		}
 	}
 	
 	@Override
@@ -129,7 +133,59 @@ public class HappyScheduleService extends Service {
 					}
 				}
 				if("push".equals(type)) {
-					
+					if(pushFuture!=null) {
+						pushFuture.cancel(true);						
+					}
+					Intent i = new Intent(getApplicationContext(), HappyScheduleService.class);
+					i.setData(Uri.parse("http://wmwm.us?type=push"));
+					final PendingIntent pi = PendingIntent.getService(getApplicationContext(), 0, i, 0);
+					alarmManager.cancel(pi);
+					alarmManager.set(AlarmManager.RTC, System.currentTimeMillis()+18000000, pi);
+					pushFuture = ThreadHelper.getScheduler().submit(new Runnable() {
+						@Override
+						public void run() {
+							String needsSave = WDb.get().getPreference("rail_push_matrix_needs_save");
+							if(needsSave==null) {
+								alarmManager.cancel(pi);
+								return;
+							}
+							String data = WDb.get().getPreference("rail_push_matrix");
+							if(data==null) {
+								alarmManager.cancel(pi);
+								return;
+							}
+							String pushId = SettingsFragment.getRegistrationId();
+							if(pushId==null) {
+								alarmManager.cancel(pi);
+								return;
+							}
+							OkHttpClient client = new OkHttpClient();
+							HttpURLConnection conn = null;
+							try {
+								conn = client.open(new URL("http://ryangravener.com/njrails/register_service.php?push_id="+pushId));
+								conn.setDoInput(true);
+								conn.setDoOutput(true);
+								conn.setRequestMethod("POST");
+								conn.setRequestProperty("Content-Type","application/x-www-form-urlencoded");
+								conn.setRequestProperty("Content-Length",String.valueOf(("services="+URLEncoder.encode(data,"utf-8")).getBytes().length));
+								OutputStream out = conn.getOutputStream();
+								System.out.println(data);
+								out.write(("services="+URLEncoder.encode(data,"utf-8")).getBytes());
+								out.close();
+								int resp = conn.getResponseCode();
+								if(resp==200) {
+									WDb.get().savePreference("rail_push_matrix_needs_save", null);
+									alarmManager.cancel(pi);
+								}
+							} catch (Exception e) {
+								
+							} finally {
+								if(conn!=null) {
+									conn.disconnect();
+								}
+							}
+						}
+					});
 				}
 				if("lines".equals(type)) {
 					if(linesFuture!=null) {
@@ -163,6 +219,8 @@ public class HappyScheduleService extends Service {
 										} catch (Exception e) {
 											
 										}
+									} else {
+										c.setTimeInMillis(0);
 									}
 									Calendar later = (Calendar) c.clone();
 									later.add(Calendar.HOUR_OF_DAY, 5);
@@ -191,7 +249,9 @@ public class HappyScheduleService extends Service {
 							} catch (Exception e) {
 								Log.e(TAG, "could not get config", e);
 							} finally {
-								conn.disconnect();
+								if(conn!=null) {
+									conn.disconnect();
+								}
 								if(in!=null) {
 									try {
 										in.close();

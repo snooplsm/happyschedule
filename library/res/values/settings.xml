@@ -45,5 +45,11 @@
     <string name="settings_key_rail_lines">push_notifications_rail_lines</string>
     <string name="settings_summary_rail_lines">Select which rail lines you want to receive alerts on.</string>
 
+    <string name="settings_key_push_vibrate">push_notifications_vibrate</string>
+    <string name="settings_title_push_vibrate">Vibrate</string>
+    <string name="settings_description_push_vibrate">Make the phone vibrate upon an incoming alert.</string>
+    <string name="settings_title_push_sound">Sound</string>
+    <string name="settings_description_sound">Make a noise upon incoming alert.</string>
+    <string name="settings_key_push_audio">push_notifications_audio</string>
     
 </resources>

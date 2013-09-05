@@ -31,7 +31,7 @@ import android.widget.AdapterView.OnItemLongClickListener;
 import com.emilsjolander.components.stickylistheaders.StickyListHeadersAdapter;
 import com.emilsjolander.components.stickylistheaders.StickyListHeadersListView;
 
-public class FragmentHistory extends HappyFragment {
+public class FragmentHistory extends HappyFragment implements IPrimary {
 
 	StickyListHeadersListView list;
 	
@@ -60,7 +60,7 @@ public class FragmentHistory extends HappyFragment {
 	
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		inflater.inflate(R.menu.fragment_history,menu);
+		inflater.inflate(R.menu.fragment_history,menu);		
 	}
 	
 	@Override
@@ -185,7 +185,7 @@ public class FragmentHistory extends HappyFragment {
 //				});
 //			}
 //		});
-//		getFragmentManager().beginTransaction().replace(R.id.fragment_ad, ad).commit();
+//		getFragmentManager().beginTransaction().replace(R.id.fragment_ad, ad).commit();		
 	}
 	
 	@Override
@@ -253,6 +253,12 @@ public class FragmentHistory extends HappyFragment {
 			return new HistoryView(ctx);
 		}
 		
+	}
+
+	@Override
+	public void setPrimaryItem() {
+		// TODO Auto-generated method stub
+		getActivity().getActionBar().setSubtitle("History");		
 	}
 	
 }

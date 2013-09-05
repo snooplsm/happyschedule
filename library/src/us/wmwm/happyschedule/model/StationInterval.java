@@ -12,8 +12,8 @@ import org.json.JSONObject;
 
 public class StationInterval extends StationToStation {
 
+	public int sequence;
 	public int level;
-
 	public int transferDuration;
 	
 	public int arriveSequence;
@@ -25,7 +25,7 @@ public class StationInterval extends StationToStation {
 	
 	public StationInterval(JSONObject o) {
 		super(o);
-		level = o.optInt("level");
+		sequence = o.optInt("level");
 		transferDuration = o.optInt("transferDuration");
 		arriveSequence = o.optInt("arriveSequence");
 		schedule = new Schedule(o.optJSONObject("schedule"));
@@ -52,14 +52,14 @@ public class StationInterval extends StationToStation {
 	}
 
 	public StationInterval next() {
-		int nextLevel = level + 1;
-		String[] pair = schedule.transfers[nextLevel];
+		int nextSequence = sequence + 1;
+		String[] pair = schedule.transfers.get(level)[nextSequence];
 		Integer transferDuration = schedule.transferEdges.get(pair[0] + "-"
 				+ pair[1]);
 		StationInterval si = new StationInterval();
 		si.departId = pair[0];
 		si.arriveId = pair[1];
-		si.level = nextLevel;
+		si.sequence = nextSequence;
 		si.schedule = schedule;
 		if (transferDuration != null) {
 			Calendar cal = Calendar.getInstance();
@@ -119,10 +119,10 @@ public class StationInterval extends StationToStation {
 	private static final SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
 
 	public boolean hasNext() {
-		if (level == schedule.transfers.length - 1) {
+		if (sequence == schedule.transfers.get(level).length - 1) {
 			return false;
 		}
-		String[] pair = schedule.transfers[level + 1];
+		String[] pair = schedule.transfers.get(level)[sequence + 1];
 		Integer transferDuration = schedule.transferEdges.get(pair[0] + "-"
 				+ pair[1]);
 		if (transferDuration != null) {

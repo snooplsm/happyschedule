@@ -12,15 +12,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="6dp"
-        android:orientation="vertical"
         android:layout_marginRight="6dp"
-        android:background="@drawable/bg_accent_flat_light" >
+        android:background="@drawable/bg_accent_flat_light"
+        android:orientation="vertical" >
 
         <LinearLayout
             android:id="@+id/alarms"
             android:layout_width="match_parent"
-            android:orientation="vertical"
-            android:layout_height="wrap_content" >
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
         </LinearLayout>
 
         <LinearLayout
@@ -44,7 +44,6 @@
                 android:visibility="gone"
                 app1:src="@drawable/pin" />
 
-            
             <us.wmwm.happyschedule.views.ScheduleControlButton
                 android:id="@+id/trips"
                 android:layout_width="0dp"
@@ -52,6 +51,14 @@
                 android:layout_gravity="center"
                 android:layout_weight="1"
                 app1:src="@drawable/ic_action_view_as_list" />
+
+            <us.wmwm.happyschedule.views.ScheduleControlButton
+                android:id="@+id/share"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                app1:src="@drawable/ic_action_share" />
         </LinearLayout>
     </LinearLayout>
 

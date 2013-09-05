@@ -22,7 +22,6 @@ import us.wmwm.happyschedule.model.Schedule;
 import us.wmwm.happyschedule.model.Service;
 import us.wmwm.happyschedule.model.StopTime;
 import us.wmwm.happyschedule.model.TripInfo;
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -133,20 +132,43 @@ public class ScheduleDao {
 
 	public Schedule getSchedule(final String departStationId,
 			final String arriveStationId, Date start, Date end) {
-		Cursor cur = Db.get().db
-				.rawQuery(
-						"select a,b from schedule_path where source=? and target=? and level=0 order by sequence asc",
-						new String[] { departStationId, arriveStationId });
-		String[][] pairs = new String[cur.getCount()][2];
-		int i = 0;
+		Cursor cur = Db.get().db.rawQuery("select level from schedule_path where source=? and target=? order by level desc", new String[]{departStationId,arriveStationId});
+		int levels = 0;
+		if(cur.moveToNext()) {
+			levels = cur.getInt(0)+1;
+		}
+		cur.close();
+		List<String[][]> pairs = new ArrayList<String[][]>(levels);
+//		for(int i = 0; i < levels; i++) {
+//			cur = Db.get().db
+//					.rawQuery(
+//							"select a,b from schedule_path where source=? and target=? and level = ? order by sequence asc",
+//							new String[] { departStationId, arriveStationId, String.valueOf(i) });
+//			String[][] pp = new String[cur.getCount()][2];
+//			pairs.add(pp);
+//			cur.close();
+//		}
 		Set<String> p = new HashSet<String>();
+		cur = Db.get().db
+				.rawQuery(
+						"select a,b,level,sequence from schedule_path where source=? and target=? order by level asc, sequence desc",
+						new String[]{departStationId,arriveStationId});
 		while (cur.moveToNext()) {
-			pairs[i][0] = cur.getString(0);
-			pairs[i][1] = cur.getString(1);
+			int level = cur.getInt(2);
+			int sequence = cur.getInt(3);
+			String[][] data;
+			if(pairs.size()==level+1) {
+				data = pairs.get(level);
+			} else { 
+					data = new String[sequence+1][2];
+					pairs.add(data);	
+			}
+			
+			data[sequence][0] = cur.getString(0);
+			data[sequence][1] = cur.getString(1);
 			// System.out.println(pairs[i][0] + " - " + pairs[i][1]);
-			p.add(pairs[i][0]);
-			p.add(pairs[i][1]);
-			i++;
+			p.add(data[sequence][0]);
+			p.add(data[sequence][1]);
 		}
 		cur.close();
 		cur = Db.get().db.rawQuery(String.format(
@@ -183,55 +205,74 @@ public class ScheduleDao {
 		Map<String, String> routeIds = new HashMap<String, String>();
 		String stationsFragment = "stop_id=" + join(p, " or stop_id=");
 		String query = "select a1.depart,a1.arrive,a1.service_id,a1.trip_id,a1.block_id,a1.route_id,a1.stop_id,a1.lft from nested_trip a1 where a1.stop_id=? or a1.stop_id=? and a1.service_id in (select service_id from service where date in(:foo))";
-		for (i = 0; i < pairs.length; i++) {
-			Map<String, List<ConnectionInterval>> tripToConnectionIntervals = new HashMap<String, List<ConnectionInterval>>();
-			Cursor rur = Db.get().db
-					.rawQuery(
-							"select duration from transfer_edge where source=? and target=?",
-							new String[] { pairs[i][0], pairs[i][1] });
-			if (rur.moveToNext()) {
-				Integer duration = rur.getInt(0);
-				transferEdges.put(pairs[i][0] + "-" + pairs[i][1], duration);
-				rur.close();
-				continue;
-			}
-			rur.close();
-			Cursor qur = Db.get().db.rawQuery(query.replace(":foo", startString+","+middle+","+endString), new String[] { pairs[i][0],
-					pairs[i][1] });
-			pairToTimes.put(pairs[i], tripToConnectionIntervals);
-			while (qur.moveToNext()) {
-				String depart = qur.getString(0);
-				String arrive = qur.getString(1);
-				String serviceId = qur.getString(2);
-				String tripId = qur.getString(3);
-				String blockId = qur.getString(4);
-				String routeId = qur.getString(5);
-				String stopId = qur.getString(6);
-				int seq = qur.getInt(7);
-				routeIds.put(routeId, "");
-				ConnectionInterval interval = new ConnectionInterval();
-				interval.tripId = tripId;
-				interval.sequence = seq;
-				tripIds.add(tripId);
-				interval.routeId = routeId;
-				interval.serviceId = serviceId;
-				interval.departure = depart;
-				interval.arrival = arrive;
-				interval.sourceId = stopId;
-				interval.targetId = stopId;
-				interval.blockId = blockId;
-				serviceIds.add(serviceId);
-				List<ConnectionInterval> cin = tripToConnectionIntervals
-						.get(tripId);
-				if (cin == null) {
-					cin = new ArrayList<ConnectionInterval>(2);
-					tripToConnectionIntervals.put(tripId, cin);
+		for(int j = 0; j < levels; j++) {
+			System.out.println("level " + j);
+			for (int i = 0; i < pairs.get(j).length; i++) {
+				System.out.println("sequence " + i);
+				if(transferEdges.containsKey(pairs.get(j)[i])) {
+					System.out.println("continuing because transferEdge contains " + Arrays.toString(pairs.get(j)[i]));
+					continue;
 				}
-				cin.add(interval);
+				System.out.println("trying to get trip intervals for " + Arrays.toString(pairs.get(j)[i]));
+				Map<String, List<ConnectionInterval>> tripToConnectionIntervals = pairToTimes.get(pairs.get(j)[i]);
+				if(tripToConnectionIntervals==null) {
+					tripToConnectionIntervals = new HashMap<String, List<ConnectionInterval>>();
+				}
+				Cursor rur = Db.get().db
+						.rawQuery(
+								"select duration from transfer_edge where source=? and target=?",
+								new String[] { pairs.get(j)[i][0], pairs.get(j)[i][1] });
+				if (rur.moveToNext()) {
+					Integer duration = rur.getInt(0);
+					transferEdges.put(pairs.get(j)[i][0] + "-" + pairs.get(j)[i][1], duration);
+					rur.close();
+					continue;
+				}
+				rur.close();
+				Cursor qur = Db.get().db.rawQuery(query.replace(":foo", startString+","+middle+","+endString), new String[] { pairs.get(j)[i][0],
+						pairs.get(j)[i][1] });
+				pairToTimes.put(pairs.get(j)[i], tripToConnectionIntervals);
+				while (qur.moveToNext()) {
+					String depart = qur.getString(0);
+					String arrive = qur.getString(1);
+					String serviceId = qur.getString(2);
+					String tripId = qur.getString(3);
+					String blockId = qur.getString(4);
+					String routeId = qur.getString(5);
+					String stopId = qur.getString(6);
+					int seq = qur.getInt(7);
+					routeIds.put(routeId, "");
+					ConnectionInterval interval = new ConnectionInterval();
+					interval.tripId = tripId;
+					interval.sequence = seq;
+					tripIds.add(tripId);
+					interval.routeId = routeId;
+					interval.serviceId = serviceId;
+					interval.departure = depart;
+					interval.arrival = arrive;
+					interval.sourceId = stopId;
+					interval.targetId = stopId;
+					interval.blockId = blockId;
+					serviceIds.add(serviceId);
+					//System.out.println(tripToConnectionIntervals.size() + " " + tripId);
+					List<ConnectionInterval> cin = tripToConnectionIntervals
+							.get(tripId);
+					if (cin == null) {
+						cin = new ArrayList<ConnectionInterval>(2);
+						//System.out.println("first connection interval");
+						tripToConnectionIntervals.put(tripId, cin);
+					} else {
+						System.out.println("cin not null!");
+					}
+					if(cin.size()==2) {
+						System.out.println("size is 2, continuing");
+						continue;
+					}
+					cin.add(interval);
+				}
+				qur.close();
 			}
-			qur.close();
 		}
-
 		cur = Db.get().db.rawQuery(
 				"select date,service_id from service where date in (:foo)".replace(":foo", startString+","+middle+","+endString),
 				null);
@@ -268,35 +309,39 @@ public class ScheduleDao {
 		}
 		Map<String[],Set<String>> regular = new HashMap<String[],Set<String>>();
 		Map<String[],Set<String>> reverse = new HashMap<String[],Set<String>>();
-		for (String[] pair : pairs) {
-			Set<String> reg = new HashSet<String>();
-			Set<String> rev = new HashSet<String>();
-			regular.put(pair, reg);
-			reverse.put(pair, rev);
-			if(pairToTimes.get(pair)==null) {
-				continue;
-			}
-			for (Map.Entry<String, List<ConnectionInterval>> e : pairToTimes
-					.get(pair).entrySet()) {
-				List<ConnectionInterval> value = e.getValue();
-				if(value.size()!=2) {
+		
+		for(int j = 0; j < levels; j++) {
+			String[][] pp = pairs.get(j);
+			for (String[] pair : pairs.get(j)) {
+				Set<String> reg = new HashSet<String>();
+				Set<String> rev = new HashSet<String>();
+				regular.put(pair, reg);
+				reverse.put(pair, rev);
+				if(pairToTimes.get(pair)==null) {
 					continue;
 				}
-				ConnectionInterval a = value.get(0);
-				ConnectionInterval b = value.get(1);
-				if(a.sourceId.equals(pair[0])) {
-					if(a.sequence<b.sequence) {
-						reg.add(e.getKey());
-					} else {
-						Collections.reverse(value);
-						rev.add(e.getKey());
+				for (Map.Entry<String, List<ConnectionInterval>> e : pairToTimes
+						.get(pair).entrySet()) {
+					List<ConnectionInterval> value = e.getValue();
+					if(value.size()!=2) {
+						continue;
 					}
-				} else {
-					if(a.sequence < b.sequence) {
-						rev.add(e.getKey());
+					ConnectionInterval a = value.get(0);
+					ConnectionInterval b = value.get(1);
+					if(a.sourceId.equals(pair[0])) {
+						if(a.sequence<b.sequence) {
+							reg.add(e.getKey());
+						} else {
+							Collections.reverse(value);
+							rev.add(e.getKey());
+						}
 					} else {
-						Collections.reverse(value);
-						reg.add(e.getKey());
+						if(a.sequence < b.sequence) {
+							rev.add(e.getKey());
+						} else {
+							Collections.reverse(value);
+							reg.add(e.getKey());
+						}
 					}
 				}
 			}

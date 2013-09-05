@@ -102,7 +102,7 @@ public class ScheduleView extends RelativeLayout {
 			train.setVisibility(View.GONE);
 			duration.setText(duration(sts2));
 			time.setText(shrink(sts.departTime) + " - " + shrink(sts2.getArriveTime()));
-			if (sts2.schedule.transfers.length > 1) {
+			if (sts2.schedule.transfers.get(sts2.level).length > 1) {
 				populateConnections(sts2);
 			} else {
 				populateExtraInfo(sts2);

@@ -22,6 +22,7 @@ public class ScheduleControlsView extends LinearLayout {
 		void onTimer();
 		void onTimerCancel(Alarm alarm);
 		void onTrips(Schedule schedule, StationToStation stationToStation);
+		void onShare(Schedule schedule, StationToStation stationToStation);
 	}
 	
 	View addTimer;
@@ -39,6 +40,9 @@ public class ScheduleControlsView extends LinearLayout {
 			if(v==addTimer) {
 				listener.onTimer();
 			}
+			if(v==share) {
+				listener.onShare(schedule,stationToStation);
+			}
 		};
 	};
 	
@@ -49,6 +53,8 @@ public class ScheduleControlsView extends LinearLayout {
 	
 	View trips;
 	
+	View share;
+	
 	public ScheduleControlsView(Context context) {
 		super(context);
 		LayoutInflater.from(context).inflate(R.layout.view_schedule_controls, this);
@@ -58,6 +64,8 @@ public class ScheduleControlsView extends LinearLayout {
 		pin.setOnClickListener(onClick);
 		trips.setOnClickListener(onClick);
 		addTimer.setOnClickListener(onClick);
+		share = findViewById(R.id.share);
+		share.setOnClickListener(onClick);
 		alarms = (LinearLayout) findViewById(R.id.alarms);
 	}
 	

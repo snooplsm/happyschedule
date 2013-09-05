@@ -93,6 +93,7 @@
 
         <TextView
             android:id="@+id/track2"
+            android:visibility="gone"
             android:layout_width="41dp"
             android:layout_height="41dp"
             android:layout_alignParentRight="true"
@@ -110,6 +111,7 @@
         android:layout_width="41dp"
         android:layout_height="41dp"
         android:layout_alignParentRight="true"
+        android:visibility="gone"
         android:layout_alignBottom="@+id/train_info_container"
         android:layout_marginRight="4dp"
         android:background="@drawable/circle"

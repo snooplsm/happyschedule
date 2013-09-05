@@ -4,15 +4,14 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_centerVertical="true"
-        android:text="Created By\nRyan Gravener"
-        android:visibility="gone" />
+    <FrameLayout
+        android:id="@+id/main_fragment_ad"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+    </FrameLayout>
 
     <android.support.v4.view.ViewPager
+        android:layout_below="@id/main_fragment_ad"
         android:id="@+id/pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent" >
@@ -22,7 +21,7 @@
             android:layout_height="wrap_content" />
     </android.support.v4.view.ViewPager>
 
-    <RelativeLayout
+    <RelativeLayout        
         android:id="@+id/fragment_schedule"
         android:layout_width="match_parent"
         android:layout_height="match_parent" >

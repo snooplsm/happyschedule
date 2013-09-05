@@ -3,11 +3,17 @@ package us.wmwm.happyschedule.fragment;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.json.JSONObject;
+
 import us.wmwm.happyschedule.R;
+import us.wmwm.happyschedule.ThreadHelper;
 import us.wmwm.happyschedule.dao.WDb;
 import us.wmwm.happyschedule.fragment.FragmentHistory.OnHistoryListener;
 import us.wmwm.happyschedule.fragment.FragmentPickStations.OnGetSchedule;
+import us.wmwm.happyschedule.model.AppAd;
+import us.wmwm.happyschedule.model.AppConfig;
 import us.wmwm.happyschedule.model.Station;
+import us.wmwm.happyschedule.util.Streams;
 import us.wmwm.happyschedule.views.FragmentMainAdapter;
 import android.app.ActionBar;
 import android.os.Bundle;
@@ -41,17 +47,25 @@ public class FragmentMain extends Fragment {
 				handler.post(new Runnable() {
 					public void run() {
 						ActionBar a = getActivity().getActionBar();
-						a.setSubtitle(null);
+						if (pager.getCurrentItem() == 0) {
+							a.setSubtitle("History");
+						} else if (pager.getCurrentItem() == 2) {
+							a.setSubtitle("w/ DepartureVision");
+						} else {
+							a.setSubtitle(null);
+						}
+
 						a.setDisplayHomeAsUpEnabled(false);
 						a.setHomeButtonEnabled(false);
 						getActivity().invalidateOptionsMenu();
 					};
 				});
 			} else {
-				BackStackEntry e = getFragmentManager().getBackStackEntryAt(count-1);
+				BackStackEntry e = getFragmentManager().getBackStackEntryAt(
+						count - 1);
 				final String title;
-				if(!TextUtils.isEmpty(e.getBreadCrumbTitle())) {
-					 title = e.getBreadCrumbTitle().toString();
+				if (!TextUtils.isEmpty(e.getBreadCrumbTitle())) {
+					title = e.getBreadCrumbTitle().toString();
 				} else {
 					title = null;
 				}
@@ -82,7 +96,7 @@ public class FragmentMain extends Fragment {
 	}
 
 	OnGetSchedule onGetSchedule;
-	
+
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
@@ -92,7 +106,7 @@ public class FragmentMain extends Fragment {
 			public void run() {
 				final FragmentMainAdapter fma = new FragmentMainAdapter(
 						getFragmentManager());
-				pager.setAdapter(fma);				
+				pager.setAdapter(fma);
 				pager.setCurrentItem(1);
 				fma.setOnGetScheduleListener(onGetSchedule = new OnGetSchedule() {
 
@@ -109,17 +123,23 @@ public class FragmentMain extends Fragment {
 						FragmentSchedule fs = FragmentSchedule.newInstance(
 								from, to);
 						fs.setOnGetSchedule(onGetSchedule);
-						if(getFragmentManager().getBackStackEntryCount()==0) {
+						if (getFragmentManager().getBackStackEntryCount() == 0) {
 						} else {
-							for(int i = getFragmentManager().getBackStackEntryCount()-1; i>=0; i--) {
-								BackStackEntry e = getFragmentManager().getBackStackEntryAt(i);
-								if("schedule".equals(e.getName())) {
-									getFragmentManager().popBackStackImmediate(i, i);
+							for (int i = getFragmentManager()
+									.getBackStackEntryCount() - 1; i >= 0; i--) {
+								BackStackEntry e = getFragmentManager()
+										.getBackStackEntryAt(i);
+								if ("schedule".equals(e.getName())) {
+									getFragmentManager().popBackStackImmediate(
+											i, i);
 								}
-							}							
+							}
 						}
 						t.addToBackStack("schedule");
-						t.replace(R.id.fragment_schedule, fs).setBreadCrumbTitle((from.getName() + " to " + to.getName())).commit();
+						t.replace(R.id.fragment_schedule, fs)
+								.setBreadCrumbTitle(
+										(from.getName() + " to " + to.getName()))
+								.commit();
 						ActionBar a = getActivity().getActionBar();
 						a.setDisplayHomeAsUpEnabled(true);
 						a.setHomeButtonEnabled(true);
@@ -127,19 +147,21 @@ public class FragmentMain extends Fragment {
 					}
 				});
 				fma.setOnHistoryListener(new OnHistoryListener() {
-					
+
 					@Override
-					public void onHistory(final Station from, final Station to) {						
+					public void onHistory(final Station from, final Station to) {
 						onGetSchedule.onGetSchedule(from, to);
 						new Thread() {
 							@Override
 							public void run() {
 								try {
-									WDb.get().savePreference("lastDepartId", from.getId());
-									WDb.get().savePreference("lastArriveId", to.getId());
+									WDb.get().savePreference("lastDepartId",
+											from.getId());
+									WDb.get().savePreference("lastArriveId",
+											to.getId());
 									WDb.get().saveHistory(from, to);
 								} catch (Exception e) {
-									
+
 								}
 							}
 						}.start();
@@ -164,6 +186,27 @@ public class FragmentMain extends Fragment {
 				// //pager.invalidate();
 				// }
 				// });
+			}
+		});
+		ThreadHelper.getScheduler().submit(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					AppConfig config = new AppConfig(new JSONObject(Streams.readFully(Streams.getStream("config.json"))));
+					final AppAd ad = config.getBestAd(getActivity(), FragmentMain.class);
+					if(ad!=null) {
+						handler.post(new Runnable() {
+							@Override
+							public void run() {
+								FragmentHappyAd fad = FragmentHappyAd.newIntance(ad);
+								getFragmentManager().beginTransaction().replace(R.id.main_fragment_ad, fad).commit();
+							}
+						});
+					}
+					
+				} catch (Exception e) {
+					
+				}
 			}
 		});
 

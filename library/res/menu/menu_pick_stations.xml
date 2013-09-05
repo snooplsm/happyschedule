@@ -7,14 +7,18 @@
         android:showAsAction="always"
         android:title="Reverse"/>
     <item
-        
         android:icon="@drawable/ic_menu_moreoverflow_normal_holo_dark"
         android:showAsAction="always"
         android:title="More">
         <menu>
-            <item                
+            <item
                 android:id="@+id/menu_settings"
                 android:title="Settings">
+            </item>
+            <item
+                android:id="@+id/menu_share_pick"
+                android:actionProviderClass="android.widget.ShareActionProvider"
+                android:title="Share">
             </item>
         </menu>
     </item>
