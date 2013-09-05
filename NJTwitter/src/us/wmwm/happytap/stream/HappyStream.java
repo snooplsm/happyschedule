@@ -25,6 +25,7 @@ import twitter4j.StatusDeletionNotice;
 import twitter4j.StatusListener;
 import twitter4j.TwitterStream;
 import twitter4j.TwitterStreamFactory;
+import twitter4j.URLEntity;
 import twitter4j.User;
 import twitter4j.UserList;
 import twitter4j.UserStreamListener;
@@ -96,7 +97,7 @@ public class HappyStream {
 						String data = Streams.readFully(fin);
 						a = new JSONArray(data);
 					} catch (Exception e) {
-
+						e.printStackTrace();
 					} finally {
 						if (fin != null) {
 							try {
@@ -133,12 +134,12 @@ public class HappyStream {
 					fos = new FileOutputStream(file);
 					fos.write(a.toString().getBytes());
 				} catch (Exception e) {
-
+					e.printStackTrace();
 				} finally {
 					try {
 						fos.close();
 					} catch (Exception e) {
-
+						e.printStackTrace();
 					}
 				}
 				saveStatus(status);
@@ -311,6 +312,13 @@ public class HappyStream {
 
 	}
 
+	private static boolean checkSize(JSONObject data) {
+		if (data.toString().getBytes().length > 4096) {
+			return false;
+		}
+		return true;
+	}
+
 	public static void processStatus(Status status) throws Exception {
 		ResultSet users = null;
 		if (status.getUser().getScreenName().equalsIgnoreCase("nj_rails")) {
@@ -328,7 +336,40 @@ public class HappyStream {
 		fields.put("time_to_live", 1800);
 		JSONObject data = new JSONObject();
 		data.put("title", status.getUser().getName());
-		data.put("message", status.getText());
+		StringBuilder text = new StringBuilder(status.getText());
+		if (status.getURLEntities() != null) {
+			for (int i = status.getURLEntities().length - 1; i >= 0; i--) {
+				URLEntity e = status.getURLEntities()[i];
+				text.replace(e.getStart(), e.getEnd(), e.getDisplayURL());
+			}
+		}
+		JSONObject tweet = new JSONObject(DataObjectFactory.getRawJSON(status));
+		data.put("tweet", tweet);
+		data.put("message", text);
+		if(!checkSize(data)) {
+			tweet.remove("source");
+			tweet.remove("lang");
+			tweet.remove("truncated");
+			tweet.remove("possibly_sensitive");
+			tweet.remove("favorited");
+			tweet.remove("filter_level");
+			if(!checkSize(data)) {
+				JSONObject user = tweet.getJSONObject("user");				
+				user.remove("default_profile");
+				user.remove("verified");
+				user.remove("contributors_enabled");
+				user.remove("profile_image_url_https");
+				user.remove("follower_request_sent");
+				user.remove("is_translator");
+				if(!checkSize(data)) {
+					user.remove("description");				
+				}
+				
+			}
+		}
+		if(!checkSize(data)) {
+			data.remove("tweet");
+		}
 		fields.put("data", data);
 		Map<String, String> headers = new HashMap<String, String>();
 		headers.put("Authorization", "key=" + apiKey);
@@ -339,6 +380,9 @@ public class HappyStream {
 			long userId = users.getLong(2);
 			regs.put(pushId);
 			userIds.add(userId);
+		}
+		if (regs.length() == 0) {
+			return;
 		}
 		fields.put("registration_ids", regs);
 		URL u = new URL("https://android.googleapis.com/gcm/send");
@@ -356,36 +400,43 @@ public class HappyStream {
 			OutputStream out = conn.getOutputStream();
 			out.write(fields.toString().getBytes());
 			out.close();
-			int code = conn.getResponseCode();			
-			if (code == 200) {				
+			int code = conn.getResponseCode();
+
+			if (code == 200) {
+				in = conn.getInputStream();
 				String response = Streams.readFully(in);
 				JSONObject o = new JSONObject(response);
 				JSONArray a = o.getJSONArray("results");
 				for (int i = 0; i < a.length(); i++) {
 					JSONObject ob = a.getJSONObject(i);
+					System.out.println(ob);
 					boolean success = !ob.has("error");
 					if (success) {
 						saveSentNotification(status, userIds.get(i));
 					}
 				}
 			} else {
-				Streams.readFully(in);
+				in = conn.getErrorStream();
+				System.err.println(Streams.readFully(in));
 			}
-			users.close();
 		} catch (Exception e) {
-
+			e.printStackTrace();
 		} finally {
-			if(in!=null) {
+			if (in != null) {
 				in.close();
 			}
-			if(conn!=null) {
+			if (conn != null) {
 				conn.disconnect();
+			}
+			if (users != null) {
+				users.close();
 			}
 		}
 	}
 
 	private static void saveSentNotification(Status status, Long userId)
 			throws Exception {
+		System.out.println("saving " + status.getText() + " for " + userId);
 		PreparedStatement stat = conn
 				.prepareStatement("insert into SENT(user_id,status_id) values(?,?)");
 		stat.setLong(1, userId);

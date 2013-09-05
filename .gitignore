@@ -8,3 +8,6 @@ google-play-services_lib/bin
 google-play-services_lib/gen
 LIRails/bin
 LIRails/gen
+NJTwitter/bin
+NJTwitter/push.db
+NJTwitter/njtransit.json
