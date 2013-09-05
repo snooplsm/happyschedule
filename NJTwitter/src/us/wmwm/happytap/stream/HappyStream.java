@@ -50,7 +50,7 @@ public class HappyStream {
 		Connection connection = null;
 		try {
 			Class.forName("org.sqlite.JDBC");
-			connection = DriverManager.getConnection("jdbc:sqlite:push.db");
+			connection = DriverManager.getConnection("jdbc:sqlite:"+args[5]);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
