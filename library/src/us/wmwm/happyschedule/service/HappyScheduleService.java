@@ -10,6 +10,9 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+import java.util.TimeZone;
 import java.util.concurrent.Future;
 
 import org.json.JSONObject;
@@ -35,6 +38,7 @@ import android.os.IBinder;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.flurry.android.FlurryAgent;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.squareup.okhttp.OkHttpClient;
 
@@ -43,7 +47,12 @@ public class HappyScheduleService extends Service {
 	NotificationManager notifs;
 	AlarmManager alarmManager;
 	
-	SimpleDateFormat RFC = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
+	static SimpleDateFormat RFC;
+	
+	static {
+		 RFC = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
+		 RFC.setTimeZone(TimeZone.getTimeZone("GMT"));
+	}
 	
 	private static final String TAG = HappyScheduleService.class.getSimpleName();
 	
@@ -56,7 +65,7 @@ public class HappyScheduleService extends Service {
 		Intent i = new Intent(this, HappyScheduleService.class);
 		i.setData(Uri.parse("http://wmwm.us?type=lines"));
 		pi = PendingIntent.getService(this, 0, i, 0);
-		alarmManager.setRepeating(AlarmManager.RTC, System.currentTimeMillis()+10000, 43200000,pi);
+		alarmManager.setRepeating(AlarmManager.RTC, System.currentTimeMillis()+10000, 86400000,pi);
 		ThreadHelper.getScheduler().submit(updateGCM);
 	}
 	
@@ -151,11 +160,13 @@ public class HappyScheduleService extends Service {
 							}
 							String data = WDb.get().getPreference("rail_push_matrix");
 							if(data==null) {
+								FlurryAgent.logEvent("NoPushMatrix");
 								alarmManager.cancel(pi);
 								return;
 							}
 							String pushId = SettingsFragment.getRegistrationId();
 							if(pushId==null) {
+								FlurryAgent.logEvent("NoRegistrationIdOnSavePushMatrix");
 								alarmManager.cancel(pi);
 								return;
 							}
@@ -169,13 +180,15 @@ public class HappyScheduleService extends Service {
 								conn.setRequestProperty("Content-Type","application/x-www-form-urlencoded");
 								conn.setRequestProperty("Content-Length",String.valueOf(("services="+URLEncoder.encode(data,"utf-8")).getBytes().length));
 								OutputStream out = conn.getOutputStream();
-								System.out.println(data);
 								out.write(("services="+URLEncoder.encode(data,"utf-8")).getBytes());
 								out.close();
 								int resp = conn.getResponseCode();
 								if(resp==200) {
 									WDb.get().savePreference("rail_push_matrix_needs_save", null);
 									alarmManager.cancel(pi);
+									FlurryAgent.logEvent("SavedPushMatrix");
+								} else {
+									FlurryAgent.logEvent("FailedSavePushMatrix");
 								}
 							} catch (Exception e) {
 								
@@ -194,6 +207,7 @@ public class HappyScheduleService extends Service {
 					linesFuture = ThreadHelper.getScheduler().submit(new Runnable() {
 						@Override
 						public void run() {
+							Log.d(TAG, "UpdateScheduleThread");
 							OkHttpClient client = new OkHttpClient();
 							HttpURLConnection conn = null;
 							InputStream in = null;
@@ -211,40 +225,48 @@ public class HappyScheduleService extends Service {
 								}
 								Calendar c = null;
 								if(config.exists()) {
+									Log.d(TAG, "UpdateScheduleThread - config exists");
 									c = Calendar.getInstance();
 									String lastModded = WDb.get().getPreference("config_last_modified");
 									if(lastModded!=null) {
-										try {
+										try {											
 											c.setTimeInMillis(Long.parseLong(lastModded));
+											Log.d(TAG, "UpdateScheduleThread - time set to " + c.getTime());
 										} catch (Exception e) {
-											
+											Log.e(TAG, "UpdateScheduleThreadException",e);
 										}
 									} else {
 										c.setTimeInMillis(0);
+										Log.d(TAG, "UpdateScheduleThread - time set to " + c.getTime());
 									}
 									Calendar later = (Calendar) c.clone();
-									later.add(Calendar.HOUR_OF_DAY, 5);
+									later.add(Calendar.HOUR_OF_DAY, 24);
 									if(!Calendar.getInstance().after(later)) {
+										Log.d(TAG, "UpdateScheduleThread - returning since " + Calendar.getInstance().getTime()+ "  ! after " + later.getTime());
 										return;
 									}									
 								}
 								
 								conn = client.open(new URL("http://ryangravener.com/njrails/config.json?v="+URLEncoder.encode(version,"utf-8")));
-								if(c!=null) {
+								if(c!=null) {								
+									Log.d(TAG, "UpdateScheduleThread - adding If-Modified-Since " + RFC.format(c.getTime()));
 									conn.addRequestProperty("If-Modified-Since", RFC.format(c.getTime()));
 								}
 								if(conn.getResponseCode()==200) {
+									Log.d(TAG, "UpdateScheduleThread - 200 response ");
 									String txt = Streams.readFully(in = conn.getInputStream());
 									JSONObject t = new JSONObject(txt);
 									if(txt!=null) {
 										fos = openFileOutput("config.json", Context.MODE_PRIVATE);
 										fos.write(txt.getBytes());
-										Log.d(TAG, "saved config");
+										Log.d(TAG, "UpdateScheduleThread - saved config");
+										FlurryAgent.logEvent("ConfigUpdated", Collections.singletonMap("date", new Date().toString()));
 										WDb.get().savePreference("config_last_modified", String.valueOf(System.currentTimeMillis()));
 									}
 								} else {
-									Streams.readFully(in = conn.getInputStream());
-									Log.d(TAG, "config up to date");
+									FlurryAgent.logEvent("ConfigUpToDate", Collections.singletonMap("date", new Date().toString()));
+									//Streams.readFully(in = conn.getEr);
+									Log.d(TAG, "UpdateScheduleThread - config up to date with response code " + conn.getResponseCode());
 								}
 							} catch (Exception e) {
 								Log.e(TAG, "could not get config", e);

@@ -206,14 +206,14 @@ public class ScheduleDao {
 		String stationsFragment = "stop_id=" + join(p, " or stop_id=");
 		String query = "select a1.depart,a1.arrive,a1.service_id,a1.trip_id,a1.block_id,a1.route_id,a1.stop_id,a1.lft from nested_trip a1 where a1.stop_id=? or a1.stop_id=? and a1.service_id in (select service_id from service where date in(:foo))";
 		for(int j = 0; j < levels; j++) {
-			System.out.println("level " + j);
+			//System.out.println("level " + j);
 			for (int i = 0; i < pairs.get(j).length; i++) {
-				System.out.println("sequence " + i);
+				//System.out.println("sequence " + i);
 				if(transferEdges.containsKey(pairs.get(j)[i])) {
-					System.out.println("continuing because transferEdge contains " + Arrays.toString(pairs.get(j)[i]));
+					//System.out.println("continuing because transferEdge contains " + Arrays.toString(pairs.get(j)[i]));
 					continue;
 				}
-				System.out.println("trying to get trip intervals for " + Arrays.toString(pairs.get(j)[i]));
+				//System.out.println("trying to get trip intervals for " + Arrays.toString(pairs.get(j)[i]));
 				Map<String, List<ConnectionInterval>> tripToConnectionIntervals = pairToTimes.get(pairs.get(j)[i]);
 				if(tripToConnectionIntervals==null) {
 					tripToConnectionIntervals = new HashMap<String, List<ConnectionInterval>>();
@@ -262,10 +262,10 @@ public class ScheduleDao {
 						//System.out.println("first connection interval");
 						tripToConnectionIntervals.put(tripId, cin);
 					} else {
-						System.out.println("cin not null!");
+						//System.out.println("cin not null!");
 					}
 					if(cin.size()==2) {
-						System.out.println("size is 2, continuing");
+						//System.out.println("size is 2, continuing");
 						continue;
 					}
 					cin.add(interval);

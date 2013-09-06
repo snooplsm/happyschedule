@@ -6,6 +6,8 @@ import java.util.List;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.flurry.android.FlurryAgent;
+
 import us.wmwm.happyschedule.R;
 import us.wmwm.happyschedule.ThreadHelper;
 import us.wmwm.happyschedule.application.HappyApplication;
@@ -45,6 +47,7 @@ public class FragmentRaiLines extends HappyFragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		FlurryAgent.logEvent("FragmentRailLines");
 	}
 	
 	@Override
@@ -84,7 +87,6 @@ public class FragmentRaiLines extends HappyFragment {
 			ThreadHelper.getScheduler().submit(new Runnable() {
 				public void run() {
 					try {
-						System.out.println(railPushMatrix.toJSON().toString());
 						WDb.get().savePreference("rail_push_matrix", railPushMatrix.toJSON().toString());
 						WDb.get().savePreference("rail_push_matrix_needs_save", String.valueOf(System.currentTimeMillis()));
 					} catch (Exception e) {

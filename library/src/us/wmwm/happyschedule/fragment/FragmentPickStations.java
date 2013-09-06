@@ -354,7 +354,9 @@ public class FragmentPickStations extends Fragment implements IPrimary {
 			animate(arrivalButton);
 			canGet = false;
 		}
-
+		if(!canGet) {
+			FlurryAgent.logEvent("CanNotGetSchedule");
+		}
 		return canGet;
 	}
 
