@@ -8,6 +8,7 @@ import us.wmwm.happyschedule.R;
 import us.wmwm.happyschedule.ThreadHelper;
 import us.wmwm.happyschedule.model.Alarm;
 import us.wmwm.happyschedule.service.HappyScheduleService;
+import us.wmwm.happyschedule.service.Poller;
 import android.app.Application;
 import android.content.Intent;
 
@@ -53,6 +54,17 @@ public class HappyApplication extends Application {
 	
 	public static HappyApplication get() {
 		return INSTANCE;
+	}
+	
+	public static Poller getPoller() {
+		String pollerClassName = get().getString(R.string.poller);
+		try {
+			Class<?> clazz = Class.forName(pollerClassName);
+			return (Poller) clazz.newInstance();
+		} catch (Exception e) {
+			
+		}
+		return null;
 	}
 	
 }

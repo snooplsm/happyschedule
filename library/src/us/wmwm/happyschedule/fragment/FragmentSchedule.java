@@ -119,6 +119,7 @@ public class FragmentSchedule extends Fragment {
 		View view = inflater.inflate(R.layout.fragment_schedule, container,
 				false);
 		pager = (ViewPager) view.findViewById(R.id.pager2);
+		setHasOptionsMenu(true);
 		return view;
 	}
 
@@ -126,13 +127,7 @@ public class FragmentSchedule extends Fragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 	}
-
-	@Override
-	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		inflater.inflate(R.menu.menu_schedule, menu);
-		super.onCreateOptionsMenu(menu, inflater);
-	}
-
+	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		if (item.getItemId() == R.id.menu_change_day) {
@@ -160,6 +155,9 @@ public class FragmentSchedule extends Fragment {
 		pager.setOffscreenPageLimit(0);
 		if (item.getItemId() == R.id.menu_go_to_today) {
 			pager.setCurrentItem(adapter.getTodaysPosition());
+		}
+		if(item.getItemId()==R.id.menu_reverse_in) {
+			onGetSchedule.onGetSchedule(to, from);
 		}
 		return super.onOptionsItemSelected(item);
 	}

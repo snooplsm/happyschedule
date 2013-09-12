@@ -23,7 +23,7 @@ import us.wmwm.happyschedule.model.LineStyle;
 import us.wmwm.happyschedule.model.Station;
 import us.wmwm.happyschedule.model.StationToStation;
 import us.wmwm.happyschedule.model.TrainStatus;
-import us.wmwm.happyschedule.service.DeparturePoller;
+import us.wmwm.happyschedule.service.Poller;
 import us.wmwm.happyschedule.util.Streams;
 import us.wmwm.happyschedule.views.OnStationSelectedListener;
 import android.app.Activity;
@@ -58,7 +58,7 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary,
 
 	Future<?> refresh;
 
-	DeparturePoller poller;
+	Poller poller;
 
 	DepartureVisionAdapter adapter;
 
@@ -140,7 +140,7 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary,
 		public void run() {
 			try {
 				final List<TrainStatus> s = poller.getTrainStatuses(appConfig,
-						station.getDepartureVision());
+						station.getDepartureVision(),null);
 				String key = getKey();
 				if (s != null && !s.isEmpty()) {
 					count++;
@@ -296,7 +296,7 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary,
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		poller = new DeparturePoller();
+		poller = HappyApplication.getPoller();
 		Bundle arguments = getArguments();
 		if (arguments != null) {
 			station = (Station) arguments.getSerializable("station");

@@ -2,6 +2,7 @@ package us.wmwm.happyschedule.views;
 
 import org.json.JSONArray;
 
+import us.wmwm.happyschedule.R;
 import us.wmwm.happyschedule.application.HappyApplication;
 import us.wmwm.happyschedule.dao.Db;
 import us.wmwm.happyschedule.fragment.FragmentDepartureVision;
@@ -118,8 +119,13 @@ public class FragmentMainAdapter extends FragmentStatePagerAdapter {
 		} catch (Exception e) {
 			departureVisions = new JSONArray();
 		}
-		return 2 + (departureVisions.length() == 0 ? 1 : departureVisions
-				.length());
+		int count = 2;
+		if(HappyApplication.get().getString(R.string.poller).length()==0) {
+			
+		} else {
+			count = count+1;
+		}
+		return count;
 	}
 
 	@Override

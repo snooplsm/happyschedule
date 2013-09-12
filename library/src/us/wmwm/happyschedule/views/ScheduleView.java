@@ -150,8 +150,7 @@ public class ScheduleView extends RelativeLayout {
 
 			} else {
 				added = true;
-				String depart = times.format(sts2.departTime.getTime())
-						.toLowerCase();
+				String depart = shrink2(sts2.departTime);
 				depart = depart.substring(0, depart.length() - 1).replace(" ",
 						"");
 				if(depart.length()<6) {
@@ -165,8 +164,7 @@ public class ScheduleView extends RelativeLayout {
 				b.append("↝\n");
 
 				if (!(sts2.tripId != null & sts2.tripId.equals(nextTripId))) {
-					String arrive = times.format(sts2.arriveTime.getTime())
-							.toLowerCase();
+					String arrive = shrink2(sts2.arriveTime);
 					arrive = arrive.substring(0, arrive.length() - 1).replace(
 							" ", "");					
 					
@@ -209,8 +207,7 @@ public class ScheduleView extends RelativeLayout {
 		}
 
 		if (sts2.tripId != null && !sts2.tripId.equals(lastTripId)) {
-			String depart = times.format(sts2.departTime.getTime())
-					.toLowerCase();
+			String depart = shrink2(sts2.departTime);
 			depart = depart.substring(0, depart.length() - 1).replace(" ", "");
 			if(depart.length()<6) {
 				//b.append(" ");
@@ -221,8 +218,7 @@ public class ScheduleView extends RelativeLayout {
 			b.append(" ");
 			b.append("↝\n");
 		}
-		String arrive = times.format(sts2.getArriveTime().getTime())
-				.toLowerCase();
+		String arrive = shrink2(sts2.getArriveTime());
 		arrive = arrive.substring(0, arrive.length() - 1).replace(" ", "");
 		if(arrive.length()<6) {
 			//b.append(" ");
@@ -245,9 +241,17 @@ public class ScheduleView extends RelativeLayout {
 	}
 
 	private String shrink(Calendar cal) {
-		return TIME.format(cal.getTime()).toLowerCase();// .replace(" am",
-														// "a").replace(" pm",
-														// "p");
+		if(cal==null) {
+			return "error";
+		}
+		return TIME.format(cal.getTime()).toLowerCase();// .replace(" am",														// "a").replace(" pm",														// "p");
+	}
+	
+	private String shrink2(Calendar cal) {
+		if(cal==null) {
+			return "error2";
+		}
+		return times.format(cal.getTime()).toLowerCase();
 	}
 
 	public void setStatus(TrainStatus trainStatus) {

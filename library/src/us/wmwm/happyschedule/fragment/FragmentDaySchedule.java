@@ -1,9 +1,7 @@
 package us.wmwm.happyschedule.fragment;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -16,12 +14,11 @@ import java.util.concurrent.TimeUnit;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.flurry.android.FlurryAgent;
-
 import us.wmwm.happyschedule.Alarms;
 import us.wmwm.happyschedule.R;
 import us.wmwm.happyschedule.ThreadHelper;
 import us.wmwm.happyschedule.activity.AlarmActivity;
+import us.wmwm.happyschedule.application.HappyApplication;
 import us.wmwm.happyschedule.dao.ScheduleDao;
 import us.wmwm.happyschedule.dao.WDb;
 import us.wmwm.happyschedule.fragment.FragmentAlarmPicker.OnTimerPicked;
@@ -35,7 +32,7 @@ import us.wmwm.happyschedule.model.StationInterval;
 import us.wmwm.happyschedule.model.StationToStation;
 import us.wmwm.happyschedule.model.TrainStatus;
 import us.wmwm.happyschedule.model.Type;
-import us.wmwm.happyschedule.service.DeparturePoller;
+import us.wmwm.happyschedule.service.Poller;
 import us.wmwm.happyschedule.util.Share;
 import us.wmwm.happyschedule.util.Streams;
 import us.wmwm.happyschedule.views.EmptyView;
@@ -55,7 +52,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.ShareCompat;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.util.Log;
@@ -64,11 +60,12 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.RelativeLayout;
+
+import com.flurry.android.FlurryAgent;
 
 public class FragmentDaySchedule extends Fragment implements IPrimary,
 		ISecondary {
@@ -151,7 +148,7 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 
 	Future<?> poll;
 
-	DeparturePoller poller;
+	Poller poller;
 
 	Runnable populateAdpter = new Runnable() {
 		@Override
@@ -191,7 +188,7 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 				Log.d(FragmentDaySchedule.class.getSimpleName(),
 						"getting train statuses");
 				final List<TrainStatus> s = poller.getTrainStatuses(appConfig,from
-						.getDepartureVision());
+						.getDepartureVision(),to.getDepartureVision());
 				Log.d(FragmentDaySchedule.class.getSimpleName(),
 						"got train statuses: " + s.size());
 				String key = getKey();
@@ -250,7 +247,12 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 			FlurryAgent.logEvent("UpdateSchedule",args);
 			Log.d(FragmentDaySchedule.class.getSimpleName(),
 					"updating schedule view");
-			handler.post(populateAdpter);
+			handler.post(new Runnable() {
+				@Override
+				public void run() {
+					adapter.notifyDataSetChanged();
+				}
+			});
 		};
 	};
 
@@ -436,7 +438,7 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		
-		poller = new DeparturePoller();
+		poller = HappyApplication.getPoller();
 		alarmManger = (AlarmManager) getActivity().getSystemService(
 				Context.ALARM_SERVICE);
 		notifs = (NotificationManager) getActivity().getSystemService(
@@ -729,6 +731,7 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 	public boolean onOptionsItemSelected(MenuItem item) {
 		if (item.getItemId() == R.id.menu_go_to_next_train) {
 			moveToNextTrain();
+			return true;
 		}
 		if (item.getItemId() == android.R.id.home) {
 			getActivity().onBackPressed();
@@ -736,9 +739,7 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 		}
 		if (item.getItemId() == R.id.menu_departurevision) {
 			onDepartureVision.onDepartureVision(from);
-		}
-		if (item.getItemId() == R.id.menu_reverse) {
-			onGetSchedule.onGetSchedule(to, from);
+			return true;
 		}
 		if(item.getItemId()==R.id.menu_share) {
 			Map<String,String> k = new HashMap<String,String>();
@@ -749,8 +750,9 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 			k.put("date", new Date().toString());
 			FlurryAgent.logEvent("ShareSchedule", k);
 			startActivity(Intent.createChooser(Share.intent(appConfig, this.getActivity(), from, to, day), "Share"));
+			return true;
 		}
-		return super.onOptionsItemSelected(item);
+		return false;
 	}
 
 	public void onPause() {

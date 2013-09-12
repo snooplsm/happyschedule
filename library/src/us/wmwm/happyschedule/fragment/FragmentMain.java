@@ -111,18 +111,13 @@ public class FragmentMain extends Fragment {
 				fma.setOnGetScheduleListener(onGetSchedule = new OnGetSchedule() {
 
 					@Override
-					public void onGetSchedule(Station from, Station to) {
+					public void onGetSchedule(final Station from, final Station to) {
 						Map<String, String> args = new HashMap<String, String>();
 						args.put("from_id", from.getId());
 						args.put("to_id", to.getId());
 						args.put("from_name", from.getName());
 						args.put("to_name", to.getName());
 						FlurryAgent.logEvent("OnGetSchedule", args);
-						FragmentTransaction t = getFragmentManager()
-								.beginTransaction();
-						FragmentSchedule fs = FragmentSchedule.newInstance(
-								from, to);
-						fs.setOnGetSchedule(onGetSchedule);
 						if (getFragmentManager().getBackStackEntryCount() == 0) {
 						} else {
 							for (int i = getFragmentManager()
@@ -130,20 +125,30 @@ public class FragmentMain extends Fragment {
 								BackStackEntry e = getFragmentManager()
 										.getBackStackEntryAt(i);
 								if ("schedule".equals(e.getName())) {
-									getFragmentManager().popBackStackImmediate(
-											i, i);
+									getFragmentManager().popBackStackImmediate();
 								}
 							}
 						}
-						t.addToBackStack("schedule");
-						t.replace(R.id.fragment_schedule, fs)
-								.setBreadCrumbTitle(
-										(from.getName() + " to " + to.getName()))
-								.commit();
-						ActionBar a = getActivity().getActionBar();
-						a.setDisplayHomeAsUpEnabled(true);
-						a.setHomeButtonEnabled(true);
-						a.setDisplayUseLogoEnabled(true);
+						handler.post(new Runnable() {
+							@Override
+							public void run() {
+								FragmentTransaction t = getFragmentManager()
+										.beginTransaction();
+								FragmentSchedule fs = FragmentSchedule.newInstance(
+										from, to);
+								fs.setOnGetSchedule(onGetSchedule);
+								t.addToBackStack("schedule");
+								t.replace(R.id.fragment_schedule, fs)
+										.setBreadCrumbTitle(
+												(from.getName() + " to " + to.getName()))
+										.commit();
+								ActionBar a = getActivity().getActionBar();
+								a.setDisplayHomeAsUpEnabled(true);
+								a.setHomeButtonEnabled(true);
+								a.setDisplayUseLogoEnabled(true);
+							}
+						});
+						
 					}
 				});
 				fma.setOnHistoryListener(new OnHistoryListener() {

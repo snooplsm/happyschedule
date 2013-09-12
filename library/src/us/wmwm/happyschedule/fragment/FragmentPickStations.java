@@ -153,7 +153,7 @@ public class FragmentPickStations extends Fragment implements IPrimary {
 				handler.post(new Runnable() {
 					@Override
 					public void run() {
-						fare.setText(adult);
+						fare.setText("Fare: " + adult);
 						fare.setVisibility(View.VISIBLE);
 					}
 				});

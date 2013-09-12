@@ -1,4 +1,4 @@
-package us.wmwm.happyschedule.service;
+package us.wmwm.happyschedule.lirails.service;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -19,10 +19,11 @@ import org.jsoup.select.Elements;
 
 import us.wmwm.happyschedule.model.AppConfig;
 import us.wmwm.happyschedule.model.TrainStatus;
+import us.wmwm.happyschedule.service.Poller;
 import android.util.Log;
 
 
-public class DeparturePoller implements Poller {
+public class LirrPoller implements Poller {
 	
 	private static final String TRK = "TRK";
 	private static final String STATUS = "STATUS";

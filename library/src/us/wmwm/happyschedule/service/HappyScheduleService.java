@@ -247,7 +247,7 @@ public class HappyScheduleService extends Service {
 									}									
 								}
 								
-								conn = client.open(new URL("http://ryangravener.com/njrails/config.json?v="+URLEncoder.encode(version,"utf-8")));
+								conn = client.open(new URL(getString(R.string.config_url)+"?v="+URLEncoder.encode(version,"utf-8")));
 								if(c!=null) {								
 									Log.d(TAG, "UpdateScheduleThread - adding If-Modified-Since " + RFC.format(c.getTime()));
 									conn.addRequestProperty("If-Modified-Since", RFC.format(c.getTime()));

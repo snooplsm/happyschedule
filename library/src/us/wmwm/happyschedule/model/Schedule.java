@@ -18,6 +18,8 @@ import java.util.TreeMap;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import us.wmwm.happyschedule.util.Statistics;
+
 public class Schedule implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -80,6 +82,7 @@ public class Schedule implements Serializable {
 		int sum = 0;
 		int nsize = size;
 		LinkedHashSet<Integer> toRemove = new LinkedHashSet<Integer>();
+		List<Double> time = new ArrayList<Double>();
 		Map<StationInterval, Integer> cache = new HashMap<StationInterval, Integer>();
 		for (int i = 0; i < size; i++) {
 			StationInterval s = (StationInterval) stationToStations.get(i);
@@ -92,6 +95,37 @@ public class Schedule implements Serializable {
 				nsize--;
 				toRemove.add(i);
 			} else {
+				time.add((double)tot);
+				if(i==0 || i ==size-1) {
+					continue;
+				}
+				boolean canMoveForward = true;
+				int pos = i+1;
+				int ahead = 4;
+				while(canMoveForward) {
+					StationInterval next = (StationInterval) stationToStations.get(pos);
+					if(next==null) {
+						break;
+					}
+					Integer nextTot = cache.get(next);
+					if(nextTot==null) {
+						nextTot = s.totalMinutes();
+						cache.put(next, tot);
+					}
+					StationInterval prev = (StationInterval) stationToStations.get(pos-2);
+					Integer prevTot = cache.get(prev);
+					if(s.getDepartTime().before(next.getDepartTime())) {
+						Calendar arrive = s.getArriveTime();
+						if(arrive!=null && arrive.after(next.getArriveTime())) {
+							System.out.println("removing ");
+							if(!toRemove.contains(i)) {
+								toRemove.add(i);
+							}
+						}
+					} 
+					ahead--;
+					canMoveForward = ahead>0 && i < size;
+				}
 				// int count = 0;
 				// boolean addedFirst = false;
 				// Calendar now = Calendar.getInstance();
@@ -141,6 +175,9 @@ public class Schedule implements Serializable {
 			// System.out.println(stationToStations.get(k[i].intValue()));
 			stationToStations.remove(k[i].intValue());
 		}
+		
+		
+		
 		nsize = 0;
 		if (stationToStations != null) {
 			nsize = stationToStations.size();
@@ -149,14 +186,21 @@ public class Schedule implements Serializable {
 			int tot = cache.get(stationToStations.get(i));
 			sum += tot;
 		}
-		double mean = sum / (double) size;
-		double std = Math.sqrt(sum / (double) size);
-		double norm = std * 6 + mean + .5 * mean;
+		if(time.isEmpty()) {
+			return;
+		}
+		Statistics stats = new Statistics(time);
+		double mean = stats.getMean();
+		double std = stats.getStdDev();
+//		System.out.println("the mean is: " + mean);
+//		System.out.println("the medin is: " + stats.median());
 		for (int i = 0; i < nsize; i++) {
 			StationInterval s = (StationInterval) stationToStations.get(i);
-			int duration = cache.get(s);
+			int duration = s.totalMinutes();
 			boolean canAdd = true;
-			if (duration > norm) {
+			double diff = duration - stats.median();
+//			System.out.println("the diff is " + diff + " the duration is " + duration);
+			if (diff > 0 && duration-stats.median() > 10) {
 				canAdd = false;
 			}
 			if (canAdd) {
@@ -168,6 +212,7 @@ public class Schedule implements Serializable {
 
 	void traversal(ScheduleTraverser traversal,
 			Map<String[], Set<String>> tripIds) {
+		List<StationInterval> all = new ArrayList<StationInterval>();
 		for (int level = 0; level < transfers.size(); level++) {
 			int first = 0;
 			int ignore = 0;
@@ -205,7 +250,7 @@ public class Schedule implements Serializable {
 			}
 
 			stationIntervals = new HashMap<String[], List<StationInterval>>();
-
+			
 			for (int i = goback; i < transfers.get(level).length; i++) {
 				String[] pair = transfers.get(level)[i];
 				Integer transferDuration = transferEdges.get(pair[0] + "-"
@@ -317,19 +362,18 @@ public class Schedule implements Serializable {
 				if(inters==null) {
 					continue;
 				}
-				Collections.sort(inters,
-						new Comparator<StationInterval>() {
-							@Override
-							public int compare(StationInterval lhs,
-									StationInterval rhs) {
-								return lhs.departTime.compareTo(rhs.departTime);
-							}
-						});
-				List<StationInterval> intervals = stationIntervals
-						.get(transfers.get(level)[goback]);
-				traverse(intervals, traversal);
+				all.addAll(inters);				
 			}
 		}
+		Collections.sort(all,
+				new Comparator<StationInterval>() {
+					@Override
+					public int compare(StationInterval lhs,
+							StationInterval rhs) {
+						return lhs.departTime.compareTo(rhs.departTime);
+					}
+				});
+		traverse(all, traversal);
 	}
 
 	public StationInterval getStationIntervalForTripId(String tripId) {

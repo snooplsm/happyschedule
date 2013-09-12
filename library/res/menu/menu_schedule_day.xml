@@ -7,7 +7,7 @@
         android:showAsAction="always">
         <menu>
             <item
-                android:id="@+id/menu_reverse"
+                android:id="@+id/menu_reverse_in"
                 android:title="Reverse"/>
             <item
                 android:id="@+id/menu_go_to_today"

@@ -407,14 +407,20 @@ public class HappyStream {
 				String response = Streams.readFully(in);
 				JSONObject o = new JSONObject(response);
 				JSONArray a = o.getJSONArray("results");
+				List<Long> successfuls = new ArrayList<Long>();
 				for (int i = 0; i < a.length(); i++) {
 					JSONObject ob = a.getJSONObject(i);
 					System.out.println(ob);
 					boolean success = !ob.has("error");
 					if (success) {
-						saveSentNotification(status, userIds.get(i));
+						successfuls.add(userIds.get(i));						
+					} else {
+						if("NotRegistered".equals(ob.opt("error"))) {
+							deletePushId(userIds.get(i));
+						}
 					}
 				}
+				saveSentNotification(status, successfuls);
 			} else {
 				in = conn.getErrorStream();
 				System.err.println(Streams.readFully(in));
@@ -434,15 +440,41 @@ public class HappyStream {
 		}
 	}
 
-	private static void saveSentNotification(Status status, Long userId)
-			throws Exception {
-		System.out.println("saving " + status.getText() + " for " + userId);
-		PreparedStatement stat = conn
-				.prepareStatement("insert into SENT(user_id,status_id) values(?,?)");
-		stat.setLong(1, userId);
-		stat.setLong(2, status.getId());
+	private static void deletePushId(Long long1) throws Exception {
+		PreparedStatement stat = conn.prepareStatement("delete from services where user_id=?");
+		stat.setLong(1, long1);
 		stat.execute();
 		stat.close();
+		stat = conn.prepareStatement("delete from user where id=?");
+		stat.setLong(1, long1);
+		stat.execute();
+		stat.close();
+	}
+
+	private static void saveSentNotification(Status status, List<Long> userIds)
+			throws Exception {
+		PreparedStatement stat = conn
+				.prepareStatement("insert into SENT(user_id,status_id) values(?,?)");
+		boolean before = conn.getAutoCommit();
+		conn.setAutoCommit(false);
+		try {
+			for(Long userId : userIds) {
+				
+				stat.setLong(1, userId);
+				stat.setLong(2, status.getId());
+				stat.addBatch();
+				System.out.println("saving " + status.getText() + " for " + userId);
+			}
+			stat.executeBatch();
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.err.println("rolling back");
+			conn.rollback();
+		} finally {
+			conn.commit();
+			conn.setAutoCommit(before);
+			stat.close();
+		}
 	}
 
 	public static ResultSet findUsersForService(Status status, int day, int hour)
