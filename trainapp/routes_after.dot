@@ -1,0 +1,227 @@
+graph
+		"unix" {
+			rankdir=LR;
+	11 [label="North Jersey Coast Line"];
+10 [label="Northeast Corridor"];
+11--10
+11 [label="North Jersey Coast Line"];
+13 [label="Newark Light Rail"];
+11--13
+11 [label="North Jersey Coast Line"];
+12 [label="North Jersey Coast Line"];
+11--12
+11 [label="North Jersey Coast Line"];
+14 [label="Pascack Valley Line"];
+11--14
+11 [label="North Jersey Coast Line"];
+16 [label="Raritan Valley Line"];
+11--16
+11 [label="North Jersey Coast Line"];
+4 [label="Montclair-Boonton Line"];
+11--4
+11 [label="North Jersey Coast Line"];
+7 [label="Port Jervis Line"];
+11--7
+11 [label="North Jersey Coast Line"];
+6 [label="Main/Bergen County Line"];
+11--6
+11 [label="North Jersey Coast Line"];
+9 [label="Gladstone Branch"];
+11--9
+11 [label="North Jersey Coast Line"];
+8 [label="Morris & Essex Line"];
+11--8
+10 [label="Northeast Corridor"];
+13 [label="Newark Light Rail"];
+10--13
+10 [label="Northeast Corridor"];
+12 [label="North Jersey Coast Line"];
+10--12
+10 [label="Northeast Corridor"];
+15 [label="Princeton Shuttle"];
+10--15
+10 [label="Northeast Corridor"];
+14 [label="Pascack Valley Line"];
+10--14
+10 [label="Northeast Corridor"];
+17 [label="Riverline Light Rail"];
+10--17
+10 [label="Northeast Corridor"];
+16 [label="Raritan Valley Line"];
+10--16
+10 [label="Northeast Corridor"];
+1 [label="Princeton Shuttle"];
+10--1
+10 [label="Northeast Corridor"];
+4 [label="Montclair-Boonton Line"];
+10--4
+10 [label="Northeast Corridor"];
+7 [label="Port Jervis Line"];
+10--7
+10 [label="Northeast Corridor"];
+6 [label="Main/Bergen County Line"];
+10--6
+10 [label="Northeast Corridor"];
+9 [label="Gladstone Branch"];
+10--9
+10 [label="Northeast Corridor"];
+8 [label="Morris & Essex Line"];
+10--8
+13 [label="Newark Light Rail"];
+12 [label="North Jersey Coast Line"];
+13--12
+13 [label="Newark Light Rail"];
+16 [label="Raritan Valley Line"];
+13--16
+13 [label="Newark Light Rail"];
+3 [label="Montclair-Boonton Line"];
+13--3
+13 [label="Newark Light Rail"];
+4 [label="Montclair-Boonton Line"];
+13--4
+13 [label="Newark Light Rail"];
+9 [label="Gladstone Branch"];
+13--9
+13 [label="Newark Light Rail"];
+8 [label="Morris & Essex Line"];
+13--8
+12 [label="North Jersey Coast Line"];
+14 [label="Pascack Valley Line"];
+12--14
+12 [label="North Jersey Coast Line"];
+16 [label="Raritan Valley Line"];
+12--16
+12 [label="North Jersey Coast Line"];
+3 [label="Montclair-Boonton Line"];
+12--3
+12 [label="North Jersey Coast Line"];
+5 [label="Hudson-Bergen Light Rail"];
+12--5
+12 [label="North Jersey Coast Line"];
+4 [label="Montclair-Boonton Line"];
+12--4
+12 [label="North Jersey Coast Line"];
+7 [label="Port Jervis Line"];
+12--7
+12 [label="North Jersey Coast Line"];
+6 [label="Main/Bergen County Line"];
+12--6
+12 [label="North Jersey Coast Line"];
+9 [label="Gladstone Branch"];
+12--9
+12 [label="North Jersey Coast Line"];
+8 [label="Morris & Essex Line"];
+12--8
+15 [label="Princeton Shuttle"];
+1 [label="Princeton Shuttle"];
+15--1
+14 [label="Pascack Valley Line"];
+16 [label="Raritan Valley Line"];
+14--16
+14 [label="Pascack Valley Line"];
+3 [label="Montclair-Boonton Line"];
+14--3
+14 [label="Pascack Valley Line"];
+5 [label="Hudson-Bergen Light Rail"];
+14--5
+14 [label="Pascack Valley Line"];
+4 [label="Montclair-Boonton Line"];
+14--4
+14 [label="Pascack Valley Line"];
+7 [label="Port Jervis Line"];
+14--7
+14 [label="Pascack Valley Line"];
+6 [label="Main/Bergen County Line"];
+14--6
+14 [label="Pascack Valley Line"];
+9 [label="Gladstone Branch"];
+14--9
+14 [label="Pascack Valley Line"];
+8 [label="Morris & Essex Line"];
+14--8
+16 [label="Raritan Valley Line"];
+3 [label="Montclair-Boonton Line"];
+16--3
+16 [label="Raritan Valley Line"];
+5 [label="Hudson-Bergen Light Rail"];
+16--5
+16 [label="Raritan Valley Line"];
+4 [label="Montclair-Boonton Line"];
+16--4
+16 [label="Raritan Valley Line"];
+7 [label="Port Jervis Line"];
+16--7
+16 [label="Raritan Valley Line"];
+6 [label="Main/Bergen County Line"];
+16--6
+16 [label="Raritan Valley Line"];
+9 [label="Gladstone Branch"];
+16--9
+16 [label="Raritan Valley Line"];
+8 [label="Morris & Essex Line"];
+16--8
+3 [label="Montclair-Boonton Line"];
+5 [label="Hudson-Bergen Light Rail"];
+3--5
+3 [label="Montclair-Boonton Line"];
+4 [label="Montclair-Boonton Line"];
+3--4
+3 [label="Montclair-Boonton Line"];
+7 [label="Port Jervis Line"];
+3--7
+3 [label="Montclair-Boonton Line"];
+6 [label="Main/Bergen County Line"];
+3--6
+3 [label="Montclair-Boonton Line"];
+9 [label="Gladstone Branch"];
+3--9
+3 [label="Montclair-Boonton Line"];
+8 [label="Morris & Essex Line"];
+3--8
+5 [label="Hudson-Bergen Light Rail"];
+4 [label="Montclair-Boonton Line"];
+5--4
+5 [label="Hudson-Bergen Light Rail"];
+7 [label="Port Jervis Line"];
+5--7
+5 [label="Hudson-Bergen Light Rail"];
+6 [label="Main/Bergen County Line"];
+5--6
+5 [label="Hudson-Bergen Light Rail"];
+9 [label="Gladstone Branch"];
+5--9
+5 [label="Hudson-Bergen Light Rail"];
+8 [label="Morris & Essex Line"];
+5--8
+4 [label="Montclair-Boonton Line"];
+7 [label="Port Jervis Line"];
+4--7
+4 [label="Montclair-Boonton Line"];
+6 [label="Main/Bergen County Line"];
+4--6
+4 [label="Montclair-Boonton Line"];
+9 [label="Gladstone Branch"];
+4--9
+4 [label="Montclair-Boonton Line"];
+8 [label="Morris & Essex Line"];
+4--8
+7 [label="Port Jervis Line"];
+6 [label="Main/Bergen County Line"];
+7--6
+7 [label="Port Jervis Line"];
+9 [label="Gladstone Branch"];
+7--9
+7 [label="Port Jervis Line"];
+8 [label="Morris & Essex Line"];
+7--8
+6 [label="Main/Bergen County Line"];
+9 [label="Gladstone Branch"];
+6--9
+6 [label="Main/Bergen County Line"];
+8 [label="Morris & Essex Line"];
+6--8
+9 [label="Gladstone Branch"];
+8 [label="Morris & Essex Line"];
+9--8
+
+	}

@@ -122,7 +122,11 @@ public class StationInterval extends StationToStation {
 		if (sequence == schedule.transfers.get(level).length - 1) {
 			return false;
 		}
-		String[] pair = schedule.transfers.get(level)[sequence + 1];
+		String[][] pp = schedule.transfers.get(level);
+		if(pp.length==1) {
+			return false;
+		}
+		String[] pair = pp[sequence + 1];
 		Integer transferDuration = schedule.transferEdges.get(pair[0] + "-"
 				+ pair[1]);
 		if (transferDuration != null) {
@@ -177,17 +181,30 @@ public class StationInterval extends StationToStation {
 		return (int) ((a.getTimeInMillis() - d.getTimeInMillis()) / 60000);
 	}
 	
+	Calendar arriveTimeCached;
+	Integer connections;
+	
+	public int getConnections() {
+		return connections;
+	}
+	
 	public Calendar getArriveTime() {
+		if(arriveTimeCached!=null) {
+			return arriveTimeCached;
+		}
+		connections = 0;
 		StationInterval k = this;
 		Calendar d = k.departTime;
 		Calendar a = k.arriveTime;
 		while (k.hasNext()) {
 			k = k.next();
 			a = k.arriveTime;
+			connections++;
 		}
 		if(a==null || d == null || !k.arriveId.equals(schedule.arriveId)) {
 			return null;
 		}
+		arriveTimeCached = a;
 		return a;
 	}
 

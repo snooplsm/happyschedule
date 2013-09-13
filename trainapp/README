@@ -1,0 +1,15 @@
+required tools:
+python
+networkx
+
+to build the graphs and databases:
+python graph_builder.py
+
+to run the program:
+python program.py
+
+to view network on google maps:
+open target/*.html
+
+to view network in graphviz:
+open *.dot

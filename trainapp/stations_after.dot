@@ -1,0 +1,547 @@
+graph
+		"unix" {
+			rankdir=LR;
+	133 [label="East Norwalk"];
+1 [label="Grand Central Terminal"];
+133--1
+133 [label="East Norwalk"];
+131 [label="South Norwalk"];
+133--131
+133 [label="East Norwalk"];
+4 [label="Harlem-125th St."];
+133--4
+133 [label="East Norwalk"];
+134 [label="Westport"];
+133--134
+91 [label="Brewster"];
+90 [label="Croton Falls"];
+91--90
+91 [label="Brewster"];
+88 [label="Golden's Bridge"];
+91--88
+91 [label="Brewster"];
+74 [label="White Plains"];
+91--74
+91 [label="Brewster"];
+86 [label="Katonah"];
+91--86
+91 [label="Brewster"];
+94 [label="Southeast"];
+91--94
+131 [label="South Norwalk"];
+140 [label="Bridgeport"];
+131--140
+131 [label="South Norwalk"];
+158 [label="Merritt 7"];
+131--158
+131 [label="South Norwalk"];
+149 [label="New Haven"];
+131--149
+131 [label="South Norwalk"];
+124 [label="Stamford"];
+131--124
+131 [label="South Norwalk"];
+4 [label="Harlem-125th St."];
+131--4
+131 [label="South Norwalk"];
+134 [label="Westport"];
+131--134
+131 [label="South Norwalk"];
+128 [label="Darien"];
+131--128
+131 [label="South Norwalk"];
+129 [label="Rowayton"];
+131--129
+131 [label="South Norwalk"];
+138 [label="Fairfield"];
+131--138
+137 [label="Southport"];
+138 [label="Fairfield"];
+137--138
+137 [label="Southport"];
+136 [label="Green's Farms"];
+137--136
+137 [label="Southport"];
+134 [label="Westport"];
+137--134
+136 [label="Green's Farms"];
+138 [label="Fairfield"];
+136--138
+136 [label="Green's Farms"];
+134 [label="Westport"];
+136--134
+134 [label="Westport"];
+124 [label="Stamford"];
+134--124
+134 [label="Westport"];
+138 [label="Fairfield"];
+134--138
+134 [label="Westport"];
+4 [label="Harlem-125th St."];
+134--4
+138 [label="Fairfield"];
+140 [label="Bridgeport"];
+138--140
+138 [label="Fairfield"];
+1 [label="Grand Central Terminal"];
+138--1
+138 [label="Fairfield"];
+124 [label="Stamford"];
+138--124
+138 [label="Fairfield"];
+188 [label="Fairfield Metro"];
+138--188
+24 [label="Ardsley-on-Hudson"];
+25 [label="Irvington"];
+24--25
+24 [label="Ardsley-on-Hudson"];
+23 [label="Dobbs Ferry"];
+24--23
+25 [label="Irvington"];
+27 [label="Tarrytown"];
+25--27
+27 [label="Tarrytown"];
+23 [label="Dobbs Ferry"];
+27--23
+27 [label="Tarrytown"];
+33 [label="Croton Harmon"];
+27--33
+27 [label="Tarrytown"];
+18 [label="Yonkers"];
+27--18
+27 [label="Tarrytown"];
+31 [label="Ossining"];
+27--31
+27 [label="Tarrytown"];
+30 [label="Scarborough"];
+27--30
+27 [label="Tarrytown"];
+29 [label="Philipse Manor"];
+27--29
+27 [label="Tarrytown"];
+1 [label="Grand Central Terminal"];
+27--1
+27 [label="Tarrytown"];
+4 [label="Harlem-125th St."];
+27--4
+20 [label="Greystone"];
+19 [label="Glenwood"];
+20--19
+20 [label="Greystone"];
+1 [label="Grand Central Terminal"];
+20--1
+20 [label="Greystone"];
+22 [label="Hastings-on-Hudson"];
+20--22
+22 [label="Hastings-on-Hudson"];
+18 [label="Yonkers"];
+22--18
+22 [label="Hastings-on-Hudson"];
+4 [label="Harlem-125th St."];
+22--4
+22 [label="Hastings-on-Hudson"];
+23 [label="Dobbs Ferry"];
+22--23
+29 [label="Philipse Manor"];
+30 [label="Scarborough"];
+29--30
+94 [label="Southeast"];
+97 [label="Patterson"];
+94--97
+4 [label="Harlem-125th St."];
+622 [label="Yankees-E153 St."];
+4--622
+4 [label="Harlem-125th St."];
+114 [label="Rye"];
+4--114
+4 [label="Harlem-125th St."];
+62 [label="Mt Vernon West"];
+4--62
+4 [label="Harlem-125th St."];
+116 [label="Greenwich"];
+4--116
+4 [label="Harlem-125th St."];
+64 [label="Fleetwood"];
+4--64
+4 [label="Harlem-125th St."];
+110 [label="Larchmont"];
+4--110
+4 [label="Harlem-125th St."];
+112 [label="Harrison"];
+4--112
+4 [label="Harlem-125th St."];
+68 [label="Crestwood"];
+4--68
+4 [label="Harlem-125th St."];
+83 [label="Chappaqua"];
+4--83
+4 [label="Harlem-125th St."];
+84 [label="Mount Kisco"];
+4--84
+4 [label="Harlem-125th St."];
+46 [label="Beacon"];
+4--46
+4 [label="Harlem-125th St."];
+1 [label="Grand Central Terminal"];
+4--1
+4 [label="Harlem-125th St."];
+140 [label="Bridgeport"];
+4--140
+4 [label="Harlem-125th St."];
+76 [label="North White Plains"];
+4--76
+4 [label="Harlem-125th St."];
+108 [label="New Rochelle"];
+4--108
+4 [label="Harlem-125th St."];
+74 [label="White Plains"];
+4--74
+4 [label="Harlem-125th St."];
+124 [label="Stamford"];
+4--124
+4 [label="Harlem-125th St."];
+71 [label="Scarsdale"];
+4--71
+4 [label="Harlem-125th St."];
+105 [label="Mt Vernon East "];
+4--105
+4 [label="Harlem-125th St."];
+11 [label="Marble Hill"];
+4--11
+4 [label="Harlem-125th St."];
+39 [label="Peekskill"];
+4--39
+4 [label="Harlem-125th St."];
+59 [label="Woodlawn"];
+4--59
+4 [label="Harlem-125th St."];
+58 [label="Williams Bridge"];
+4--58
+4 [label="Harlem-125th St."];
+33 [label="Croton Harmon"];
+4--33
+4 [label="Harlem-125th St."];
+54 [label="Melrose"];
+4--54
+4 [label="Harlem-125th St."];
+31 [label="Ossining"];
+4--31
+4 [label="Harlem-125th St."];
+56 [label="Fordham"];
+4--56
+4 [label="Harlem-125th St."];
+18 [label="Yonkers"];
+4--18
+120 [label="Riverside"];
+121 [label="Old Greenwich"];
+120--121
+120 [label="Riverside"];
+118 [label="Cos Cob"];
+120--118
+121 [label="Old Greenwich"];
+124 [label="Stamford"];
+121--124
+124 [label="Stamford"];
+153 [label="Glenbrook"];
+124--153
+124 [label="Stamford"];
+140 [label="Bridgeport"];
+124--140
+124 [label="Stamford"];
+56 [label="Fordham"];
+124--56
+124 [label="Stamford"];
+1 [label="Grand Central Terminal"];
+124--1
+124 [label="Stamford"];
+116 [label="Greenwich"];
+124--116
+124 [label="Stamford"];
+128 [label="Darien"];
+124--128
+124 [label="Stamford"];
+127 [label="Noroton Heights"];
+124--127
+127 [label="Noroton Heights"];
+128 [label="Darien"];
+127--128
+128 [label="Darien"];
+129 [label="Rowayton"];
+128--129
+161 [label="Cannondale"];
+160 [label="Wilton"];
+161--160
+161 [label="Cannondale"];
+162 [label="Branchville"];
+161--162
+59 [label="Woodlawn"];
+61 [label="Wakefield"];
+59--61
+59 [label="Woodlawn"];
+62 [label="Mt Vernon West"];
+59--62
+59 [label="Woodlawn"];
+74 [label="White Plains"];
+59--74
+59 [label="Woodlawn"];
+58 [label="Williams Bridge"];
+59--58
+58 [label="Williams Bridge"];
+57 [label="Botanical Garden"];
+58--57
+58 [label="Williams Bridge"];
+56 [label="Fordham"];
+58--56
+55 [label="Tremont"];
+54 [label="Melrose"];
+55--54
+55 [label="Tremont"];
+56 [label="Fordham"];
+55--56
+54 [label="Melrose"];
+1 [label="Grand Central Terminal"];
+54--1
+57 [label="Botanical Garden"];
+61 [label="Wakefield"];
+57--61
+57 [label="Botanical Garden"];
+62 [label="Mt Vernon West"];
+57--62
+57 [label="Botanical Garden"];
+56 [label="Fordham"];
+57--56
+56 [label="Fordham"];
+62 [label="Mt Vernon West"];
+56--62
+56 [label="Fordham"];
+1 [label="Grand Central Terminal"];
+56--1
+56 [label="Fordham"];
+114 [label="Rye"];
+56--114
+56 [label="Fordham"];
+108 [label="New Rochelle"];
+56--108
+56 [label="Fordham"];
+116 [label="Greenwich"];
+56--116
+56 [label="Fordham"];
+112 [label="Harrison"];
+56--112
+56 [label="Fordham"];
+74 [label="White Plains"];
+56--74
+56 [label="Fordham"];
+105 [label="Mt Vernon East "];
+56--105
+51 [label="Poughkeepsie"];
+49 [label="New Hamburg"];
+51--49
+90 [label="Croton Falls"];
+89 [label="Purdy's"];
+90--89
+115 [label="Port Chester"];
+114 [label="Rye"];
+115--114
+115 [label="Port Chester"];
+116 [label="Greenwich"];
+115--116
+68 [label="Crestwood"];
+1 [label="Grand Central Terminal"];
+68--1
+68 [label="Crestwood"];
+71 [label="Scarsdale"];
+68--71
+68 [label="Crestwood"];
+66 [label="Tuckahoe"];
+68--66
+88 [label="Golden's Bridge"];
+83 [label="Chappaqua"];
+88--83
+88 [label="Golden's Bridge"];
+89 [label="Purdy's"];
+88--89
+88 [label="Golden's Bridge"];
+86 [label="Katonah"];
+88--86
+88 [label="Golden's Bridge"];
+74 [label="White Plains"];
+88--74
+89 [label="Purdy's"];
+76 [label="North White Plains"];
+89--76
+111 [label="Mamaroneck"];
+110 [label="Larchmont"];
+111--110
+111 [label="Mamaroneck"];
+112 [label="Harrison"];
+111--112
+110 [label="Larchmont"];
+1 [label="Grand Central Terminal"];
+110--1
+110 [label="Larchmont"];
+114 [label="Rye"];
+110--114
+110 [label="Larchmont"];
+108 [label="New Rochelle"];
+110--108
+112 [label="Harrison"];
+1 [label="Grand Central Terminal"];
+112--1
+112 [label="Harrison"];
+114 [label="Rye"];
+112--114
+83 [label="Chappaqua"];
+1 [label="Grand Central Terminal"];
+83--1
+83 [label="Chappaqua"];
+76 [label="North White Plains"];
+83--76
+83 [label="Chappaqua"];
+74 [label="White Plains"];
+83--74
+83 [label="Chappaqua"];
+81 [label="Pleasantville"];
+83--81
+83 [label="Chappaqua"];
+84 [label="Mount Kisco"];
+83--84
+80 [label="Hawthorne"];
+81 [label="Pleasantville"];
+80--81
+80 [label="Hawthorne"];
+79 [label="Mount Pleasant"];
+80--79
+80 [label="Hawthorne"];
+78 [label="Valhalla"];
+80--78
+81 [label="Pleasantville"];
+76 [label="North White Plains"];
+81--76
+86 [label="Katonah"];
+84 [label="Mount Kisco"];
+86--84
+86 [label="Katonah"];
+85 [label="Bedford Hills"];
+86--85
+118 [label="Cos Cob"];
+116 [label="Greenwich"];
+118--116
+84 [label="Mount Kisco"];
+74 [label="White Plains"];
+84--74
+84 [label="Mount Kisco"];
+85 [label="Bedford Hills"];
+84--85
+108 [label="New Rochelle"];
+1 [label="Grand Central Terminal"];
+108--1
+108 [label="New Rochelle"];
+114 [label="Rye"];
+108--114
+108 [label="New Rochelle"];
+106 [label="Pelham"];
+108--106
+108 [label="New Rochelle"];
+105 [label="Mt Vernon East "];
+108--105
+100 [label="HM Valley-Wingdale"];
+99 [label="Appalachian Trail"];
+100--99
+100 [label="HM Valley-Wingdale"];
+98 [label="Pawling"];
+100--98
+100 [label="HM Valley-Wingdale"];
+101 [label="Dover Plains"];
+100--101
+101 [label="Dover Plains"];
+176 [label="Tenmile River"];
+101--176
+106 [label="Pelham"];
+105 [label="Mt Vernon East "];
+106--105
+105 [label="Mt Vernon East "];
+1 [label="Grand Central Terminal"];
+105--1
+39 [label="Peekskill"];
+33 [label="Croton Harmon"];
+39--33
+39 [label="Peekskill"];
+42 [label="Garrison"];
+39--42
+39 [label="Peekskill"];
+37 [label="Cortlandt"];
+39--37
+39 [label="Peekskill"];
+40 [label="Manitou"];
+39--40
+39 [label="Peekskill"];
+46 [label="Beacon"];
+39--46
+33 [label="Croton Harmon"];
+46 [label="Beacon"];
+33--46
+33 [label="Croton Harmon"];
+31 [label="Ossining"];
+33--31
+33 [label="Croton Harmon"];
+37 [label="Cortlandt"];
+33--37
+33 [label="Croton Harmon"];
+1 [label="Grand Central Terminal"];
+33--1
+31 [label="Ossining"];
+1 [label="Grand Central Terminal"];
+31--1
+31 [label="Ossining"];
+30 [label="Scarborough"];
+31--30
+114 [label="Rye"];
+1 [label="Grand Central Terminal"];
+114--1
+114 [label="Rye"];
+116 [label="Greenwich"];
+114--116
+622 [label="Yankees-E153 St."];
+9 [label="Morris Heights"];
+622--9
+622 [label="Yankees-E153 St."];
+11 [label="Marble Hill"];
+622--11
+61 [label="Wakefield"];
+62 [label="Mt Vernon West"];
+61--62
+62 [label="Mt Vernon West"];
+1 [label="Grand Central Terminal"];
+62--1
+62 [label="Mt Vernon West"];
+74 [label="White Plains"];
+62--74
+62 [label="Mt Vernon West"];
+64 [label="Fleetwood"];
+62--64
+64 [label="Fleetwood"];
+1 [label="Grand Central Terminal"];
+64--1
+64 [label="Fleetwood"];
+65 [label="Bronxville"];
+64--65
+65 [label="Bronxville"];
+66 [label="Tuckahoe"];
+65--66
+177 [label="Wassaic"];
+176 [label="Tenmile River"];
+177--176
+172 [label="Waterbury"];
+171 [label="Naugatuck"];
+172--171
+171 [label="Naugatuck"];
+170 [label="Beacon Falls"];
+171--170
+170 [label="Beacon Falls"];
+169 [label="Seymour"];
+170--169
+162 [label="Branchville"];
+163 [label="Redding"];
+162--163
+508 [label="

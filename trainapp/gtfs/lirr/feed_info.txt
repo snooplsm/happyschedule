@@ -1,0 +1,2 @@
+"feed_publisher_name","feed_publisher_url","feed_timezone","feed_lang","feed_version"
+"Long Island Rail Road","http://mta.info/lirr","America/New_York","en","GO502_13"

@@ -3,6 +3,7 @@ package us.wmwm.happyschedule.model;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
@@ -101,7 +102,7 @@ public class Schedule implements Serializable {
 				}
 				boolean canMoveForward = true;
 				int pos = i+1;
-				int ahead = 4;
+				int ahead = size/2;
 				while(canMoveForward) {
 					StationInterval next = (StationInterval) stationToStations.get(pos);
 					if(next==null) {
@@ -114,15 +115,26 @@ public class Schedule implements Serializable {
 					}
 					StationInterval prev = (StationInterval) stationToStations.get(pos-2);
 					Integer prevTot = cache.get(prev);
-					if(s.getDepartTime().before(next.getDepartTime())) {
+					if(s.getDepartTime().before(next.getDepartTime()) || s.getDepartTime().equals(next.getDepartTime())) {
 						Calendar arrive = s.getArriveTime();
-						if(arrive!=null && arrive.after(next.getArriveTime())) {
+						Calendar nextArrive = next.getArriveTime();
+						if(arrive==null) {
+							toRemove.add(i);
+						} else		
+						if((arrive.after(nextArrive) || arrive.equals(nextArrive)) ) {
 							System.out.println("removing ");
 							if(!toRemove.contains(i)) {
 								toRemove.add(i);
 							}
 						}
-					} 
+					}
+					if(s.getDepartTime().equals(next.getDepartTime()) && s.getArriveTime().equals(next.getArriveTime())) {
+						if(s.getConnections()<=next.getConnections()) {
+							if(!toRemove.contains(pos)) {
+								toRemove.add(pos);
+							}
+						}
+					}
 					ahead--;
 					canMoveForward = ahead>0 && i < size;
 				}
@@ -213,12 +225,14 @@ public class Schedule implements Serializable {
 	void traversal(ScheduleTraverser traversal,
 			Map<String[], Set<String>> tripIds) {
 		List<StationInterval> all = new ArrayList<StationInterval>();
+		stationIntervals = new HashMap<String[], List<StationInterval>>();
 		for (int level = 0; level < transfers.size(); level++) {
 			int first = 0;
 			int ignore = 0;
 			Set<Integer> deleteMe = new HashSet<Integer>();
 			for (int i = 0; i < transfers.get(level).length; i++) {
 				String[] pair = transfers.get(level)[i];
+				System.out.println(Arrays.toString(pair));
 				if (pair[0].equals(pair[1])) {
 					deleteMe.add(i);
 					ignore++;
@@ -249,7 +263,7 @@ public class Schedule implements Serializable {
 				}
 			}
 
-			stationIntervals = new HashMap<String[], List<StationInterval>>();
+			
 			
 			for (int i = goback; i < transfers.get(level).length; i++) {
 				String[] pair = transfers.get(level)[i];
@@ -373,6 +387,13 @@ public class Schedule implements Serializable {
 						return lhs.departTime.compareTo(rhs.departTime);
 					}
 				});
+		for(int i = 0; i < transfers.size(); i++) {
+			String[][] t = transfers.get(i);
+			for(int j = 0; j < t.length; j++) {
+				String[] seq = t[j];
+				System.out.println(i + " " + seq[0] + " - " + seq[1]);
+			}
+		}
 		traverse(all, traversal);
 	}
 

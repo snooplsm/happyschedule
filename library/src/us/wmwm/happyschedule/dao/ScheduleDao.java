@@ -230,7 +230,7 @@ public class ScheduleDao {
 				}
 				rur.close();
 				Cursor qur = Db.get().db.rawQuery(query.replace(":foo", startString+","+middle+","+endString), new String[] { pairs.get(j)[i][0],
-						pairs.get(j)[i][1] });
+						pairs.get(j)[i][1] });				
 				pairToTimes.put(pairs.get(j)[i], tripToConnectionIntervals);
 				while (qur.moveToNext()) {
 					String depart = qur.getString(0);
@@ -312,7 +312,8 @@ public class ScheduleDao {
 		
 		for(int j = 0; j < levels; j++) {
 			String[][] pp = pairs.get(j);
-			for (String[] pair : pairs.get(j)) {
+			for (String[] pair : pp) {
+				System.err.println(Arrays.toString(pair));
 				Set<String> reg = new HashSet<String>();
 				Set<String> rev = new HashSet<String>();
 				regular.put(pair, reg);

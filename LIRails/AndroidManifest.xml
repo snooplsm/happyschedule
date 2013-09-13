@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.lirr"
-    android:versionCode="2013082501"
+    android:versionCode="2013082502"
     android:versionName="TEST-2013-08-25" >
 
     <uses-sdk
