@@ -1,5 +1,5 @@
 <resources>
 
     <string name="app_name">LI Rails</string>
-
+    <string name="flurry_app_key">DBRZZSTWVR34DJZQ76WN</string>
 </resources>
