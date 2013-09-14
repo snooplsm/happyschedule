@@ -1,12 +1,12 @@
 package us.wmwm.happyschedule.activity;
 
+import java.util.Map;
+
 import us.wmwm.happyschedule.R;
-
-import com.flurry.android.FlurryAgent;
-
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-import android.view.MenuItem;
+
+import com.flurry.android.FlurryAgent;
 
 public class HappyActivity extends FragmentActivity {
 
@@ -14,13 +14,22 @@ public class HappyActivity extends FragmentActivity {
 	protected void onCreate(Bundle arg0) {
 		super.onCreate(arg0);
 		FlurryAgent.onStartSession(this, getString(R.string.flurry_app_key));
-		FlurryAgent.logEvent(getClass().getSimpleName());
+		Map<String,String> params = getLoggingParameters();
+		if(params==null) {
+			FlurryAgent.logEvent(getClass().getSimpleName());
+		} else {
+			FlurryAgent.logEvent(getClass().getSimpleName(),params);
+		}
 	}
 	
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
 		FlurryAgent.onEndSession(this);
+	}
+	
+	protected Map<String,String> getLoggingParameters() {
+		return null;
 	}
 	
 //	@Override

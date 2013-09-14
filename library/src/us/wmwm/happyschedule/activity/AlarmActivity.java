@@ -1,6 +1,8 @@
 package us.wmwm.happyschedule.activity;
 
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
 import us.wmwm.happyschedule.Alarms;
 import us.wmwm.happyschedule.R;
@@ -57,6 +59,29 @@ public class AlarmActivity extends HappyActivity {
 		cleanup();
 	}
 	
+	Alarm alarm;
+	
+	@Override
+	protected Map<String, String> getLoggingParameters() {
+		Map<String,String> params = new HashMap<String,String>();
+		if(alarm!=null && alarm.getStationToStation()!=null) {
+			try {
+				StationToStation sts = alarm.getStationToStation();
+				params.put("from_id", sts.departId);
+				params.put("to_id", sts.arriveId);
+				Station from = Db.get().getStop(sts.departId);
+		        Station to = Db.get().getStop(sts.arriveId);
+		        params.put("from_name", from.getName());
+		        params.put("to_name", to.getName());
+		        params.put("trip", sts.tripId);
+		        params.put("time", alarm.getTime().getTime().toString());
+			} catch (Exception e) {
+				
+			}
+		}
+		return params;
+	}
+	
 	@Override
 	protected void onCreate(Bundle bundle) {
 		super.onCreate(bundle);
@@ -79,7 +104,7 @@ public class AlarmActivity extends HappyActivity {
         setContentView(R.layout.activity_alarm);
         scheduleView = (ScheduleView) findViewById(R.id.schedule_view);
         dismiss = findViewById(R.id.dismiss);
-        final Alarm alarm = (Alarm) getIntent().getSerializableExtra("alarm");
+        alarm = (Alarm) getIntent().getSerializableExtra("alarm");
         dismiss.setOnClickListener(new OnClickListener() {
 			
 			@Override

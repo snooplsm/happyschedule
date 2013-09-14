@@ -115,25 +115,35 @@ public class Schedule implements Serializable {
 					}
 					StationInterval prev = (StationInterval) stationToStations.get(pos-2);
 					Integer prevTot = cache.get(prev);
-					if(s.getDepartTime().before(next.getDepartTime()) || s.getDepartTime().equals(next.getDepartTime())) {
-						Calendar arrive = s.getArriveTime();
-						Calendar nextArrive = next.getArriveTime();
-						if(arrive==null) {
-							toRemove.add(i);
-						} else		
+					boolean removed = false;
+					Calendar arrive = s.getArriveTime();
+					Calendar nextArrive = next.getArriveTime();
+					if(arrive==null) {
+						if(!toRemove.contains(i)) {
+							toRemove.add(i);							
+						}
+						canMoveForward = false;
+						continue;
+					} 
+					if(s.getDepartTime().before(next.getDepartTime()) || s.getDepartTime().equals(next.getDepartTime())) {												
 						if((arrive.after(nextArrive) || arrive.equals(nextArrive)) ) {
 							System.out.println("removing ");
-							if(!toRemove.contains(i)) {
+							if(!toRemove.contains(i)) {								
 								toRemove.add(i);
+								removed = true;
 							}
 						}
 					}
+					try {
 					if(s.getDepartTime().equals(next.getDepartTime()) && s.getArriveTime().equals(next.getArriveTime())) {
 						if(s.getConnections()<=next.getConnections()) {
 							if(!toRemove.contains(pos)) {
 								toRemove.add(pos);
 							}
 						}
+					}
+					} catch (Exception e) {
+						e.printStackTrace();
 					}
 					ahead--;
 					canMoveForward = ahead>0 && i < size;

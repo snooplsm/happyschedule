@@ -67,25 +67,25 @@ public class HappyStream {
 
 			@Override
 			public void onDeletionNotice(StatusDeletionNotice arg0) {
-				// TODO Auto-generated method stub
+
 
 			}
 
 			@Override
 			public void onScrubGeo(long arg0, long arg1) {
-				// TODO Auto-generated method stub
+
 
 			}
 
 			@Override
 			public void onStallWarning(StallWarning arg0) {
-				// TODO Auto-generated method stub
+
 
 			}
 
 			@Override
 			public void onStatus(Status status) {
-				// TODO Auto-generated method stub
+
 				System.out.println(status.getUser().getName() + " : "
 						+ status.getText());
 				File file = new File("njtransit.json");
@@ -144,7 +144,15 @@ public class HappyStream {
 				}
 				saveStatus(status);
 				try {
-					processStatus(status);
+					int result = 0;
+					boolean hasMore = true;
+					while(hasMore) {
+						//System.out.println("handling " + result + " to " + (result+1000));
+						int count = processStatus(status,result);
+						result+=count;
+						hasMore = count>0;
+						
+					}
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -152,113 +160,113 @@ public class HappyStream {
 
 			@Override
 			public void onTrackLimitationNotice(int arg0) {
-				// TODO Auto-generated method stub
+
 
 			}
 
 			@Override
 			public void onException(Exception arg0) {
-				// TODO Auto-generated method stub
+
 
 			}
 
 			@Override
 			public void onBlock(User arg0, User arg1) {
-				// TODO Auto-generated method stub
+
 
 			}
 
 			@Override
 			public void onDeletionNotice(long arg0, long arg1) {
-				// TODO Auto-generated method stub
+
 
 			}
 
 			@Override
 			public void onDirectMessage(DirectMessage arg0) {
-				// TODO Auto-generated method stub
+
 
 			}
 
 			@Override
 			public void onFavorite(User arg0, User arg1, Status arg2) {
-				// TODO Auto-generated method stub
+
 
 			}
 
 			@Override
 			public void onFollow(User arg0, User arg1) {
-				// TODO Auto-generated method stub
+
 
 			}
 
 			@Override
 			public void onFriendList(long[] arg0) {
-				// TODO Auto-generated method stub
+
 
 			}
 
 			@Override
 			public void onUnblock(User arg0, User arg1) {
-				// TODO Auto-generated method stub
+
 
 			}
 
 			@Override
 			public void onUnfavorite(User arg0, User arg1, Status arg2) {
-				// TODO Auto-generated method stub
+
 
 			}
 
 			@Override
 			public void onUserListCreation(User arg0, UserList arg1) {
-				// TODO Auto-generated method stub
+
 
 			}
 
 			@Override
 			public void onUserListDeletion(User arg0, UserList arg1) {
-				// TODO Auto-generated method stub
+
 
 			}
 
 			@Override
 			public void onUserListMemberAddition(User arg0, User arg1,
 					UserList arg2) {
-				// TODO Auto-generated method stub
+
 
 			}
 
 			@Override
 			public void onUserListMemberDeletion(User arg0, User arg1,
 					UserList arg2) {
-				// TODO Auto-generated method stub
+
 
 			}
 
 			@Override
 			public void onUserListSubscription(User arg0, User arg1,
 					UserList arg2) {
-				// TODO Auto-generated method stub
+
 
 			}
 
 			@Override
 			public void onUserListUnsubscription(User arg0, User arg1,
 					UserList arg2) {
-				// TODO Auto-generated method stub
+
 
 			}
 
 			@Override
 			public void onUserListUpdate(User arg0, UserList arg1) {
-				// TODO Auto-generated method stub
+
 
 			}
 
 			@Override
 			public void onUserProfileUpdate(User arg0) {
-				// TODO Auto-generated method stub
+
 
 			}
 
@@ -268,37 +276,37 @@ public class HappyStream {
 
 			@Override
 			public void onException(Exception arg0) {
-				// TODO Auto-generated method stub
+
 
 			}
 
 			@Override
 			public void onTrackLimitationNotice(int arg0) {
-				// TODO Auto-generated method stub
+
 
 			}
 
 			@Override
 			public void onStatus(Status arg0) {
-				// TODO Auto-generated method stub
+
 
 			}
 
 			@Override
 			public void onStallWarning(StallWarning arg0) {
-				// TODO Auto-generated method stub
+
 
 			}
 
 			@Override
 			public void onScrubGeo(long arg0, long arg1) {
-				// TODO Auto-generated method stub
+
 
 			}
 
 			@Override
 			public void onDeletionNotice(StatusDeletionNotice arg0) {
-				// TODO Auto-generated method stub
+
 
 			}
 		};
@@ -319,77 +327,77 @@ public class HappyStream {
 		return true;
 	}
 
-	public static void processStatus(Status status) throws Exception {
-		ResultSet users = null;
-		if (status.getUser().getScreenName().equalsIgnoreCase("nj_rails")) {
-			users = findAllUsers(status);
-		} else {
-			Calendar cal = Calendar.getInstance();
-			int hour = cal.get(Calendar.HOUR_OF_DAY);
-			int day = cal.get(Calendar.DAY_OF_WEEK);
-			users = findUsersForService(status, day, hour);
-		}
-		int count = 0;
-		JSONArray regs = new JSONArray();
-		List<Long> userIds = new ArrayList<Long>();
-		JSONObject fields = new JSONObject();
-		fields.put("time_to_live", 1800);
-		JSONObject data = new JSONObject();
-		data.put("title", status.getUser().getName());
-		StringBuilder text = new StringBuilder(status.getText());
-		if (status.getURLEntities() != null) {
-			for (int i = status.getURLEntities().length - 1; i >= 0; i--) {
-				URLEntity e = status.getURLEntities()[i];
-				text.replace(e.getStart(), e.getEnd(), e.getDisplayURL());
-			}
-		}
-		JSONObject tweet = new JSONObject(DataObjectFactory.getRawJSON(status));
-		data.put("tweet", tweet);
-		data.put("message", text);
-		if(!checkSize(data)) {
-			tweet.remove("source");
-			tweet.remove("lang");
-			tweet.remove("truncated");
-			tweet.remove("possibly_sensitive");
-			tweet.remove("favorited");
-			tweet.remove("filter_level");
-			if(!checkSize(data)) {
-				JSONObject user = tweet.getJSONObject("user");				
-				user.remove("default_profile");
-				user.remove("verified");
-				user.remove("contributors_enabled");
-				user.remove("profile_image_url_https");
-				user.remove("follower_request_sent");
-				user.remove("is_translator");
-				if(!checkSize(data)) {
-					user.remove("description");				
-				}
-				
-			}
-		}
-		if(!checkSize(data)) {
-			data.remove("tweet");
-		}
-		fields.put("data", data);
-		Map<String, String> headers = new HashMap<String, String>();
-		headers.put("Authorization", "key=" + apiKey);
-		headers.put("Content-Type", "application/json");
-		while (users.next()) {
-			count++;
-			String pushId = users.getString(1);
-			long userId = users.getLong(2);
-			regs.put(pushId);
-			userIds.add(userId);
-		}
-		if (regs.length() == 0) {
-			return;
-		}
-		fields.put("registration_ids", regs);
-		URL u = new URL("https://android.googleapis.com/gcm/send");
-
+	public static int processStatus(Status status, int offset) throws Exception {
 		HttpURLConnection conn = null;
 		InputStream in = null;
-		try {
+		ResultSet users = null;
+		try {			
+			if (status.getUser().getScreenName().equalsIgnoreCase("nj_rails")) {
+				users = findAllUsers(status,offset,1000);
+			} else {
+				Calendar cal = Calendar.getInstance();
+				int hour = cal.get(Calendar.HOUR_OF_DAY);
+				int day = cal.get(Calendar.DAY_OF_WEEK);
+				users = findUsersForService(status, day, hour,offset,1000);
+			}
+			
+			JSONArray regs = new JSONArray();
+			List<Long> userIds = new ArrayList<Long>();
+			JSONObject fields = new JSONObject();
+			fields.put("time_to_live", 1800);
+			JSONObject data = new JSONObject();
+			data.put("title", status.getUser().getName());
+			StringBuilder text = new StringBuilder(status.getText());
+			if (status.getURLEntities() != null) {
+				for (int i = status.getURLEntities().length - 1; i >= 0; i--) {
+					URLEntity e = status.getURLEntities()[i];
+					text.replace(e.getStart(), e.getEnd(), e.getDisplayURL());
+				}
+			}
+			JSONObject tweet = new JSONObject(DataObjectFactory.getRawJSON(status));
+			data.put("tweet", tweet);
+			data.put("message", text);
+			data.put("type","alert");
+			if(!checkSize(data)) {
+				tweet.remove("source");
+				tweet.remove("lang");
+				tweet.remove("truncated");
+				tweet.remove("possibly_sensitive");
+				tweet.remove("favorited");
+				tweet.remove("filter_level");
+				if(!checkSize(data)) {
+					JSONObject user = tweet.getJSONObject("user");				
+					user.remove("default_profile");
+					user.remove("verified");
+					user.remove("contributors_enabled");
+					user.remove("profile_image_url_https");
+					user.remove("follower_request_sent");
+					user.remove("is_translator");
+					if(!checkSize(data)) {
+						user.remove("description");				
+					}
+					
+				}
+			}
+			if(!checkSize(data)) {
+				data.remove("tweet");
+			}
+			fields.put("data", data);
+			//fields.put("dry_run", Boolean.TRUE);
+			Map<String, String> headers = new HashMap<String, String>();
+			headers.put("Authorization", "key=" + apiKey);
+			headers.put("Content-Type", "application/json");
+			while (users.next()) {
+				String pushId = users.getString(1);
+				long userId = users.getLong(2);
+				regs.put(pushId);
+				userIds.add(userId);
+			}
+			if (regs.length() == 0) {
+				return 0;
+			}
+			fields.put("registration_ids", regs);
+			URL u = new URL("https://android.googleapis.com/gcm/send");
 			conn = (HttpURLConnection) u.openConnection();
 			for (Map.Entry<String, String> e : headers.entrySet()) {
 				conn.setRequestProperty(e.getKey(), e.getValue());
@@ -424,7 +432,8 @@ public class HappyStream {
 			} else {
 				in = conn.getErrorStream();
 				System.err.println(Streams.readFully(in));
-			}
+			}	
+			return regs.length();
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -438,6 +447,7 @@ public class HappyStream {
 				users.close();
 			}
 		}
+		return 0;
 	}
 
 	private static void deletePushId(Long long1) throws Exception {
@@ -477,10 +487,10 @@ public class HappyStream {
 		}
 	}
 
-	public static ResultSet findUsersForService(Status status, int day, int hour)
+	public static ResultSet findUsersForService(Status status, int day, int hour, int offset, int limit)
 			throws Exception {
 		PreparedStatement stat = conn
-				.prepareStatement("select u.push_id, u.id from USER u where u.id not in (select sb.user_id from SENT sb where sb.user_id=u.id and sb.status_id=?) and u.id in (select sv.user_id from SERVICES sv where sv.screenname=? and sv.day=? and sv.hour=?) group by u.id");
+				.prepareStatement(String.format("select u.push_id, u.id from USER u where u.id not in (select sb.user_id from SENT sb where sb.user_id=u.id and sb.status_id=?) and u.id in (select sv.user_id from SERVICES sv where sv.screenname=? and sv.day=? and sv.hour=?) group by u.id limit %s, %s",offset,limit));
 		stat.setLong(1, status.getId());
 		stat.setString(2, status.getUser().getScreenName());
 		stat.setInt(3, day);
@@ -489,11 +499,10 @@ public class HappyStream {
 		return stat.getResultSet();
 	}
 
-	public static ResultSet findAllUsers(Status status) throws Exception {
+	public static ResultSet findAllUsers(Status status,int offset, int limit) throws Exception {
 		PreparedStatement stat = conn
-				.prepareStatement("select u.push_id, u.id from USER u where u.id not in (select sb.user_id from SENT sb where sb.user_id=u.id and sb.status_id=:status_id) group by u.id");
+				.prepareStatement(String.format("select u.push_id, u.id from USER u where u.id not in (select sb.user_id from SENT sb where sb.user_id=u.id and sb.status_id=:status_id) group by u.id limit %s, %s",offset,limit));
 		stat.setLong(1, status.getId());
-		stat.setMaxRows(1000);
 		stat.execute();
 		return stat.getResultSet();
 
