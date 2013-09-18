@@ -140,6 +140,10 @@
 	 {
 		"name": "NJ Transit Test",
 		"screenname": "NJ_TRANSIT_TEST"
+	},
+	{
+		"name": "Morris & Essex Lines"
+		"screenname":"NJTRANSIT_ME"
 	}
 	]
 }
