@@ -146,11 +146,11 @@ public class HappyStream {
 				try {
 					int result = 0;
 					boolean hasMore = true;
+					Long lastUserId = 0L;
 					while(hasMore) {
-						//System.out.println("handling " + result + " to " + (result+1000));
-						int count = processStatus(status,result);
-						result+=count;
-						hasMore = count>0;
+						System.out.println("handling " + lastUserId + " to " + (lastUserId+1000));
+						lastUserId = processStatus(status,lastUserId, result);
+						hasMore = lastUserId!=0;
 						
 					}
 				} catch (Exception e) {
@@ -326,14 +326,100 @@ public class HappyStream {
 		}
 		return true;
 	}
+	
+	public static int sendAppUpdated(int version, Long lastUserId) throws Exception {
+		HttpURLConnection conn = null;
+		InputStream in = null;
+		ResultSet users = null;
+		try {			
+			
+			users = findAllUsers(HappyStream.conn, lastUserId,1000);
+			
+			
+			JSONArray regs = new JSONArray();
+			List<Long> userIds = new ArrayList<Long>();
+			JSONObject fields = new JSONObject();
+			fields.put("time_to_live", 1800);
+			JSONObject data = new JSONObject();
+			data.put("type","upgrade_alert");
+			data.put("version", version);
+			fields.put("data", data);
+			//fields.put("dry_run", Boolean.TRUE);
+			Map<String, String> headers = new HashMap<String, String>();
+			headers.put("Authorization", "key=" + apiKey);
+			headers.put("Content-Type", "application/json");
+			while (users.next()) {
+				String pushId = users.getString(1);
+				long userId = users.getLong(2);
+				regs.put(pushId);
+				userIds.add(userId);
+			}
+			if (regs.length() == 0) {
+				return 0;
+			}
+			fields.put("registration_ids", regs);
+			URL u = new URL("https://android.googleapis.com/gcm/send");
+			conn = (HttpURLConnection) u.openConnection();
+			for (Map.Entry<String, String> e : headers.entrySet()) {
+				conn.setRequestProperty(e.getKey(), e.getValue());
+			}
+			conn.setRequestMethod("POST");
+			conn.setDoInput(true);
+			conn.setDoOutput(true);
+			OutputStream out = conn.getOutputStream();
+			out.write(fields.toString().getBytes());
+			out.close();
+			int code = conn.getResponseCode();
 
-	public static int processStatus(Status status, int offset) throws Exception {
+			if (code == 200) {
+				in = conn.getInputStream();
+				String response = Streams.readFully(in);
+				JSONObject o = new JSONObject(response);
+				JSONArray a = o.getJSONArray("results");
+				List<Long> successfuls = new ArrayList<Long>();
+				List<Long> notRegistered = new ArrayList<Long>();
+				for (int i = 0; i < a.length(); i++) {
+					JSONObject ob = a.getJSONObject(i);
+					System.out.println(ob);
+					boolean success = !ob.has("error");
+					if (success) {
+						successfuls.add(userIds.get(i));						
+					} else {
+						if("NotRegistered".equals(ob.opt("error"))) {
+							notRegistered.add(userIds.get(i));							
+						}
+					}
+				}
+				//saveSentNotification(status, successfuls);
+				deletePushIds(HappyStream.conn, notRegistered);
+			} else {
+				in = conn.getErrorStream();
+				System.err.println(Streams.readFully(in));
+			}	
+			return regs.length();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (in != null) {
+				in.close();
+			}
+			if (conn != null) {
+				conn.disconnect();
+			}
+			if (users != null) {
+				users.close();
+			}
+		}
+		return 0;
+	}
+
+	public static long processStatus(Status status, Long lastUserId, int offset) throws Exception {
 		HttpURLConnection conn = null;
 		InputStream in = null;
 		ResultSet users = null;
 		try {			
 			if (status.getUser().getScreenName().equalsIgnoreCase("nj_rails")) {
-				users = findAllUsers(status,offset,1000);
+				users = findAllUsers(status,lastUserId, 1000);
 			} else {
 				Calendar cal = Calendar.getInstance();
 				int hour = cal.get(Calendar.HOUR_OF_DAY);
@@ -416,6 +502,7 @@ public class HappyStream {
 				JSONObject o = new JSONObject(response);
 				JSONArray a = o.getJSONArray("results");
 				List<Long> successfuls = new ArrayList<Long>();
+				List<Long> notRegistered = new ArrayList<Long>();
 				for (int i = 0; i < a.length(); i++) {
 					JSONObject ob = a.getJSONObject(i);
 					System.out.println(ob);
@@ -424,16 +511,17 @@ public class HappyStream {
 						successfuls.add(userIds.get(i));						
 					} else {
 						if("NotRegistered".equals(ob.opt("error"))) {
-							deletePushId(userIds.get(i));
+							notRegistered.add(userIds.get(i));							
 						}
 					}
 				}
 				saveSentNotification(status, successfuls);
+				deletePushIds(HappyStream.conn,notRegistered);
 			} else {
 				in = conn.getErrorStream();
 				System.err.println(Streams.readFully(in));
 			}	
-			return regs.length();
+			return userIds.get(userIds.size()-1);
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -450,15 +538,30 @@ public class HappyStream {
 		return 0;
 	}
 
-	private static void deletePushId(Long long1) throws Exception {
+	public static void deletePushIds(Connection conn, List<Long> userIds) throws Exception {
 		PreparedStatement stat = conn.prepareStatement("delete from services where user_id=?");
-		stat.setLong(1, long1);
-		stat.execute();
-		stat.close();
-		stat = conn.prepareStatement("delete from user where id=?");
-		stat.setLong(1, long1);
-		stat.execute();
-		stat.close();
+		PreparedStatement stat2 = conn.prepareStatement("delete from user where id=?");
+		boolean before = conn.getAutoCommit();
+		conn.setAutoCommit(false);
+		try {
+			for(Long userId : userIds) {
+				stat.setLong(1, userId);
+				stat2.setLong(1, userId);
+				System.out.println("trying to delete " + userId);
+				stat.addBatch();
+				stat2.addBatch();
+			}
+			stat.executeBatch();
+			stat2.executeBatch();
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.err.println("rolling back");
+			conn.rollback();
+		} finally {
+			conn.commit();
+			conn.setAutoCommit(before);
+			stat.close();
+		}
 	}
 
 	private static void saveSentNotification(Status status, List<Long> userIds)
@@ -499,13 +602,27 @@ public class HappyStream {
 		return stat.getResultSet();
 	}
 
-	public static ResultSet findAllUsers(Status status,int offset, int limit) throws Exception {
+	public static ResultSet findAllUsers(Status status,Long lastUserId, int limit) throws Exception {
 		PreparedStatement stat = conn
-				.prepareStatement(String.format("select u.push_id, u.id from USER u where u.id not in (select sb.user_id from SENT sb where sb.user_id=u.id and sb.status_id=:status_id) group by u.id limit %s, %s",offset,limit));
-		stat.setLong(1, status.getId());
+				.prepareStatement(String.format("select u.push_id, u.id from USER u where u.id > ? and u.id not in (select sb.user_id from SENT sb where sb.user_id=u.id and sb.status_id=:status_id) group by u.id order by u.id asc limit %s",limit));
+		if(lastUserId==null) {
+			lastUserId = 0L;
+		}
+		stat.setLong(1, lastUserId);
+		stat.setLong(2, status.getId());
 		stat.execute();
 		return stat.getResultSet();
-
+	}
+	
+	public static ResultSet findAllUsers(Connection conn, Long afterUserId, int limit) throws Exception {
+		PreparedStatement stat = conn
+				.prepareStatement(String.format("select u.push_id, u.id from USER u where u.id > ? group by u.id order by u.id asc limit %s",limit));
+		if(afterUserId==null) {
+			afterUserId = 0L;
+		}
+		stat.setLong(1, afterUserId);
+		stat.execute();
+		return stat.getResultSet();
 	}
 
 }

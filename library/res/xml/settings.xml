@@ -46,5 +46,12 @@
             android:title="@string/settings_title_push_sound" >
         </CheckBoxPreference>
     </PreferenceCategory>
+    <PreferenceCategory
+        android:key="@string/settings_key_debug"
+        android:title="@string/settings_category_debug" >
+        <Preference
+            android:key="@string/settings_key_debug_push"
+            android:title="Push Id" />
+    </PreferenceCategory>
 
 </PreferenceScreen>

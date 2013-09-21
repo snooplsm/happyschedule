@@ -109,6 +109,7 @@ public class FragmentPickStations extends Fragment implements IPrimary {
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
+		FlurryAgent.logEvent(item.getTitle()+"Selected");
 		if (item.getItemId() == R.id.menu_reverse) {
 			FlurryAgent.logEvent("RevsereMenuOptionClicked",Collections.singletonMap("time", new Date().toString()));
 			reverse();

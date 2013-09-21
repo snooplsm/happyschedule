@@ -25,6 +25,7 @@ import us.wmwm.happyschedule.model.TripInfo;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.util.Log;
 
 public class ScheduleDao {
 
@@ -132,6 +133,7 @@ public class ScheduleDao {
 
 	public Schedule getSchedule(final String departStationId,
 			final String arriveStationId, Date start, Date end) {
+		Calendar now = Calendar.getInstance();
 		Cursor cur = Db.get().db.rawQuery("select level from schedule_path where source=? and target=? order by level desc", new String[]{departStationId,arriveStationId});
 		int levels = 0;
 		if(cur.moveToNext()) {
@@ -313,7 +315,7 @@ public class ScheduleDao {
 		for(int j = 0; j < levels; j++) {
 			String[][] pp = pairs.get(j);
 			for (String[] pair : pp) {
-				System.err.println(Arrays.toString(pair));
+				//System.err.println(Arrays.toString(pair));
 				Set<String> reg = new HashSet<String>();
 				Set<String> rev = new HashSet<String>();
 				regular.put(pair, reg);
@@ -362,6 +364,8 @@ public class ScheduleDao {
 		s.reverseOrder = reverse;
 		s.userEnd = end;
 		s.userStart = start;
+		Calendar later = Calendar.getInstance();
+		Log.d("ScheduleDao", "Query took " + (later.getTimeInMillis()-now.getTimeInMillis()) + "milli seconds");
 		return s;
 	}
 

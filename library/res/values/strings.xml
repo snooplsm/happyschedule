@@ -3,7 +3,7 @@
 
     <string name="app_name">NJ Rails</string>
     <string name="activity_name_rail_alerts_name">Alerts</string>
-    <string name="config_url">http://ryangravener.com/njrails/config9.json</string>
+    <string name="config_url">http://ryangravener.com/njrails/config.json</string>
     <string name="activity_name_settings">Settings</string>
     <string name="sender_id">23485923357</string>
     <string name="action_settings">Settings</string>

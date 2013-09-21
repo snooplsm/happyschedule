@@ -1,5 +1,6 @@
 package us.wmwm.happyschedule.fragment;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,11 +14,13 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
+import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -25,22 +28,32 @@ import android.util.Log;
 import com.flurry.android.FlurryAgent;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.squareup.seismic.ShakeDetector;
 
-public class SettingsFragment extends PreferenceFragment {
+public class SettingsFragment extends PreferenceFragment implements com.squareup.seismic.ShakeDetector.Listener {
 
 	ListPreference refreshInterval;
 	Preference railLine;
 	CheckBoxPreference pushNotifications;
-	
+	PreferenceCategory debugScreen;
+	Preference pushId;
 
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		addPreferencesFromResource(R.xml.settings);
+		SensorManager sensorManager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
+	    ShakeDetector sd = new ShakeDetector(this);
+	    sd.start(sensorManager);
 		refreshInterval = (ListPreference) findPreference(getString(R.string.settings_departure_vision_key_period));
 		railLine = (Preference) findPreference(getString(R.string.settings_key_rail_lines));
 		pushNotifications = (CheckBoxPreference) findPreference(getString(R.string.settings_key_push_on));
+		Object o = findPreference(getString(R.string.settings_key_debug));
+		debugScreen = (PreferenceCategory) o;
+		pushId = (Preference) findPreference(getString(R.string.settings_key_debug_push));
+		
+		
 		railLine.setIntent(new Intent(getActivity(), RailLinesActivity.class));
 		refreshInterval.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
 			
@@ -83,8 +96,15 @@ public class SettingsFragment extends PreferenceFragment {
 			}
 		});
 		int pos = refreshInterval.findIndexOfValue(refreshInterval.getValue());
-		updateRefreshInterval(pos);
+		updateRefreshInterval(pos);	
+		getPreferenceScreen().removePreference(debugScreen);
 	}
+	
+	public void onActivityCreated(Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
+		pushId.setSummary(getRegistrationId());
+		pushId.setIntent(Intent.createChooser(new Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT,pushId.getSummary().toString()), "Share"));
+	};
 	
 	BroadcastReceiver packageInstalledReceiver;
 	
@@ -136,7 +156,7 @@ public class SettingsFragment extends PreferenceFragment {
 		return regId;
 	}
 	
-	private static int getAppVersion() {
+	public static int getAppVersion() {
 	    try {
 	    	Context context = HappyApplication.get();
 	        PackageInfo packageInfo = context.getPackageManager()
@@ -150,6 +170,12 @@ public class SettingsFragment extends PreferenceFragment {
 
 	public static void saveRegistrationId(String id) {
 		WDb.get().savePreference("gcm_registration_id_"+getAppVersion(), id);
+	}
+
+	@Override
+	public void hearShake() {
+		System.out.println("shake " + new Date());
+		getPreferenceScreen().addPreference(debugScreen);
 	}
 	
 }

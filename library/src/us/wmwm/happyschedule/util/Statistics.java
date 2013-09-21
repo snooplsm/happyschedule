@@ -7,6 +7,7 @@ import java.util.List;
 public class Statistics {
 	List<Double> data;
 	double size;
+	Double median;
 
 	public Statistics(List<Double> data) {
 		this.data = data;
@@ -33,14 +34,18 @@ public class Statistics {
 	}
 
 	public double median() {
+		if(median!=null) {
+			return median;
+		}
 		List<Double> b = new ArrayList<Double>();
 		b.addAll(data);
 		Collections.sort(b);
 
 		if (b.size() % 2 == 0) {
-			return (b.get((b.size() / 2) - 1) + b.get(b.size() / 2)) / 2.0;
+			median =  (b.get((b.size() / 2) - 1) + b.get(b.size() / 2)) / 2.0;
 		} else {
-			return b.get(b.size() / 2);
+			median = b.get(b.size() / 2);
 		}
+		return median;
 	}
 }

@@ -48,6 +48,7 @@ public class MainActivity extends HappyActivity {
 	}	
 	
 	@Override
+	
 	protected void onResume() {
 		super.onResume();
 		//checkPlayServices();

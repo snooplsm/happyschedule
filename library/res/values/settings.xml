@@ -52,4 +52,9 @@
     <string name="settings_description_sound">Make a noise upon incoming alert.</string>
     <string name="settings_key_push_audio">push_notifications_audio</string>
     
+    <string name="settings_title_debug">Debug</string>
+    <string name="settings_category_debug">Debug</string>
+    <string name="settings_key_debug">debug_key</string>
+    <string name="settings_key_debug_push">push_id_key</string>
+    
 </resources>

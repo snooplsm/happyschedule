@@ -136,10 +136,6 @@
 	}, {
 		"name": "NJ Transit",
 		"screenname": "NJ_TRANSIT"
-	},
-	 {
-		"name": "NJ Transit Test",
-		"screenname": "NJ_TRANSIT_TEST"
 	}
 	]
 }

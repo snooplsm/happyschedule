@@ -2,6 +2,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <item
+        android:id="@+id/menu_day_push"
+        android:icon="@drawable/ic_action_message"
+        android:showAsAction="always"
+        android:title="Push Notifications"/>
+    <item
         android:id="@+id/more"
         android:icon="@drawable/ic_menu_moreoverflow_normal_holo_dark"
         android:showAsAction="always">

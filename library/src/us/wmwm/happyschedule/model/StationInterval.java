@@ -165,20 +165,29 @@ public class StationInterval extends StationToStation {
 		}
 		return pos < k.size();
 	}
+	
+	Integer totalCache;
 
 	public int totalMinutes() {
+		if(totalCache!=null) {
+			return totalCache;
+		}
 		int tot = 0;
+		connections = 0;
 		StationInterval k = this;
 		Calendar d = k.departTime;
 		Calendar a = k.arriveTime;
 		while (k.hasNext()) {
 			k = k.next();
 			a = k.arriveTime;
+			connections++;
 		}
 		if(a==null || d == null || !k.arriveId.equals(schedule.arriveId)) {
-			return -1;
+			totalCache = -1;
+		} else {
+			totalCache =  (int) ((a.getTimeInMillis() - d.getTimeInMillis()) / 60000);
 		}
-		return (int) ((a.getTimeInMillis() - d.getTimeInMillis()) / 60000);
+		return totalCache;
 	}
 	
 	Calendar arriveTimeCached;

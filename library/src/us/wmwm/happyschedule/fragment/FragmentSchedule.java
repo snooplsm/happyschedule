@@ -130,6 +130,7 @@ public class FragmentSchedule extends Fragment {
 	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
+		FlurryAgent.logEvent(item.getTitle()+"MenuItemSelected");
 		if (item.getItemId() == R.id.menu_change_day) {
 			final FragmentDatePicker picker = FragmentDatePicker
 					.newInstance(adapter.getCalendar(pager.getCurrentItem())

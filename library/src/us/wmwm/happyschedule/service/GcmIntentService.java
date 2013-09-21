@@ -1,16 +1,15 @@
 package us.wmwm.happyschedule.service;
 
-import org.json.JSONObject;
-
 import us.wmwm.happyschedule.R;
 import us.wmwm.happyschedule.activity.MainActivity;
+import us.wmwm.happyschedule.fragment.SettingsFragment;
 import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -63,13 +62,65 @@ public class GcmIntentService extends IntentService {
 				// This loop represents the service doing some work.
 				Log.i(TAG, "Completed work @ " + SystemClock.elapsedRealtime());
 				// Post notification of received message.
-				sendNotification(extras.getString("title"),
-						extras.getString("message"));
-				Log.i(TAG, "Received: " + extras.toString());
+				if("alert".equals(extras.getString("type"))) {
+					System.out.println(extras.get("tweet"));
+					sendNotification(extras.getString("title"),
+							extras.getString("message"));
+					Log.i(TAG, "Received: " + extras.toString());
+				} else
+				if("upgrade_alert".equals(extras.getString("type"))) {
+					int newVersion = extras.getInt("version");
+					int currVersion = SettingsFragment.getAppVersion();
+					if(currVersion<newVersion) {
+						showUpgradeNotification();
+					}
+				}
 			}
 		}
 		// Release the wake lock provided by the WakefulBroadcastReceiver.
 		GcmBroadcastReceiver.completeWakefulIntent(intent);
+	}
+
+	private void showUpgradeNotification() {
+		boolean on = PreferenceManager.getDefaultSharedPreferences(this)
+				.getBoolean(getString(R.string.settings_key_push_on), false);
+		if (!on) {
+			return;
+		}
+		mNotificationManager = (NotificationManager) this
+				.getSystemService(Context.NOTIFICATION_SERVICE);
+
+		PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
+				new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id="+getPackageName())), 0);
+
+		NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(
+				this)
+				.setSmallIcon(R.drawable.ic_stat_512)
+				.setContentTitle(getString(R.string.app_name) + " update available.")
+				.setContentText("Upgrade now to ensure correct schedules.")
+				.setLargeIcon(
+						((BitmapDrawable)getResources().getDrawable(R.drawable.ic_launcher)).getBitmap());
+		mBuilder.setContentIntent(contentIntent);
+		mBuilder.setPriority(Notification.PRIORITY_HIGH);
+		mBuilder.setLights(0xFFFF5555, 3000, 3000);
+		boolean vibrate = PreferenceManager.getDefaultSharedPreferences(this)
+				.getBoolean(getString(R.string.settings_key_push_vibrate),
+						false);
+		if (vibrate) {
+			mBuilder.setVibrate(new long[] { 0, 200, 500 });
+		}
+		boolean sound = PreferenceManager.getDefaultSharedPreferences(this)
+				.getBoolean(getString(R.string.settings_key_push_audio), false);
+		if (sound) {
+			Uri alert = RingtoneManager
+					.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+			if (alert != null) {
+				mBuilder.setSound(alert);
+			}
+		}
+		Notification notif = mBuilder.build();
+		//notif.tickerText = msg;
+		mNotificationManager.notify("update_available".hashCode(), notif);
 	}
 
 	// Put the message into a notification and post it.
@@ -92,8 +143,7 @@ public class GcmIntentService extends IntentService {
 				.setSmallIcon(R.drawable.ic_stat_512)
 				.setContentTitle(title)
 				.setLargeIcon(
-						BitmapFactory.decodeResource(getResources(),
-								R.drawable.ic_512))
+						((BitmapDrawable)getResources().getDrawable(R.drawable.ic_512)).getBitmap())
 				.setStyle(new NotificationCompat.BigTextStyle().bigText(msg))
 				.setContentText(msg);
 		mBuilder.setContentIntent(contentIntent);

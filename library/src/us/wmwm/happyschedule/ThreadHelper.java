@@ -1,10 +1,7 @@
 package us.wmwm.happyschedule;
 
 import java.util.concurrent.Executors;
-
 import java.util.concurrent.ScheduledExecutorService;
-
-import android.util.Log;
 
 public class ThreadHelper {
 
@@ -21,7 +18,7 @@ public class ThreadHelper {
 		}
 		
 		THREADS++;
-		Log.d("ThreadHelper", "thread count :" + THREADS);
+		//Log.d("ThreadHelper", "thread count :" + THREADS);
 
 		return POOL;
 

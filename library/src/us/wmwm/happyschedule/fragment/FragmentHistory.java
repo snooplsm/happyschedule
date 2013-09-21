@@ -30,6 +30,7 @@ import android.widget.AdapterView.OnItemLongClickListener;
 
 import com.emilsjolander.components.stickylistheaders.StickyListHeadersAdapter;
 import com.emilsjolander.components.stickylistheaders.StickyListHeadersListView;
+import com.flurry.android.FlurryAgent;
 
 public class FragmentHistory extends HappyFragment implements IPrimary {
 
@@ -65,13 +66,15 @@ public class FragmentHistory extends HappyFragment implements IPrimary {
 	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
+		FlurryAgent.logEvent(item.getTitle()+"MenuItemSelected");
 		if(item.getItemId()==R.id.menu_delete_all) {
 			AlertDialog.Builder b = new AlertDialog.Builder(getActivity());
 			b.setTitle("Delete All History");
 			b.setMessage("Are you sure?");
 			b.setPositiveButton("Discard", new OnClickListener() {
 				@Override
-				public void onClick(DialogInterface dialog, int which) {					
+				public void onClick(DialogInterface dialog, int which) {
+					FlurryAgent.logEvent("AllHistoryDeleted");
 					ThreadHelper.getScheduler().submit(new Runnable() {
 						@Override
 						public void run() {

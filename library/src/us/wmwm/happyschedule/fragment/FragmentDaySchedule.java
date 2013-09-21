@@ -18,6 +18,7 @@ import us.wmwm.happyschedule.Alarms;
 import us.wmwm.happyschedule.R;
 import us.wmwm.happyschedule.ThreadHelper;
 import us.wmwm.happyschedule.activity.AlarmActivity;
+import us.wmwm.happyschedule.activity.RailLinesActivity;
 import us.wmwm.happyschedule.application.HappyApplication;
 import us.wmwm.happyschedule.dao.ScheduleDao;
 import us.wmwm.happyschedule.dao.WDb;
@@ -729,6 +730,7 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
+		FlurryAgent.logEvent(item.getTitle()+"MenuItemSelected");
 		if (item.getItemId() == R.id.menu_go_to_next_train) {
 			moveToNextTrain();
 			return true;
@@ -752,6 +754,10 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 			startActivity(Intent.createChooser(Share.intent(appConfig, this.getActivity(), from, to, day), "Share"));
 			return true;
 		}
+		if(item.getItemId()==R.id.menu_day_push) {
+			Intent i = new Intent(getActivity(), RailLinesActivity.class);
+			startActivity(i);
+		}
 		return false;
 	}
 
@@ -773,13 +779,38 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 	}
 
 	@Override
-	public void onPrepareOptionsMenu(Menu menu) {
+	public void onPrepareOptionsMenu(final Menu menu) {
 		super.onPrepareOptionsMenu(menu);
 		if (DateUtils.isToday(day.getTime())) {
 			menu.removeItem(R.id.menu_go_to_today);
 		} else {
 			menu.removeItem(R.id.menu_go_to_next_train);
 			menu.removeItem(R.id.menu_departurevision);
+		}
+		final MenuItem i = menu.findItem(R.id.menu_day_push);
+		if(i!=null) {
+			i.setVisible(false);
+			ThreadHelper.getScheduler().submit(new Runnable() {
+				@Override
+				public void run() {
+					if(SettingsFragment.getRegistrationId()==null || WDb.get().getPreference("rail_push_matrix")!=null) {
+						handler.post(new Runnable() {
+							@Override
+							public void run() {
+								i.setVisible(false);
+							}
+						});					
+					} else {
+						handler.post(new Runnable() {
+							@Override
+							public void run() {
+								i.setVisible(true);
+							}
+						});
+						
+					}
+				}
+			});
 		}
 	}
 

@@ -226,6 +226,7 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary,
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
+		FlurryAgent.logEvent(item.getTitle()+"MenuItemSelected");
 		if (item.getItemId() == R.id.menu_change_station) {
 			startActivityForResult(
 					new Intent(ActivityPickStation.from(getActivity(), true)),

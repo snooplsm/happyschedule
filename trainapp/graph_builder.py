@@ -803,6 +803,8 @@ def buildGraph(agencies) :
 			blockId = None
 			if "block_id" in trip:
 				blockId = trip["block_id"]
+			else:
+				blockId = tripId
 			c.execute("INSERT INTO nested_trip(lft,rgt,trip_id,service_id,stop_id,depart,arrive,block_id,route_id) values(?,?,?,?,?,?,?,?,?)",(id+1,len(tripToStops[tripId]),tripId,trip["service_id"],stop["id"],stop["depart"],stop["arrive"],blockId,trip["route_id"]))
 			lastStation = stop
 		conn.commit()

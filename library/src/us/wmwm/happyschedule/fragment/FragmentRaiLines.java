@@ -23,6 +23,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -87,6 +88,7 @@ public class FragmentRaiLines extends HappyFragment {
 			ThreadHelper.getScheduler().submit(new Runnable() {
 				public void run() {
 					try {
+						Log.d("FragmentRailLines", railPushMatrix.toJSON().toString());
 						WDb.get().savePreference("rail_push_matrix", railPushMatrix.toJSON().toString());
 						WDb.get().savePreference("rail_push_matrix_needs_save", String.valueOf(System.currentTimeMillis()));
 					} catch (Exception e) {

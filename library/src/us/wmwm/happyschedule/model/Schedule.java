@@ -20,6 +20,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import us.wmwm.happyschedule.util.Statistics;
+import android.util.Log;
 
 public class Schedule implements Serializable {
 
@@ -80,42 +81,36 @@ public class Schedule implements Serializable {
 		if (stationToStations != null) {
 			size = stationToStations.size();
 		}
-		int sum = 0;
 		int nsize = size;
 		LinkedHashSet<Integer> toRemove = new LinkedHashSet<Integer>();
 		List<Double> time = new ArrayList<Double>();
 		Map<StationInterval, Integer> cache = new HashMap<StationInterval, Integer>();
+		System.out.println("the size is " + size);
+		int removingCount = 0;
 		for (int i = 0; i < size; i++) {
 			StationInterval s = (StationInterval) stationToStations.get(i);
-			Integer tot = cache.get(s);
-			if (tot == null) {
-				tot = s.totalMinutes();
-				cache.put(s, tot);
-			}
-			if (tot < 0) {
+			if (s.totalMinutes() < 0) {
 				nsize--;
-				toRemove.add(i);
+				if(!toRemove.contains(i)) {
+					toRemove.add(i);
+				}
 			} else {
-				time.add((double)tot);
+				time.add((double)s.totalMinutes());
 				if(i==0 || i ==size-1) {
 					continue;
 				}
 				boolean canMoveForward = true;
 				int pos = i+1;
-				int ahead = size/2;
+				int ahead = Math.min(20,(int) (size*.10));
+				s.getArriveTime();
+				if(s.connections==0) {
+					continue;
+				}
 				while(canMoveForward) {
 					StationInterval next = (StationInterval) stationToStations.get(pos);
 					if(next==null) {
 						break;
-					}
-					Integer nextTot = cache.get(next);
-					if(nextTot==null) {
-						nextTot = s.totalMinutes();
-						cache.put(next, tot);
-					}
-					StationInterval prev = (StationInterval) stationToStations.get(pos-2);
-					Integer prevTot = cache.get(prev);
-					boolean removed = false;
+					}		
 					Calendar arrive = s.getArriveTime();
 					Calendar nextArrive = next.getArriveTime();
 					if(arrive==null) {
@@ -127,10 +122,10 @@ public class Schedule implements Serializable {
 					} 
 					if(s.getDepartTime().before(next.getDepartTime()) || s.getDepartTime().equals(next.getDepartTime())) {												
 						if((arrive.after(nextArrive) || arrive.equals(nextArrive)) ) {
-							System.out.println("removing ");
+							//System.out.println("removing ");
+							removingCount++;
 							if(!toRemove.contains(i)) {								
 								toRemove.add(i);
-								removed = true;
 							}
 						}
 					}
@@ -148,48 +143,11 @@ public class Schedule implements Serializable {
 					ahead--;
 					canMoveForward = ahead>0 && i < size;
 				}
-				// int count = 0;
-				// boolean addedFirst = false;
-				// Calendar now = Calendar.getInstance();
-				// now.setTimeInMillis(s.getDepartTime().getTimeInMillis());
-				// now.add(Calendar.MINUTE, tot);
-				// for(int j = i+1; j < size; j++) {
-				// StationInterval t = (StationInterval)
-				// stationToStations.get(j);
-				// tot = cache.get(t);
-				// if(tot==null) {
-				// tot = t.totalMinutes();
-				// cache.put(t,tot);
-				// }
-				// if(tot<0) {
-				// continue;
-				// }
-				// Calendar later = Calendar.getInstance();
-				// later.setTimeInMillis(t.getDepartTime().getTimeInMillis());
-				// later.add(Calendar.MINUTE, tot);
-				// //now.add(Calendar.MINUTE, tot);
-				// System.out.println(now.getTime() + " vs " + later.getTime());
-				// if(now.equals(later)) {
-				// count++;
-				// if(!addedFirst) {
-				// count++;
-				// toRemove.add(i);
-				// addedFirst = true;
-				// }
-				// toRemove.add(j);
-				// } else {
-				// if(count>0) {
-				// toRemove.remove(toRemove.size()-1);
-				// }
-				// if(count>1) {
-				// toRemove.remove(toRemove.size()-1);
-				// }
-				// i = j-1;
-				// break;
-				// }
+				i = Math.max(i, pos-1);
 			}
-			// }
 		}
+		
+		//System.out.println("total removed " + removingCount);
 
 		Integer[] k = toRemove.toArray(new Integer[toRemove.size()]);
 
@@ -204,10 +162,6 @@ public class Schedule implements Serializable {
 		if (stationToStations != null) {
 			nsize = stationToStations.size();
 		}
-		for (int i = 0; i < nsize; i++) {
-			int tot = cache.get(stationToStations.get(i));
-			sum += tot;
-		}
 		if(time.isEmpty()) {
 			return;
 		}
@@ -217,12 +171,12 @@ public class Schedule implements Serializable {
 //		System.out.println("the mean is: " + mean);
 //		System.out.println("the medin is: " + stats.median());
 		for (int i = 0; i < nsize; i++) {
-			StationInterval s = (StationInterval) stationToStations.get(i);
+			StationInterval s = (StationInterval) stationToStations.get(i);			
 			int duration = s.totalMinutes();
 			boolean canAdd = true;
 			double diff = duration - stats.median();
 //			System.out.println("the diff is " + diff + " the duration is " + duration);
-			if (diff > 0 && duration-stats.median() > 10) {
+			if (s.connections!=0 && diff > 0 && duration-stats.median() > 25) {
 				canAdd = false;
 			}
 			if (canAdd) {
@@ -242,7 +196,7 @@ public class Schedule implements Serializable {
 			Set<Integer> deleteMe = new HashSet<Integer>();
 			for (int i = 0; i < transfers.get(level).length; i++) {
 				String[] pair = transfers.get(level)[i];
-				System.out.println(Arrays.toString(pair));
+				//System.out.println(Arrays.toString(pair));
 				if (pair[0].equals(pair[1])) {
 					deleteMe.add(i);
 					ignore++;
@@ -404,7 +358,10 @@ public class Schedule implements Serializable {
 				System.out.println(i + " " + seq[0] + " - " + seq[1]);
 			}
 		}
+		Calendar now = Calendar.getInstance();
 		traverse(all, traversal);
+		Calendar later = Calendar.getInstance();
+		Log.d("Schedule", "Query took " + (later.getTimeInMillis()-now.getTimeInMillis()) + " milli seconds");
 	}
 
 	public StationInterval getStationIntervalForTripId(String tripId) {
