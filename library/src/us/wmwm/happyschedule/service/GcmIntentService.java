@@ -1,7 +1,9 @@
 package us.wmwm.happyschedule.service;
 
+import twitter4j.json.DataObjectFactory;
 import us.wmwm.happyschedule.R;
 import us.wmwm.happyschedule.activity.MainActivity;
+import us.wmwm.happyschedule.activity.TweetActivity;
 import us.wmwm.happyschedule.fragment.SettingsFragment;
 import android.app.IntentService;
 import android.app.Notification;
@@ -63,8 +65,7 @@ public class GcmIntentService extends IntentService {
 				Log.i(TAG, "Completed work @ " + SystemClock.elapsedRealtime());
 				// Post notification of received message.
 				if("alert".equals(extras.getString("type"))) {
-					System.out.println(extras.get("tweet"));
-					sendNotification(extras.getString("title"),
+					sendNotification(extras.getString("tweet"),extras.getString("title"),
 							extras.getString("message"));
 					Log.i(TAG, "Received: " + extras.toString());
 				} else
@@ -126,7 +127,7 @@ public class GcmIntentService extends IntentService {
 	// Put the message into a notification and post it.
 	// This is just one simple example of what you might choose to do with
 	// a GCM message.
-	private void sendNotification(String title, String msg) {
+	private void sendNotification(String tweet, String title, String msg) {
 		boolean on = PreferenceManager.getDefaultSharedPreferences(this)
 				.getBoolean(getString(R.string.settings_key_push_on), false);
 		if (!on) {
@@ -135,8 +136,20 @@ public class GcmIntentService extends IntentService {
 		mNotificationManager = (NotificationManager) this
 				.getSystemService(Context.NOTIFICATION_SERVICE);
 
-		PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
-				new Intent(this, MainActivity.class), 0);
+		PendingIntent contentIntent = null;
+		try {
+			DataObjectFactory.createStatus(tweet);
+			Intent i = new Intent(this, TweetActivity.class);
+			i.setData(Uri.parse("http://wmwm.us").buildUpon().appendQueryParameter("tweet", tweet).build());
+			contentIntent = PendingIntent.getActivity(this,0,i,0);
+		} catch (Exception e) {
+			
+		}
+		
+		if(contentIntent==null) {
+			contentIntent = PendingIntent.getActivity(this, 0,
+					new Intent(this, MainActivity.class), 0);
+		}
 
 		NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(
 				this)
@@ -148,6 +161,7 @@ public class GcmIntentService extends IntentService {
 				.setContentText(msg);
 		mBuilder.setContentIntent(contentIntent);
 		mBuilder.setPriority(Notification.PRIORITY_HIGH);
+		//mBuilder.setFullScreenIntent(contentIntent, false);
 		mBuilder.setLights(0xFFFF5555, 3000, 3000);
 		boolean vibrate = PreferenceManager.getDefaultSharedPreferences(this)
 				.getBoolean(getString(R.string.settings_key_push_vibrate),

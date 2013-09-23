@@ -8,6 +8,8 @@ import java.util.concurrent.Future;
 import us.wmwm.happyschedule.R;
 import us.wmwm.happyschedule.ThreadHelper;
 import us.wmwm.happyschedule.util.Streams;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
@@ -98,6 +100,16 @@ public class FragmentWebviewAd extends FragmentHappyAd {
 				webView.loadUrl(js);
 				onAd();
 			}						
+			
+			@Override
+			public boolean shouldOverrideUrlLoading(WebView view, String url) {
+				if(url.equals(ad.getWebviewUrl())) {
+					return super.shouldOverrideUrlLoading(view, url);
+				} else {
+					startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+				}
+				return true;
+			}
 			
 			@Override
 			public void onReceivedError(WebView view, int errorCode,

@@ -13,5 +13,7 @@
 	<classpathentry kind="lib" path="libs/android-support-v4.jar"/>
 	<classpathentry kind="lib" path="libs/Flurry_3.2.1.jar"/>
 	<classpathentry kind="lib" path="libs/square-seismic-1.0.0.jar"/>
+	<classpathentry kind="lib" path="libs/picasso-2.0.2.jar"/>
+	<classpathentry kind="lib" path="libs/twitter4j-core-3.0.3.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

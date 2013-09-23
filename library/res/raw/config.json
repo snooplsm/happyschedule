@@ -8,10 +8,9 @@
 	},
 	"ads": [{
 		"webviewUrl": "http://ryangravener.com/njrails/ad.html",
-		"discardKey": "websitess",
 		"height": "50",
-		"enabled": false,
-		"fragment": "FragmentMain"
+		"enabled": true,
+		"beforeVersion": 2013082900
 	}],
 	"lines": [{
 		"keys": {
@@ -136,6 +135,14 @@
 	}, {
 		"name": "NJ Transit",
 		"screenname": "NJ_TRANSIT"
+	},
+	 {
+		"name": "NJ Transit Test",
+		"screenname": "NJ_TRANSIT_TEST"
+	},
+	{
+		"name": "Morris & Essex Lines",
+		"screenname":"NJTRANSIT_ME"
 	}
 	]
 }
