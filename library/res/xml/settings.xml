@@ -52,6 +52,13 @@
         <Preference
             android:key="@string/settings_key_debug_push"
             android:title="Push Id" />
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="@string/settings_key_debug_names"
+            android:summary="@string/settings_description_debug_names"
+            android:title="@string/settings_title_debug_names" >
+        </CheckBoxPreference>
     </PreferenceCategory>
 
 </PreferenceScreen>

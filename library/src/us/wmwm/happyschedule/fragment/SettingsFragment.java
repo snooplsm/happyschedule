@@ -45,6 +45,7 @@ public class SettingsFragment extends PreferenceFragment implements com.squareup
 		addPreferencesFromResource(R.xml.settings);
 		SensorManager sensorManager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
 	    ShakeDetector sd = new ShakeDetector(this);
+	    
 	    sd.start(sensorManager);
 		refreshInterval = (ListPreference) findPreference(getString(R.string.settings_departure_vision_key_period));
 		railLine = (Preference) findPreference(getString(R.string.settings_key_rail_lines));
@@ -97,13 +98,17 @@ public class SettingsFragment extends PreferenceFragment implements com.squareup
 		});
 		int pos = refreshInterval.findIndexOfValue(refreshInterval.getValue());
 		updateRefreshInterval(pos);	
-		getPreferenceScreen().removePreference(debugScreen);
+		//getPreferenceScreen().removePreference(debugScreen);
 	}
 	
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		pushId.setSummary(getRegistrationId());
-		pushId.setIntent(Intent.createChooser(new Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT,pushId.getSummary().toString()), "Share"));
+		if(pushId.getSummary()==null || pushId.getSummary().length()==0) {
+			
+		} else {
+			pushId.setIntent(Intent.createChooser(new Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT,pushId.getSummary().toString()), "Share"));
+		}
 	};
 	
 	BroadcastReceiver packageInstalledReceiver;

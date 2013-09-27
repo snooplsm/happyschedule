@@ -99,7 +99,7 @@ public class Schedule implements Serializable {
 				if(i==0 || i ==size-1) {
 					continue;
 				}
-				boolean canMoveForward = true;
+				boolean canMoveForward = false;
 				int pos = i+1;
 				int ahead = Math.min(20,(int) (size*.10));
 				s.getArriveTime();

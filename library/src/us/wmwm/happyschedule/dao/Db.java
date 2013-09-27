@@ -1,10 +1,13 @@
 package us.wmwm.happyschedule.dao;
 
+import us.wmwm.happyschedule.R;
 import us.wmwm.happyschedule.application.HappyApplication;
 import us.wmwm.happyschedule.fragment.FragmentLoad;
 import us.wmwm.happyschedule.model.Station;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.preference.PreferenceManager;
 
 public class Db {
 
@@ -23,6 +26,14 @@ public class Db {
 		return INSTANCE;
 	}
 
+	private String getNameQuery() {
+		String nameQuery = "name";
+		SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(HappyApplication.get());
+		if(p.getBoolean(HappyApplication.get().getString(R.string.settings_key_debug_names), false)) {
+			nameQuery = "name|| ' ('||stop_id||')'";
+		}
+		return nameQuery;
+	}
 	public Cursor getStops(boolean departureVisionOnly) {
 		if(departureVisionOnly) {
 			return db
@@ -30,9 +41,10 @@ public class Db {
 							"select stop_id as _id, stop_id, name|| ' ('||departure_vision||')', departure_vision, alternate_id, lat, lon from stop where departure_vision is not null order by name asc",
 							null);
 		} else {
+		
 		return db
 				.rawQuery(
-						"select stop_id as _id, stop_id, name, departure_vision, alternate_id, lat, lon from stop order by name asc",
+						"select stop_id as _id, stop_id, " + getNameQuery() + ", departure_vision, alternate_id, lat, lon from stop order by name asc",
 						null);
 		}
 	}
@@ -40,7 +52,7 @@ public class Db {
 	public Station getStop(String id) {
 		Cursor c = db
 				.rawQuery(
-						"select stop_id as _id,  stop_id, name, departure_vision, alternate_id, lat, lon from stop where _id=?",
+						"select stop_id as _id,  stop_id, " + getNameQuery() + ", departure_vision, alternate_id, lat, lon from stop where _id=?",
 						new String[] { id });
 		try {
 			if (c.moveToNext()) {
