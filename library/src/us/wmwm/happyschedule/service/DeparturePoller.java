@@ -121,4 +121,9 @@ public class DeparturePoller implements Poller {
 			throw e;
 		}
 	}
+
+	@Override
+	public boolean isArrivalStationRequired() {
+		return false;
+	}
 }

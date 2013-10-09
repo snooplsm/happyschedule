@@ -3,7 +3,9 @@
 
     <string name="app_name">NJ Rails</string>
     <string name="activity_name_rail_alerts_name">Alerts</string>
-    <string name="config_url">http://ryangravener.com/njrails/config9.json</string>
+    <string name="config_url">http://ryangravener.com/njrails/config.json</string>
+    <string name="register_push_url">http://ryangravener.com/njrails/register.php</string>
+    <string name="register_service_url">http://ryangravener.com/njrails/register_service.php</string>
     <string name="activity_name_settings">Settings</string>
     <string name="sender_id">23485923357</string>
     <string name="action_settings">Settings</string>
@@ -19,4 +21,6 @@
     <string name="flurry_app_key">4PZTPTTB4BVFXHYVQWWP</string>
 	<string name="view_report_error">There was a problem, but maybe you can help.</string>
 	<string name="poller">us.wmwm.happyschedule.service.DeparturePoller</string>
+	<string name="share">https://play.google.com/store/apps/details?id=</string>
+	<string name="market">play</string>
 </resources>

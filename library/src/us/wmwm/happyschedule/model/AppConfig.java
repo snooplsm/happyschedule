@@ -60,8 +60,8 @@ public class AppConfig {
 	}
 
 	public AppConfig() {
-		ads = Collections.emptyList();
-		lines = Collections.emptyList();
+		//ads = Collections.emptyList();
+		//lines = Collections.emptyList();
 		departureVision = "http://dv.njtransit.com/mobile/tid-mobile.aspx?sid=$stop_id";
 		shareDay = "http://www.njtransit.com/sf/sf_servlet.srv?hdnPageAction=TrainSchedulesFrom&selOrigin=:from&selDestination=:to&OriginDescription=:fromName&DestDescription=:toName&datepicker=:day";
 		shareTrip = "http://www.njtransit.com/sf/sf_servlet.srv?hdnPageAction=TripPlannerItineraryResultsEmailTo&StartAddress=:fromName&EndAddress=:toName&TravelFromLatLong=:fromLat,:fromLng&TravelToLatLong=:toLat,:toLng&Date=:day&ArrDep=D&Hour=:hour&Minute=:minute&AmPm=:ampm&Mode=BCTLXR&Minimize=T&WalkDistance=1.00&Atr=N&KeepThis=true&TB_iframe=true&height=125&width=300";

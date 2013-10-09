@@ -182,7 +182,7 @@ public class Share {
 		Intent i = new Intent(Intent.ACTION_SEND);
 		i.setType("text/plain");
 		i.putExtra(Intent.EXTRA_SUBJECT, (ctx.getString(R.string.app_name)));
-		i.putExtra(Intent.EXTRA_TEXT, "https://play.google.com/store/apps/details?id="+ctx.getPackageName());
+		i.putExtra(Intent.EXTRA_TEXT, ctx.getString(R.string.share)+ctx.getPackageName());
 		return i;
 	}
 

@@ -105,7 +105,7 @@ public class FragmentHistory extends HappyFragment implements IPrimary {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		View view = inflater.inflate(R.layout.fragment_station_picker, container,false);
+		View view = inflater.inflate(R.layout.fragment_history, container,false);
 		list = (StickyListHeadersListView) view.findViewById(R.id.list);
 		list.setAdapter(adapter = new HistoryAdapter(getActivity()));
 		list.setOnItemClickListener(new OnItemClickListener() {
@@ -261,7 +261,31 @@ public class FragmentHistory extends HappyFragment implements IPrimary {
 	@Override
 	public void setPrimaryItem() {
 		// TODO Auto-generated method stub
-		getActivity().getActionBar().setSubtitle("History");		
+		getActivity().getActionBar().setSubtitle("History");	
+		FragmentAmazonAd ad = new FragmentAmazonAd();
+		ad.setHappyAdListener(new HappyAdListener() {
+			@Override
+			public void onAd() {
+			}
+
+			@Override
+			public void onAdFailed(int count, boolean noFill) {
+				handler.post(new Runnable() {
+					@Override
+					public void run() {
+						try {
+							FragmentGoogleAd gad = new FragmentGoogleAd();
+							getFragmentManager().beginTransaction()
+									.replace(R.id.fragment_history_ad, gad).commit();
+						} catch (Exception e) {
+
+						}
+					}
+				});
+			}
+		});
+		getFragmentManager().beginTransaction().replace(R.id.fragment_history_ad, ad)
+				.commit();
 	}
 	
 }

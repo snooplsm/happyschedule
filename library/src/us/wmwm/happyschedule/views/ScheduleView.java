@@ -153,6 +153,10 @@ public class ScheduleView extends RelativeLayout {
 				String depart = shrink2(sts2.departTime);
 				depart = depart.substring(0, depart.length() - 1).replace(" ",
 						"");
+//				if (sts2.routeId != null) {
+//					b.append(sts2.schedule.routeIdToName.get(sts2.routeId));
+//					b.append("\n");
+//				}
 				if(depart.length()<6) {
 					//b.append("  ");
 				}
@@ -198,7 +202,10 @@ public class ScheduleView extends RelativeLayout {
 							b.append("↝\n");
 						}
 					}
-
+//					if (sts2.routeId != null) {
+//						b.append(sts2.schedule.routeIdToName.get(sts2.routeId));
+//						b.append("\n");
+//					}
 				}
 
 			} else {
@@ -207,6 +214,10 @@ public class ScheduleView extends RelativeLayout {
 		}
 
 		if (sts2.tripId != null && !sts2.tripId.equals(lastTripId)) {
+			if (sts2.routeId != null) {
+			b.append(sts2.schedule.routeIdToName.get(sts2.routeId));
+			b.append("\n");
+		}
 			String depart = shrink2(sts2.departTime);
 			depart = depart.substring(0, depart.length() - 1).replace(" ", "");
 			if(depart.length()<6) {

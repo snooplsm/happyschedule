@@ -2,4 +2,11 @@
 
     <string name="app_name">LI Rails</string>
     <string name="flurry_app_key">DBRZZSTWVR34DJZQ76WN</string>
+    <string name="config_url">lhttp://ryangravener.com/lirails/config.json</string>
+    <string name="register_push_url">http://ryangravener.com/lirails/register.php</string>
+    <string name="register_service_url">http://ryangravener.com/lirails/register_service.php</string>
+    <string name="poller">us.wmwm.happyschedule.lirails.service.LirrPoller</string>
+    <string name="amazon_app_key">bec2b6df359341c3a70afeedc50f3363</string>
+    <string name="admob_app_key">a14d07cbc165069</string>
+
 </resources>

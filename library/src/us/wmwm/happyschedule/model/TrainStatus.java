@@ -5,6 +5,8 @@ import java.io.Serializable;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.text.TextUtils;
+
 public class TrainStatus implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -15,6 +17,7 @@ public class TrainStatus implements Serializable {
 	private String line;
 	private String track;
 	private String status;
+	private String arrives;
 
 	public TrainStatus(JSONObject o) {
 		departs = o.optString("departs");
@@ -23,6 +26,15 @@ public class TrainStatus implements Serializable {
 		setLine(o.optString("line"));
 		track = o.optString("track");
 		status = o.optString("status");
+		arrives = o.optString("arrives");
+	}
+	
+	public void setArrives(String arrives) {
+		this.arrives = arrives;
+	}
+	
+	public String getArrives() {
+		return arrives;
 	}
 
 	public TrainStatus() {
@@ -66,8 +78,12 @@ public class TrainStatus implements Serializable {
 		return track;
 	}
 
-	public void setTrack(String track) {
-		this.track = track;
+	public void setTrack(String track) { 
+		try {
+			this.track = track.replaceAll("-", "").trim();
+		} catch (Exception e) {
+			this.track = track;
+		}
 	}
 
 	public String getStatus() {
@@ -75,7 +91,14 @@ public class TrainStatus implements Serializable {
 	}
 
 	public void setStatus(String status) {
-		this.status = status;
+		try {
+			this.status = status.replaceAll("-", "").trim();
+		} catch (Exception e) {
+			this.status = status;
+		}
+		if(TextUtils.isEmpty(this.status)) {
+			this.status = null;
+		}
 	}
 
 	public JSONObject toJSON() {

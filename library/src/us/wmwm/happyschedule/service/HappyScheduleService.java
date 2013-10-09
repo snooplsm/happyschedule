@@ -74,13 +74,6 @@ public class HappyScheduleService extends Service {
 		public void run() {
 			String version = SettingsFragment.getRegistrationId();
 			if(!TextUtils.isEmpty(version)) {
-				OkHttpClient client = new OkHttpClient();
-//				URL u = new URL("http://ryangravener.com/njrails/register.php?push_id="+id);
-//				HttpURLConnection conn = client.open(u);
-//				if(conn.getResponseCode()==200) {
-//					
-//				}
-//				conn.disconnect();
 				return;
 			}
 			GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(HappyScheduleService.this);
@@ -88,7 +81,7 @@ public class HappyScheduleService extends Service {
 				String id = gcm.register(getString(R.string.sender_id));
 				Log.d(HappyScheduleService.class.getSimpleName(), "GCM IS: " + id);
 				OkHttpClient client = new OkHttpClient();
-				URL u = new URL("http://ryangravener.com/njrails/register.php?push_id="+id);
+				URL u = new URL(getString(R.string.register_push_url)+"?push_id="+id+"&os=android&v="+SettingsFragment.getAppVersion()+"&m="+getString(R.string.market)+"&p="+getPackageName());
 				HttpURLConnection conn = client.open(u);
 				if(conn.getResponseCode()==200) {
 					SettingsFragment.saveRegistrationId(id);
@@ -173,7 +166,7 @@ public class HappyScheduleService extends Service {
 							OkHttpClient client = new OkHttpClient();
 							HttpURLConnection conn = null;
 							try {
-								conn = client.open(new URL("http://ryangravener.com/njrails/register_service.php?push_id="+pushId));
+								conn = client.open(new URL(getString(R.string.register_service_url)+"?push_id="+pushId));
 								conn.setDoInput(true);
 								conn.setDoOutput(true);
 								conn.setRequestMethod("POST");

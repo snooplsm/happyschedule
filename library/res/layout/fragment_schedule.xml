@@ -14,7 +14,7 @@
         android:id="@+id/pager2"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/fragment_ad"
+        android:layout_above="@+id/fragment_schedule_ad"
         android:layout_below="@id/top_ad" >
 
         <us.wmwm.happyschedule.views.ScheduleTabStrip
@@ -25,7 +25,7 @@
     </android.support.v4.view.ViewPager>
 
     <RelativeLayout
-        android:id="@+id/fragment_ad"
+        android:id="@+id/fragment_schedule_ad"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true" >

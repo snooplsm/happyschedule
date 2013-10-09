@@ -1,6 +1,6 @@
 {
 	"departure_vision": {
-		"url": "http://wx3.lirr.org/lirr/TrainTime/traintime.php?startsta=${stop_id}&endsta=${end_id}"
+		"url": "http://wx3.lirr.org/lirr/TrainTime/traintime.php?startsta=$stop_id&endsta=$end_id"
 	},
 	"share": {
 		"day": "http://www.njtransit.com/sf/sf_servlet.srv?hdnPageAction=TrainSchedulesFrom&selOrigin=:from&selDestination=:to&OriginDescription=:fromName&DestDescription=:toName&datepicker=:day",
@@ -13,10 +13,97 @@
 		"enabled": false,
 		"fragment": "FragmentMain"
 	}],
-	"lines": [],
+	"lines": [{
+		"keys": {
+			"port washington": ""
+		},
+		"color": "#F16364",
+		"acronym": "PW"
+	}, 
+	
+	{
+		"keys": {
+			"penn station": ""
+		},
+		"color": "#F16364",
+		"acronym": "PEN"
+	},
+	{
+		"keys": {
+			"raritan valley": ""
+		},
+		"color": "#F58559",
+		"acronym": "RAV"
+	}, {
+		"keys": {
+			"pascack valley": ""
+		},
+		"color": "#000000",
+		"acronym": "PV"
+	}, {
+		"keys": {
+			"main line": ""
+		},
+		"color": "#000000",
+		"acronym": "ML"
+	}, {
+		"keys": {
+			"bergen co. line": ""
+		},
+		"color": "#000000",
+		"acronym": "BL"
+	}, {
+		"keys": {
+			"ronkonkoma": ""
+		},
+		"color": "#95227B",
+		"acronym": "Ron"
+	}, {
+		"keys": {
+			"long beach": ""
+		},
+		"color": "#CE6300",
+		"acronym": "LB"
+	}, {
+		"keys": {
+			"m&e": "",
+			"morristown line": ""
+		},
+		"color": "#67BF74",
+		"acronym": "M&E"
+	}, {
+		"keys": {
+			"acrl": "",
+			"atl. city line": ""
+		},
+		"color": "#6495ed",
+		"acronym": "AC"
+	},
+	{
+		"keys": {
+			"huntington": "",
+			"no jersey coast": ""
+		},
+		"color": "#59A2BE",
+		"acronym": "Hun"
+	}
+	],
 	"rail_lines": [{
 		"name": "Long Island Rail Road",
 		"screenname": "LIRR"
+	},
+	{
+		"name": "New York City Alerts",
+		"screenname":"NYCityAlerts"
+	},
+	{
+		"name": "Subway ACE",
+		"screenname": "511nyACE"
+	},
+	{
+		"name": "Subway 123",
+		"screenname": "511ny123"
 	}
+	
 	]
 }

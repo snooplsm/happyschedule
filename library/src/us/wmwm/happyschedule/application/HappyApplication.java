@@ -25,6 +25,7 @@ public class HappyApplication extends Application {
 		
 		super.onCreate();
 		FlurryAgent.setReportLocation(false);
+		FlurryAgent.setCaptureUncaughtExceptions(false);
 		try {
 			AdRegistration.setAppKey(getString(R.string.amazon_app_key));
 		} catch (Exception e) {
@@ -41,12 +42,6 @@ public class HappyApplication extends Application {
 						Alarms.removeAlarm(INSTANCE, alarm);
 					}
 				}
-			}
-		});
-		ThreadHelper.getScheduler().submit(new Runnable() {
-			@Override
-			public void run() {
-				
 			}
 		});
 		startService(new Intent(this,HappyScheduleService.class));

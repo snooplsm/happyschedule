@@ -25,12 +25,13 @@ import android.util.Log;
 
 public class LirrPoller implements Poller {
 	
-	private static final String TRK = "TRK";
-	private static final String STATUS = "STATUS";
+	private static final String TRK = "Track";
+	private static final String STATUS = "Status";
 	private static final String TRAIN = "TRAIN";
-	private static final String LINE = "LINE";
+	private static final String LINE = "For";
 	private static final String TO = "TO";
-	private static final String DEPARTS = "DEP";
+	private static final String ARRIVE = "Sched Arr";
+	private static final String DEPARTS = "Departs";
 	
 	@Override
 	public List<TrainStatus> getTrainStatuses(AppConfig config, String station, String stationB) throws IOException {
@@ -49,6 +50,7 @@ public class LirrPoller implements Poller {
 		}
 		HttpURLConnection conn = null;
 		try {
+			
 			conn = (HttpURLConnection) url.openConnection();
 			conn.setReadTimeout(10000);
 			conn.setRequestProperty("User-Agent", "Mozilla/5.0 (iPhone; CPU iPhone OS 5_0 like Mac OS X) AppleWebKit/534.46 (KHTML, like Gecko) Version/5.1 Mobile/9A334 Safari/7534.48.3");
@@ -62,7 +64,12 @@ public class LirrPoller implements Poller {
 			while ((line = br.readLine()) != null) {
 				data.append(line);
 			}
+//			File file = new File(HappyApplication.get().getExternalFilesDir("files"), "departure.html");
+//			FileOutputStream fos = new FileOutputStream(file);
+//			fos.write(data.toString().getBytes());
+//			fos.close();
 			br.close();
+//			System.out.println(data.toString());
 			Document document = Jsoup.parse(data.toString());
 			
 			Elements tables = document.getElementsByTag("table");
@@ -71,49 +78,65 @@ public class LirrPoller implements Poller {
 			
 			Elements trs = table.getElementsByTag("tr");
 			
-			Element third = trs.get(2);
+			Element third = trs.get(1);
 			
-			Elements tds = third.getElementsByTag("td");
+			Elements tds = third.getElementsByTag("th");
 			
 			Map<String, Integer> typeToPosition = new HashMap<String,Integer>();
+			
 			
 			for(int i = 0; i < tds.size(); i++) {
 				Element td = tds.get(i);
 				if(TRK.equalsIgnoreCase(td.text())) {
 					typeToPosition.put(TRK, i);
+					continue;
 				}
 				if(TRAIN.equalsIgnoreCase(td.text())) {
 					typeToPosition.put(TRAIN, i);
+					continue;
 				}
 				if(STATUS.equalsIgnoreCase(td.text())) {
+					if(typeToPosition.containsKey(STATUS)) {
+						continue;
+					}
 					typeToPosition.put(STATUS,i);
+					continue;
 				}
 				if(LINE.equalsIgnoreCase(td.text())) {
 					typeToPosition.put(LINE, i);
+					continue;
 				}
 				if(TO.equalsIgnoreCase(td.text())) {
 					typeToPosition.put(TO, i);
+					continue;
 				}
 				if(DEPARTS.equalsIgnoreCase(td.text())) {
 					typeToPosition.put(DEPARTS, i);
+					continue;
+				}
+				if(ARRIVE.equalsIgnoreCase(td.text())) {
+					typeToPosition.put(ARRIVE, i);
+					continue;
 				}
 			}
 			
-			for(int i = 3; i < trs.size(); i++) {
+			for(int i = 2; i < trs.size(); i++) {
 				tds = trs.get(i).getElementsByTag("td");
-				Element train = tds.get(typeToPosition.get(TRAIN));
+				String train = tds.get(typeToPosition.get(DEPARTS)).getElementsByAttribute("title").first().attr("title");
 				Element track = tds.get(typeToPosition.get(TRK));
 				Element status = tds.get(typeToPosition.get(STATUS));
 				Element lline = tds.get(typeToPosition.get(LINE));
-				Element to = tds.get(typeToPosition.get(TO));
+				//Element to = tds.get(typeToPosition.get(TO));
 				Element departs = tds.get(typeToPosition.get(DEPARTS));
+				Element arrives = tds.get(typeToPosition.get(ARRIVE));
 					TrainStatus tstatus = new TrainStatus();
-					tstatus.setStatus(status.text());
-					tstatus.setTrack(track.text());
-					tstatus.setTrain(train.text());
-					tstatus.setLine(lline.text());
-					tstatus.setDest(to.text());
-					tstatus.setDeparts(departs.text());
+					tstatus.setStatus(status.text().trim());
+					tstatus.setTrack(track.text().trim());
+					tstatus.setTrain(train.trim());
+					tstatus.setLine(lline.text().trim());
+					//tstatus.setDest(to.text());
+					tstatus.setDeparts(departs.text().replaceAll("AM", "").replaceAll("PM", "").trim());
+					tstatus.setArrives(arrives.text().replaceAll("AM", "").replaceAll("PM", "").trim());
 					statuses.add(tstatus);
 			}
 			
@@ -122,4 +145,11 @@ public class LirrPoller implements Poller {
 			throw e;
 		}
 	}
+
+	@Override
+	public boolean isArrivalStationRequired() {
+		return true;
+	}
+	
+	
 }

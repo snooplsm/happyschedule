@@ -126,7 +126,7 @@ public class AlarmActivity extends HappyActivity {
         scheduleView.setData(sts,from,to);
         getActionBar().setSubtitle(from.getName() + " to " + to.getName());
         if(!TextUtils.isEmpty(from.getDepartureVision())) {
-        	getSupportFragmentManager().beginTransaction().replace(R.id.fragment_depareturevision, FragmentDepartureVision.newInstance(from,sts,false)).commit();
+        	getSupportFragmentManager().beginTransaction().replace(R.id.fragment_depareturevision, FragmentDepartureVision.newInstance(from,to,sts,false)).commit();
         }
         vibrator.vibrate(new long[] {0,200,500},0);
         Uri alert = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);

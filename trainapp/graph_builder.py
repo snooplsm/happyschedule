@@ -804,7 +804,12 @@ def buildGraph(agencies) :
 			if "block_id" in trip:
 				blockId = trip["block_id"]
 			else:
-				blockId = tripId
+				split = tripId.split("_")
+				if len(split)==1:
+					split = split[0]
+				else:
+					split = split[len(split)-1]
+				blockId = split[-4:]
 			c.execute("INSERT INTO nested_trip(lft,rgt,trip_id,service_id,stop_id,depart,arrive,block_id,route_id) values(?,?,?,?,?,?,?,?,?)",(id+1,len(tripToStops[tripId]),tripId,trip["service_id"],stop["id"],stop["depart"],stop["arrive"],blockId,trip["route_id"]))
 			lastStation = stop
 		conn.commit()
@@ -918,9 +923,15 @@ def buildGraph(agencies) :
 							# 	indent = indent+1					
 							# print ""
 			conn.commit()
+	removalsReader = csv.reader(open(override+"/removals.csv"))
 	connectionsReader = csv.reader(open(override+"/connections.csv"))
 	print "processing connections"
 	c.execute("create index foo on schedule_path(source,target)");
+	for row in removalsReader:
+		depart = row[0]
+		arrive = row[1]
+		c.execute("DELETE from schedule_path where source=? and target=?",(depart,arrive))
+	conn.commit()
 	for row in connectionsReader:
 		depart = row[0]
 		arrive = row[len(row)-1]
@@ -944,6 +955,7 @@ def buildGraph(agencies) :
 			c.execute("INSERT INTO schedule_path(source,target,a,b,level,sequence) values(?,?,?,?,?,?)",tuples)
 	conn.commit()			
 	c.execute("drop index foo")
+	c.execute("vacuum")
 #	c.execute("delete from schedule_path where (source=? and target=?) or (target=? and source=?)",("51","105","51","105"))
 #	c.execute("delete from schedule_path where (source=? and target=?) or (target=? and source=?)",("52","105","52","105"))
 	# c.execute("INSERT INTO schedule_path(source,target,a,b,level,sequence) values(?,?,?,?,?,?)",("51","105","51","38174",0,0))			

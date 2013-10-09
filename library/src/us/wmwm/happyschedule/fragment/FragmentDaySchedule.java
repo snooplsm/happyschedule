@@ -1,5 +1,6 @@
 package us.wmwm.happyschedule.fragment;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -7,6 +8,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.UUID;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -93,7 +95,7 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 	AlarmManager alarmManger;
 	AppConfig appConfig;
 	boolean canLoad = false;
-	
+
 	BroadcastReceiver connectionReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
@@ -105,9 +107,10 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 			if (info != null && info.isConnected()) {
 				// erroText.setVisibility(View.GONE);
 				if (poll == null || poll.isCancelled()) {
-					if(!TextUtils.isEmpty(from.getDepartureVision()) && DateUtils.isToday(day.getTime())) {
-						poll = ThreadHelper.getScheduler().scheduleAtFixedRate(r,
-								100, 10000, TimeUnit.MILLISECONDS);
+					if (!TextUtils.isEmpty(from.getDepartureVision())
+							&& DateUtils.isToday(day.getTime())) {
+						poll = ThreadHelper.getScheduler().scheduleAtFixedRate(
+								r, 900, 10000, TimeUnit.MILLISECONDS);
 					}
 				}
 			} else {
@@ -128,6 +131,16 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 	Handler handler = new Handler();
 
 	List<StationToStation> k = null;
+
+	static SimpleDateFormat HOURMINUTE = new SimpleDateFormat("h:mm");
+
+	static {
+		try {
+			HOURMINUTE.setTimeZone(TimeZone.getTimeZone("America/New_York"));
+		} catch (Exception e) {
+			// not worth it
+		}
+	}
 
 	List<TrainStatus> lastStatuses;
 
@@ -167,13 +180,13 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 			} else {
 				list.setVisibility(View.VISIBLE);
 			}
-			if(adapter.getGroupCount()==0) {
+			if (adapter.getGroupCount() == 0) {
 				EmptyView v = new EmptyView(activity);
 				root.addView(v);
-			}			
+			}
 		}
 	};
-	
+
 	Runnable hideProgress = new Runnable() {
 		public void run() {
 			progressBar.setVisibility(View.GONE);
@@ -188,8 +201,8 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 			try {
 				Log.d(FragmentDaySchedule.class.getSimpleName(),
 						"getting train statuses");
-				final List<TrainStatus> s = poller.getTrainStatuses(appConfig,from
-						.getDepartureVision(),to.getDepartureVision());
+				final List<TrainStatus> s = poller.getTrainStatuses(appConfig,
+						from.getDepartureVision(), to.getDepartureVision());
 				Log.d(FragmentDaySchedule.class.getSimpleName(),
 						"got train statuses: " + s.size());
 				String key = getKey();
@@ -209,11 +222,36 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 								.putLong(key + "Time",
 										System.currentTimeMillis()).commit();
 					}
-					for (TrainStatus status : s) {
-						Log.d(FragmentDaySchedule.class.getSimpleName(),
-								status.getTrain() + " : " + status.getStatus());
-						tripIdToTrainStatus.put(status.getTrain(), status);
+					long time = System.currentTimeMillis();
+					if(poller.isArrivalStationRequired()) {
+						for (TrainStatus status : s) {
+							Log.d(FragmentDaySchedule.class.getSimpleName(),
+									status.toString());
+							for (int i = 0; i < o.size(); i++) {
+								StationToStation sts = o.get(i);
+	
+								if (sts.blockId.endsWith(status.getTrain())) {
+									if (HOURMINUTE.format(
+											sts.getDepartTime().getTime()).equals(
+											status.getDeparts())) {
+	
+									} else {
+										System.out.println("not a match " + sts + " vs " + status.getDeparts());
+									}
+									tripIdToTrainStatus.put(sts.blockId, status);
+								}
+							}
+						}
+					} else {
+						for (TrainStatus status : s) {
+							Log.d(FragmentDaySchedule.class.getSimpleName(),
+									status.getTrain() + " : " + status.getStatus());
+							tripIdToTrainStatus.put(status.getTrain(), status);
+						}
 					}
+					long end = System.currentTimeMillis();
+					System.out.println("took " + ((end - time) / 1000)
+							+ " seconds");
 					lastStatuses = s;
 				}
 				handler.post(new Runnable() {
@@ -239,13 +277,13 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 
 	Runnable updateEverySixtySeconds = new Runnable() {
 		public void run() {
-			Map<String,String> args = new HashMap<String,String>();
+			Map<String, String> args = new HashMap<String, String>();
 			args.put("day", day.toString());
 			args.put("from_id", from.getId());
 			args.put("from_name", from.getName());
 			args.put("to_id", to.getId());
 			args.put("to_name", to.getName());
-			FlurryAgent.logEvent("UpdateSchedule",args);
+			FlurryAgent.logEvent("UpdateSchedule", args);
 			Log.d(FragmentDaySchedule.class.getSimpleName(),
 					"updating schedule view");
 			handler.post(new Runnable() {
@@ -271,19 +309,19 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 	private String getKey() {
 		return "lastStatuses" + from.getId();
 	}
-	
+
 	Runnable load = new Runnable() {
 		@Override
 		public void run() {
 			Log.d(TAG, "IN LOAD");
-			Map<String,String> args = new HashMap<String,String>();
-			
+			Map<String, String> args = new HashMap<String, String>();
+
 			List<Alarm> alarms = Alarms.getAlarms(getActivity());
 			tripIdToAlarm = new HashMap<StationToStation, List<Alarm>>();
 			for (Alarm a : alarms) {
 				addAlarm(a);
 			}
-			
+
 			Calendar date = Calendar.getInstance();
 			date.setTime(day);
 			final Calendar tomorrow = Calendar.getInstance();
@@ -332,8 +370,7 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 								k.add(stationToStation);
 							}
 						} else {
-							if (!stationToStation.departTime
-									.before(priorLimit)
+							if (!stationToStation.departTime.before(priorLimit)
 									&& !stationToStation.departTime
 											.after(limit))
 								k.add(stationToStation);
@@ -343,6 +380,16 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 					}
 				});
 				handler.post(populateAdpter);
+				try {
+					String str = Streams
+							.readFully(Streams.getStream("config.json"));
+					// Log.d(TAG, str);
+					appConfig = new AppConfig(new JSONObject(str));
+				} catch (Exception e) {
+					appConfig = AppConfig.DEFAULT;
+					Log.e(TAG, "can't parse appConfig", e);
+				}
+				ThreadHelper.getScheduler().submit(r);
 				Log.i(TAG, "SUCCESSFUL SCHEDULE");
 			} catch (Exception e) {
 				Log.e(TAG, "UNSUCCESSFUL SCHEDULE", e);
@@ -369,24 +416,15 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 
 				}
 			}
-			
-			try {
-				String str = Streams.readFully(Streams.getStream("config.json"));
-				//Log.d(TAG, str);
-				appConfig = new AppConfig(new JSONObject(str));
-			} catch (Exception e) {
-				appConfig = AppConfig.DEFAULT;
-				Log.e(TAG, "can't parse appConfig",e);
-			}
+
 			handler.post(hideProgress);
 			handler.postDelayed(new Runnable() {
 				public void run() {
 					getActivity().invalidateOptionsMenu();
 				};
-			},50);
+			}, 50);
 			updateSchedulePeriodically();
 		}
-		
 
 	};
 
@@ -395,14 +433,15 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 			return;
 		}
 		Log.d(TAG, "SCHEDULING!!");
-		loadScheduleFuture = ThreadHelper.getScheduler().schedule(load, 100, TimeUnit.MILLISECONDS);
+		loadScheduleFuture = ThreadHelper.getScheduler().schedule(load, 100,
+				TimeUnit.MILLISECONDS);
 	}
-	
+
 	Future<?> moveToNext;
 
 	private void moveToNextTrain() {
 		Log.d(TAG, "moveToNextTrain");
-		if(moveToNext!=null) {
+		if (moveToNext != null) {
 			moveToNext.cancel(true);
 		}
 		moveToNext = null;
@@ -431,14 +470,13 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 				});
 			}
 		});
-		
-		
+
 	}
 
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		
+
 		poller = HappyApplication.getPoller();
 		alarmManger = (AlarmManager) getActivity().getSystemService(
 				Context.ALARM_SERVICE);
@@ -508,10 +546,10 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 						@Override
 						public void onPin() {
 							ArrayList<String> blocks = new ArrayList<String>();
-							if(sts instanceof StationInterval) {
-								StationInterval si = (StationInterval)sts;
-								while(si.hasNext()) {
-									if(si.blockId!=null) {
+							if (sts instanceof StationInterval) {
+								StationInterval si = (StationInterval) sts;
+								while (si.hasNext()) {
+									if (si.blockId != null) {
 										blocks.add(si.blockId);
 									}
 								}
@@ -538,7 +576,10 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 													Intent i = AlarmActivity
 															.from(getActivity(),
 																	stationToStation,
-																	cal, type, UUID.randomUUID().toString());
+																	cal,
+																	type,
+																	UUID.randomUUID()
+																			.toString());
 													Alarm alarm = (Alarm) i
 															.getSerializableExtra("alarm");
 													addAlarm(alarm);
@@ -578,8 +619,11 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 
 						@Override
 						public void onShare(Schedule schedule,
-								StationToStation stationToStation) {							
-							startActivity(Intent.createChooser(Share.intent(getActivity(), (StationInterval) stationToStation), "Share"));
+								StationToStation stationToStation) {
+							startActivity(Intent.createChooser(Share.intent(
+									getActivity(),
+									(StationInterval) stationToStation),
+									"Share"));
 						}
 
 					});
@@ -675,7 +719,7 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);	
+		super.onCreate(savedInstanceState);
 
 	}
 
@@ -689,12 +733,12 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 	};
 
 	RelativeLayout root;
-	
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		root = (RelativeLayout) inflater.inflate(R.layout.fragment_day_schedule, container,
-				false);
+		root = (RelativeLayout) inflater.inflate(
+				R.layout.fragment_day_schedule, container, false);
 		list = (ExpandableListView) root.findViewById(R.id.list2);
 		progressBar = root.findViewById(R.id.progress);
 		return root;
@@ -707,7 +751,7 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 		try {
 			getActivity().unregisterReceiver(connectionReceiver);
 		} catch (Exception e) {
-			
+
 		}
 		if (loadScheduleFuture != null) {
 			loadScheduleFuture.cancel(true);
@@ -718,19 +762,20 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 		}
 		poll = null;
 		if (updateScheduleFuture != null) {
-			Log.d(TAG, "cancel updateSched: " + updateScheduleFuture.cancel(true));
+			Log.d(TAG,
+					"cancel updateSched: " + updateScheduleFuture.cancel(true));
 		}
 		updateScheduleFuture = null;
-		if(moveToNext!=null) {
+		if (moveToNext != null) {
 			moveToNext.cancel(true);
 		}
 		moveToNext = null;
-		 
+
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		FlurryAgent.logEvent(item.getTitle()+"MenuItemSelected");
+		FlurryAgent.logEvent(item.getTitle() + "MenuItemSelected");
 		if (item.getItemId() == R.id.menu_go_to_next_train) {
 			moveToNextTrain();
 			return true;
@@ -740,21 +785,23 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 			return true;
 		}
 		if (item.getItemId() == R.id.menu_departurevision) {
-			onDepartureVision.onDepartureVision(from);
+			onDepartureVision.onDepartureVision(from, to);
 			return true;
 		}
-		if(item.getItemId()==R.id.menu_share) {
-			Map<String,String> k = new HashMap<String,String>();
+		if (item.getItemId() == R.id.menu_share) {
+			Map<String, String> k = new HashMap<String, String>();
 			k.put("from_id", from.getId());
 			k.put("to_id", to.getId());
 			k.put("from_name", from.getName());
 			k.put("to_name", to.getName());
 			k.put("date", new Date().toString());
 			FlurryAgent.logEvent("ShareSchedule", k);
-			startActivity(Intent.createChooser(Share.intent(appConfig, this.getActivity(), from, to, day), "Share"));
+			startActivity(Intent.createChooser(
+					Share.intent(appConfig, this.getActivity(), from, to, day),
+					"Share"));
 			return true;
 		}
-		if(item.getItemId()==R.id.menu_day_push) {
+		if (item.getItemId() == R.id.menu_day_push) {
 			Intent i = new Intent(getActivity(), RailLinesActivity.class);
 			startActivity(i);
 		}
@@ -772,7 +819,9 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 		}
 		if (updateScheduleFuture != null) {
 			if (updateScheduleFuture != null) {
-				Log.d(TAG, "cancel updateSched: " + updateScheduleFuture.cancel(true));
+				Log.d(TAG,
+						"cancel updateSched: "
+								+ updateScheduleFuture.cancel(true));
 			}
 			updateScheduleFuture = null;
 		}
@@ -788,18 +837,19 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 			menu.removeItem(R.id.menu_departurevision);
 		}
 		final MenuItem i = menu.findItem(R.id.menu_day_push);
-		if(i!=null) {
+		if (i != null) {
 			i.setVisible(false);
 			ThreadHelper.getScheduler().submit(new Runnable() {
 				@Override
 				public void run() {
-					if(SettingsFragment.getRegistrationId()==null || WDb.get().getPreference("rail_push_matrix")!=null) {
+					if (SettingsFragment.getRegistrationId() == null
+							|| WDb.get().getPreference("rail_push_matrix") != null) {
 						handler.post(new Runnable() {
 							@Override
 							public void run() {
 								i.setVisible(false);
 							}
-						});					
+						});
 					} else {
 						handler.post(new Runnable() {
 							@Override
@@ -807,7 +857,7 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 								i.setVisible(true);
 							}
 						});
-						
+
 					}
 				}
 			});
@@ -830,7 +880,8 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 			updateSchedulePeriodically();
 		}
 		NetworkInfo i = manager.getActiveNetworkInfo();
-		if (i != null && i.isConnected() && canLoad && !TextUtils.isEmpty(from.getDepartureVision())) {
+		if (i != null && i.isConnected() && canLoad
+				&& !TextUtils.isEmpty(from.getDepartureVision())) {
 			poll = ThreadHelper.getScheduler().scheduleAtFixedRate(r, 100,
 					10000, TimeUnit.MILLISECONDS);
 		}
@@ -847,14 +898,14 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 	public void setOnGetSchedule(OnGetSchedule onGetSchedule) {
 		this.onGetSchedule = onGetSchedule;
 	}
-	
+
 	int loadingAttempt = 0;
 
 	@Override
 	public void setPrimaryItem() {
 		if (activityCreated && o == null) {
 			loadingAttempt++;
-			Log.d(TAG, "LoadingSchedule attepmt " + loadingAttempt);			
+			Log.d(TAG, "LoadingSchedule attepmt " + loadingAttempt);
 			loadSchedule();
 		}
 	}
@@ -871,7 +922,7 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 		if (loadScheduleFuture != null) {
 			loadScheduleFuture.cancel(true);
 		}
-		loadScheduleFuture=null;
+		loadScheduleFuture = null;
 		if (poll != null) {
 			poll.cancel(true);
 		}

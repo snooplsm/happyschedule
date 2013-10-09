@@ -31,6 +31,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -44,6 +45,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.emilsjolander.components.stickylistheaders.StickyListHeadersListView;
 import com.flurry.android.FlurryAgent;
@@ -52,7 +54,8 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary,
 		ISecondary {
 
 	StickyListHeadersListView list;
-	View stationSelect;
+	TextView stationSelect;
+	TextView stationArriveSelect;
 
 	Future<?> poll;
 
@@ -69,6 +72,8 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary,
 	List<TrainStatus> lastStatuses;
 
 	Station station;
+
+	Station stationArrive;
 
 	View empty;
 
@@ -107,7 +112,8 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary,
 				erroText.setVisibility(View.GONE);
 				if (poll == null || poll.isCancelled()) {
 					poll = ThreadHelper.getScheduler().scheduleAtFixedRate(r,
-							100, SettingsFragment.getPollMilliseconds(), TimeUnit.MILLISECONDS);
+							100, SettingsFragment.getPollMilliseconds(),
+							TimeUnit.MILLISECONDS);
 				}
 			} else {
 				if (poll != null) {
@@ -118,11 +124,12 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary,
 		}
 	};
 
-	public static FragmentDepartureVision newInstance(Station station,
+	public static FragmentDepartureVision newInstance(Station station, Station arrival, 
 			StationToStation sts, boolean isOverlay) {
 		FragmentDepartureVision dv = new FragmentDepartureVision();
 		Bundle b = new Bundle();
 		b.putSerializable("station", station);
+		b.putSerializable("stationArrival", arrival);
 		if (sts != null) {
 			b.putSerializable("stationToStation", sts);
 		}
@@ -140,21 +147,22 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary,
 		public void run() {
 			try {
 				final List<TrainStatus> s = poller.getTrainStatuses(appConfig,
-						station.getDepartureVision(),null);
+						station.getDepartureVision(), stationArrive!=null ? stationArrive.getDepartureVision(): null);
 				String key = getKey();
 				if (s != null && !s.isEmpty()) {
 					count++;
-					Map<String,String> k = new HashMap<String,String>();
+					Map<String, String> k = new HashMap<String, String>();
 					k.put("station_id", station.getId());
 					k.put("station_name", station.getName());
-					FlurryAgent.logEvent("DepartureVision",k);
+					FlurryAgent.logEvent("DepartureVision", k);
 					JSONArray a = new JSONArray();
 					if (lastStatuses != null) {
 						for (int i = 0; i < lastStatuses.size(); i++) {
 							a.put(lastStatuses.get(i).toJSON());
 						}
 						PreferenceManager
-								.getDefaultSharedPreferences(getActivity())
+								.getDefaultSharedPreferences(
+										HappyApplication.get())
 								.edit()
 								.putString("lastStation", station.getId())
 								.putString(key, a.toString())
@@ -178,7 +186,7 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary,
 				});
 
 			} catch (Exception e) {
-				Log.e(TAG,"error with polling", e);
+				Log.e(TAG, "error with polling", e);
 			}
 		}
 	};
@@ -189,7 +197,8 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary,
 		View root = inflater.inflate(R.layout.fragment_departurevision,
 				container, false);
 		list = (StickyListHeadersListView) root.findViewById(R.id.list);
-		stationSelect = root.findViewById(R.id.departure);
+		stationSelect = (TextView) root.findViewById(R.id.departure);
+		stationArriveSelect = (TextView) root.findViewById(R.id.arrival);
 		erroText = root.findViewById(R.id.no_internet);
 		empty = root.findViewById(R.id.empty);
 		return root;
@@ -215,6 +224,7 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary,
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
+		poller = HappyApplication.getPoller();
 		super.onCreate(savedInstanceState);
 		Bundle args = getArguments();
 		boolean showControls = true;
@@ -226,11 +236,16 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary,
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		FlurryAgent.logEvent(item.getTitle()+"MenuItemSelected");
+		FlurryAgent.logEvent(item.getTitle() + "MenuItemSelected");
 		if (item.getItemId() == R.id.menu_change_station) {
 			startActivityForResult(
 					new Intent(ActivityPickStation.from(getActivity(), true)),
 					100);
+		}
+		if (item.getItemId() == R.id.menu_change_arrival_station) {
+			startActivityForResult(
+					new Intent(ActivityPickStation.from(getActivity(), true)),
+					200);
 		}
 		if (item.getItemId() == R.id.menu_add_station) {
 			startActivityForResult(new Intent(getActivity(),
@@ -296,13 +311,14 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary,
 
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
-		super.onActivityCreated(savedInstanceState);
-		poller = HappyApplication.getPoller();
+		super.onActivityCreated(savedInstanceState);		
 		Bundle arguments = getArguments();
 		if (arguments != null) {
 			station = (Station) arguments.getSerializable("station");
 			stationToStation = (StationToStation) arguments
 					.getSerializable("stationToStation");
+			stationArrive = (Station) arguments
+					.getSerializable("stationArrive");
 			canLoad = arguments.getBoolean("isOverlay");
 		}
 
@@ -316,6 +332,9 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary,
 		manager = (ConnectivityManager) getActivity().getSystemService(
 				Context.CONNECTIVITY_SERVICE);
 		loadColors();
+		if (!poller.isArrivalStationRequired()) {
+			stationArriveSelect.setVisibility(View.GONE);
+		}
 		if (station == null) {
 			stationSelect.setVisibility(View.VISIBLE);
 			stationSelect.setOnClickListener(new OnClickListener() {
@@ -330,31 +349,55 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary,
 		} else {
 			stationSelect.setVisibility(View.GONE);
 		}
+		if(poller.isArrivalStationRequired() && stationArrive==null) {			
+			stationArriveSelect.setVisibility(View.VISIBLE);
+			if(station!=null) {
+				stationSelect.setText(station.getName());
+			}
+			if(stationArrive!=null) {
+				stationArriveSelect.setText(stationArrive.getName());
+			}
+			stationArriveSelect.setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View v) {
+					startActivityForResult(
+							ActivityPickStation.from(getActivity(), true), 200);
+				}
+			});
+			return;
+		}
+		if(station!=null) {
+			stationSelect.setVisibility(View.GONE);
+		}
+		if(stationArrive!=null) {
+			stationSelect.setVisibility(View.GONE);
+		}
 		loadInitial();
-//		FragmentAmazonAd ad = new FragmentAmazonAd();
-//		ad.setHappyAdListener(new HappyAdListener() {
-//			@Override
-//			public void onAd() {
-//			}
-//
-//			@Override
-//			public void onAdFailed(int count, boolean noFill) {
-//				handler.post(new Runnable() {
-//					@Override
-//					public void run() {
-//						try {
-//							FragmentGoogleAd gad = new FragmentGoogleAd();
-//							getFragmentManager().beginTransaction()
-//									.replace(R.id.fragment_ad, gad).commit();
-//						} catch (Exception e) {
-//
-//						}
-//					}
-//				});
-//			}
-//		});
-//		getFragmentManager().beginTransaction().replace(R.id.fragment_ad, ad)
-//				.commit();
+		// FragmentAmazonAd ad = new FragmentAmazonAd();
+		// ad.setHappyAdListener(new HappyAdListener() {
+		// @Override
+		// public void onAd() {
+		// }
+		//
+		// @Override
+		// public void onAdFailed(int count, boolean noFill) {
+		// handler.post(new Runnable() {
+		// @Override
+		// public void run() {
+		// try {
+		// FragmentGoogleAd gad = new FragmentGoogleAd();
+		// getFragmentManager().beginTransaction()
+		// .replace(R.id.fragment_ad, gad).commit();
+		// } catch (Exception e) {
+		//
+		// }
+		// }
+		// });
+		// }
+		// });
+		// getFragmentManager().beginTransaction().replace(R.id.fragment_ad, ad)
+		// .commit();
 		activityCreated = true;
 	}
 
@@ -429,7 +472,8 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary,
 		NetworkInfo i = manager.getActiveNetworkInfo();
 		if (i != null && i.isConnected() && canLoad) {
 			poll = ThreadHelper.getScheduler().scheduleAtFixedRate(r, 100,
-					SettingsFragment.getPollMilliseconds(), TimeUnit.MILLISECONDS);
+					SettingsFragment.getPollMilliseconds(),
+					TimeUnit.MILLISECONDS);
 		}
 	}
 
@@ -445,7 +489,12 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary,
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (resultCode == Activity.RESULT_OK) {
-			Station station = (Station) data.getSerializableExtra("station");
+			if(requestCode==100) {
+				station = (Station) data.getSerializableExtra("station");
+			} else {
+				stationArrive = (Station) data.getSerializableExtra("station");
+			}
+			canLoad = true;
 			if (requestCode == 100 || requestCode == 200) {
 				String k = PreferenceManager.getDefaultSharedPreferences(
 						HappyApplication.get()).getString("departure_visions",
@@ -462,7 +511,8 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary,
 					}
 					departureVisions.put(station.getId());
 				} else {
-					departureVisions.put(station.getId());
+					SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(HappyApplication.get());
+					p.edit().putString("departureVisionArrivalId", stationArrive.getId()).commit();
 				}
 				adapter.notifyDataSetInvalidated();
 				PreferenceManager
@@ -470,15 +520,18 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary,
 						.edit()
 						.putString("departure_visions",
 								departureVisions.toString()).commit();
-				this.station = station;
-				this.stationSelect.setVisibility(View.GONE);
+				if(requestCode==100) {
+					this.stationSelect.setVisibility(View.GONE);
+				}
+				if(requestCode==200) {
+					this.stationArriveSelect.setVisibility(View.GONE);
+				}
 				if (poll != null) {
 					poll.cancel(true);
 				}
-				if (canLoad && station != null) {
-					poll = ThreadHelper.getScheduler().scheduleAtFixedRate(r,
-							100, SettingsFragment.getPollMilliseconds(), TimeUnit.MILLISECONDS);
-				}
+				poll = ThreadHelper.getScheduler().scheduleAtFixedRate(r, 100,
+						SettingsFragment.getPollMilliseconds(),
+						TimeUnit.MILLISECONDS);
 				List<TrainStatus> ks = Collections.emptyList();
 				adapter.setData(ks);
 			}
@@ -488,9 +541,9 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary,
 		}
 		super.onActivityResult(requestCode, resultCode, data);
 	}
-	
+
 	boolean logged = false;
-	
+
 	int count;
 
 	@Override
@@ -513,19 +566,45 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary,
 			if ((poll == null || poll.isCancelled()) && station != null) {
 				Log.d(TAG, "Polling!");
 				poll = ThreadHelper.getScheduler().scheduleAtFixedRate(r, 100,
-						SettingsFragment.getPollMilliseconds(), TimeUnit.MILLISECONDS);
+						SettingsFragment.getPollMilliseconds(),
+						TimeUnit.MILLISECONDS);
 			} else {
 				Log.d(TAG, "Not Polling!");
 			}
-			if(!logged) {
-				Map<String,String> k = new HashMap<String,String>();
-				if(station!=null) {
+			if (!logged) {
+				Map<String, String> k = new HashMap<String, String>();
+				if (station != null) {
 					k.put("station_id", station.getId());
 					k.put("station_name", station.getName());
 				}
-				FlurryAgent.logEvent("FragmentDepartureVision",k);
+				FlurryAgent.logEvent("FragmentDepartureVision", k);
 			}
+			
 		}
+		FragmentAmazonAd ad = new FragmentAmazonAd();
+		ad.setHappyAdListener(new HappyAdListener() {
+			@Override
+			public void onAd() {
+			}
+
+			@Override
+			public void onAdFailed(int count, boolean noFill) {
+				handler.post(new Runnable() {
+					@Override
+					public void run() {
+						try {
+							FragmentGoogleAd gad = new FragmentGoogleAd();
+							getFragmentManager().beginTransaction()
+									.replace(R.id.fragment_departurevision_ad, gad).commit();
+						} catch (Exception e) {
+
+						}
+					}
+				});
+			}
+		});
+		getFragmentManager().beginTransaction().replace(R.id.fragment_departurevision_ad, ad)
+		.commit();
 
 	}
 

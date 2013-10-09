@@ -9,4 +9,6 @@ import us.wmwm.happyschedule.model.TrainStatus;
 public interface Poller {
 
 	List<TrainStatus> getTrainStatuses(AppConfig config, String station, String stationB) throws IOException;
+	
+	boolean isArrivalStationRequired();
 }

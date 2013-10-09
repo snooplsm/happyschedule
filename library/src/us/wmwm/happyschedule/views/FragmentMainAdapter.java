@@ -12,6 +12,7 @@ import us.wmwm.happyschedule.fragment.FragmentPickStations;
 import us.wmwm.happyschedule.fragment.IPrimary;
 import us.wmwm.happyschedule.fragment.FragmentPickStations.OnGetSchedule;
 import us.wmwm.happyschedule.model.Station;
+import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -97,7 +98,7 @@ public class FragmentMainAdapter extends FragmentStatePagerAdapter {
 		}
 		Station station = getDepartureVision(pos);
 		FragmentDepartureVision dv = FragmentDepartureVision.newInstance(
-				station, null,false);
+				station, getDepartureVisionArrival(),null,false);
 		dv.setRetainInstance(false);
 		dv.setOnStationSelected(onStationSelected);
 		return dv;
@@ -108,6 +109,15 @@ public class FragmentMainAdapter extends FragmentStatePagerAdapter {
 			return null;
 		}
 		return Db.get().getStop(departureVisions.optString(pos - 2));
+	}
+	
+	public Station getDepartureVisionArrival() {
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(HappyApplication.get());
+		String id = prefs.getString("departureVisionArrivalId", null);
+		if(id==null) {
+			return null;
+		}
+		return Db.get().getStop(id);
 	}
 
 	@Override

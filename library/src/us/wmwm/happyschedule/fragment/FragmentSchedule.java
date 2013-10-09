@@ -17,6 +17,7 @@ import us.wmwm.happyschedule.model.Station;
 import us.wmwm.happyschedule.model.StationToStation;
 import us.wmwm.happyschedule.util.Streams;
 import us.wmwm.happyschedule.views.ScheduleControlsView.ScheduleControlListener;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -49,14 +50,14 @@ public class FragmentSchedule extends Fragment {
 	OnDepartureVision onDepartureVision = new OnDepartureVision() {
 
 		@Override
-		public void onDepartureVision(Station station) {
+		public void onDepartureVision(Station station, Station arrival) {
 			try {
 				getFragmentManager()
 						.beginTransaction()
 						.replace(
 								R.id.fragment_date_picker,
-								FragmentDepartureVision.newInstance(station,
-										null, true))
+								FragmentDepartureVision.newInstance(station, 
+										arrival,null, true))
 						.addToBackStack(null)
 						.setBreadCrumbTitle(
 								"DepartureVision @ " + station.getName())
@@ -180,30 +181,7 @@ public class FragmentSchedule extends Fragment {
 				pager.setCurrentItem(adapter.getTodaysPosition());
 			}
 		});
-		FragmentAmazonAd ad = new FragmentAmazonAd();
-		ad.setHappyAdListener(new HappyAdListener() {
-			@Override
-			public void onAd() {
-			}
-
-			@Override
-			public void onAdFailed(int count, boolean noFill) {
-				handler.post(new Runnable() {
-					@Override
-					public void run() {
-						try {
-							FragmentGoogleAd gad = new FragmentGoogleAd();
-							getFragmentManager().beginTransaction()
-									.replace(R.id.fragment_ad, gad).commit();
-						} catch (Exception e) {
-
-						}
-					}
-				});
-			}
-		});
-		getFragmentManager().beginTransaction().replace(R.id.fragment_ad, ad)
-				.commit();
+		
 		ThreadHelper.getScheduler().submit(new Runnable() {
 			@Override
 			public void run() {
@@ -239,6 +217,30 @@ public class FragmentSchedule extends Fragment {
 				}
 			}
 		});
+		FragmentAmazonAd ad = new FragmentAmazonAd();
+		ad.setHappyAdListener(new HappyAdListener() {
+			@Override
+			public void onAd() {
+			}
+
+			@Override
+			public void onAdFailed(int count, boolean noFill) {
+				handler.post(new Runnable() {
+					@Override
+					public void run() {
+						try {
+							FragmentGoogleAd gad = new FragmentGoogleAd();
+							getFragmentManager().beginTransaction()
+									.replace(R.id.fragment_schedule_ad, gad).commit();
+						} catch (Exception e) {
+
+						}
+					}
+				});
+			}
+		});
+		getFragmentManager().beginTransaction().replace(R.id.fragment_schedule_ad, ad)
+				.commit();
 
 	}
 
