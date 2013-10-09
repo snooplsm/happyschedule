@@ -37,7 +37,7 @@ public class FragmentTweet extends HappyFragment {
 			Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.fragment_tweet, container, false);
 		avatar = (ImageView) view.findViewById(R.id.avatar);
-		name = (TextView) view.findViewById(R.id.screenname);
+		name = (TextView) view.findViewById(R.id.name);
 		ago = (TextView) view.findViewById(R.id.ago);
 		screenname = (TextView) view.findViewById(R.id.screenname);
 		text = (TextView) view.findViewById(R.id.tweet_text);
