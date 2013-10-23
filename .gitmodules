@@ -1,12 +1,6 @@
-[submodule "ActionBarSherlock"]
-	path = libraries/ActionBarSherlock
-	url = https://github.com/snooplsm/ActionBarSherlock
 [submodule "StickyListHeaders"]
 	path = libraries/StickyListHeaders
 	url = https://github.com/snooplsm/StickyListHeaders
-[submodule "AndroidSwitchBackport"]
-	path = libraries/AndroidSwitchBackport
-	url = https://github.com/BoD/android-switch-backport.git
 [submodule "libraries/AndroidTimesSquare"]
 	path = libraries/AndroidTimesSquare
 	url = https://github.com/square/android-times-square.git
