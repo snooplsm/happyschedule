@@ -133,6 +133,7 @@ public class HappyScheduleService extends Service {
 							Alarms.removeAlarm(this, alarm);
 						}						
 					}
+					stopSelf();
 				}
 				if("push".equals(type)) {
 					if(pushFuture!=null) {
@@ -149,18 +150,21 @@ public class HappyScheduleService extends Service {
 							String needsSave = WDb.get().getPreference("rail_push_matrix_needs_save");
 							if(needsSave==null) {
 								alarmManager.cancel(pi);
+								stopSelf();
 								return;
 							}
 							String data = WDb.get().getPreference("rail_push_matrix");
 							if(data==null) {
 								FlurryAgent.logEvent("NoPushMatrix");
 								alarmManager.cancel(pi);
+								stopSelf();
 								return;
 							}
 							String pushId = SettingsFragment.getRegistrationId();
 							if(pushId==null) {
 								FlurryAgent.logEvent("NoRegistrationIdOnSavePushMatrix");
 								alarmManager.cancel(pi);
+								stopSelf();
 								return;
 							}
 							OkHttpClient client = new OkHttpClient();
@@ -190,6 +194,7 @@ public class HappyScheduleService extends Service {
 									conn.disconnect();
 								}
 							}
+							stopSelf();
 						}
 					});
 				}
@@ -280,6 +285,7 @@ public class HappyScheduleService extends Service {
 									}
 								}
 							}
+							stopSelf();
 						}
 					});
 				}

@@ -48,6 +48,10 @@ public class Schedule implements Serializable {
 	private static final SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
 
 	private Map<String, StationInterval> goodStations = new HashMap<String, StationInterval>();
+	
+	public Map<String,StationInterval> getGoodStations() {
+		return goodStations;
+	}
 
 	public Schedule() {
 	}

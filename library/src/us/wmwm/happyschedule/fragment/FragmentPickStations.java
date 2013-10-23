@@ -99,7 +99,7 @@ public class FragmentPickStations extends Fragment implements IPrimary {
 	@Override
 	public void onPrepareOptionsMenu(Menu menu) {
 		super.onPrepareOptionsMenu(menu);
-		if (reverseButton.getVisibility() != View.VISIBLE) {
+		if (reverseButton==null || reverseButton.getVisibility() != View.VISIBLE) {
 			menu.removeItem(R.id.menu_reverse);
 		}
 		//ShareCompat.configureMenuItem(menu, R.id.menu_share, Share.intent(getActivity()));

@@ -19,6 +19,7 @@ import android.app.ActionBar;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentManager.BackStackEntry;
 import android.support.v4.app.FragmentManager.OnBackStackChangedListener;
 import android.support.v4.app.FragmentTransaction;
@@ -104,8 +105,12 @@ public class FragmentMain extends Fragment {
 		handler.post(new Runnable() {
 			@Override
 			public void run() {
+				FragmentManager fm = getFragmentManager();
+				if(fm==null) {
+					return;
+				}
 				final FragmentMainAdapter fma = new FragmentMainAdapter(
-						getFragmentManager());
+						fm);
 				pager.setAdapter(fma);
 				pager.setCurrentItem(1);
 				fma.setOnGetScheduleListener(onGetSchedule = new OnGetSchedule() {

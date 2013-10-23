@@ -45,6 +45,8 @@ public class HappyStream {
 	private static Connection conn;
 
 	private static String apiKey;
+	
+	private static String screenname;
 
 	public static void main(String[] args) {
 		Connection connection = null;
@@ -63,6 +65,7 @@ public class HappyStream {
 		twitterStream.setOAuthConsumer(args[0], args[1]);
 		twitterStream.setOAuthAccessToken(new AccessToken(args[2], args[3]));
 		apiKey = args[4];
+		screenname = args[6];
 		UserStreamListener l = new UserStreamListener() {
 
 			@Override
@@ -389,6 +392,7 @@ public class HappyStream {
 							notRegistered.add(userIds.get(i));							
 						}
 					}
+					//if(ob.has("registration_id"))
 				}
 				//saveSentNotification(status, successfuls);
 				deletePushIds(HappyStream.conn, notRegistered);
@@ -418,7 +422,7 @@ public class HappyStream {
 		InputStream in = null;
 		ResultSet users = null;
 		try {			
-			if (status.getUser().getScreenName().equalsIgnoreCase("nj_rails")) {
+			if (status.getUser().getScreenName().equalsIgnoreCase(screenname)) {
 				users = findAllUsers(status,lastUserId, 1000);
 			} else {
 				Calendar cal = Calendar.getInstance();

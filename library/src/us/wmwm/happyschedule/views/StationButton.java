@@ -21,7 +21,7 @@ public class StationButton extends RelativeLayout {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		text = (TextView) findViewById(R.id.departure_id);
+		text = (TextView) findViewById(R.id.text_id);
 	}
 	
 	public void setHint(String txt) {

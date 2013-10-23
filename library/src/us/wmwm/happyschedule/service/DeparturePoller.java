@@ -18,6 +18,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import us.wmwm.happyschedule.model.AppConfig;
+import us.wmwm.happyschedule.model.StationInterval;
 import us.wmwm.happyschedule.model.TrainStatus;
 import android.util.Log;
 
@@ -125,5 +126,9 @@ public class DeparturePoller implements Poller {
 	@Override
 	public boolean isArrivalStationRequired() {
 		return false;
+	}
+	
+	public Map<String, FareType> getFareTypes(Map<String,StationInterval> inter) {
+		return Collections.emptyMap();
 	}
 }

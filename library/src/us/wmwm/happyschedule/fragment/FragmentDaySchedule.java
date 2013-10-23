@@ -3,6 +3,7 @@ package us.wmwm.happyschedule.fragment;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -35,10 +36,10 @@ import us.wmwm.happyschedule.model.StationInterval;
 import us.wmwm.happyschedule.model.StationToStation;
 import us.wmwm.happyschedule.model.TrainStatus;
 import us.wmwm.happyschedule.model.Type;
+import us.wmwm.happyschedule.service.FareType;
 import us.wmwm.happyschedule.service.Poller;
 import us.wmwm.happyschedule.util.Share;
 import us.wmwm.happyschedule.util.Streams;
-import us.wmwm.happyschedule.views.EmptyView;
 import us.wmwm.happyschedule.views.ScheduleControlsView;
 import us.wmwm.happyschedule.views.ScheduleControlsView.ScheduleControlListener;
 import us.wmwm.happyschedule.views.ScheduleView;
@@ -49,12 +50,17 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.ShareCompat;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.util.Log;
@@ -63,6 +69,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup.LayoutParams;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListView;
@@ -180,9 +188,48 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 			} else {
 				list.setVisibility(View.VISIBLE);
 			}
-			if (adapter.getGroupCount() == 0) {
-				EmptyView v = new EmptyView(activity);
-				root.addView(v);
+			if (adapter.getGroupCount() == 0) {				
+				View view = LayoutInflater.from(activity).inflate(R.layout.view_help, null);
+				view.setOnClickListener(new OnClickListener() {
+					
+					@Override
+					public void onClick(View v) {
+						Intent intent = new Intent(Intent.ACTION_SENDTO);
+						intent.setType("text/plain");
+						intent.putExtra(Intent.EXTRA_EMAIL, "feedback@wmwm.us");
+						String appName = getString(R.string.app_name);
+						intent.putExtra(Intent.EXTRA_SUBJECT, appName + " Feedback");
+						StringBuilder b = new StringBuilder();
+						PackageInfo pinfo = null;
+						try {
+							pinfo = getActivity().getPackageManager().getPackageInfo(getActivity().getPackageName(), 0);
+						} catch (NameNotFoundException e) {
+							throw new RuntimeException("no app");
+						}
+						b.append(appName).append("\n\n");
+						b.append("From: ").append(from.getName() + " (").append(from.getId()).append(")").append("\n");
+						b.append("To: ").append(to.getName() + " (").append(to.getId()).append(")").append("\n");
+						b.append("Date: " + day.toString()).append("\n");
+						b.append("Time: " + Calendar.getInstance().getTime()).append("\n");
+						b.append("Version: " + pinfo.versionCode).append(" (").append(pinfo.versionName).append(")").append("\n");
+						b.append("OS Version: " + Build.VERSION.SDK_INT).append("\n");
+						b.append("Device: " + Build.DEVICE).append("\n");
+						b.append("Model: " + Build.MODEL).append("\n");
+						b.append("Manu: " + Build.MANUFACTURER).append("\n\n");
+						intent.putExtra(Intent.EXTRA_TEXT, b.toString());
+						ShareCompat.IntentBuilder builder = ShareCompat.IntentBuilder.from(getActivity());
+						builder.setType("message/rfc822");
+						builder.addEmailTo("feedback@wmwm.us");
+						builder.setSubject(appName + " Feedback");
+						builder.setChooserTitle("Email");
+						builder.setText(b.toString());
+						builder.startChooser();
+						//startActivity(Intent.createChooser(intent, "Send Email"));
+					}
+				});
+				RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+				lp.addRule(RelativeLayout.CENTER_IN_PARENT);
+				root.addView(view,lp);
 			}
 		}
 	};
@@ -223,29 +270,32 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 										System.currentTimeMillis()).commit();
 					}
 					long time = System.currentTimeMillis();
-					if(poller.isArrivalStationRequired()) {
+					if (poller.isArrivalStationRequired()) {
 						for (TrainStatus status : s) {
 							Log.d(FragmentDaySchedule.class.getSimpleName(),
 									status.toString());
 							for (int i = 0; i < o.size(); i++) {
 								StationToStation sts = o.get(i);
-	
+
 								if (sts.blockId.endsWith(status.getTrain())) {
 									if (HOURMINUTE.format(
-											sts.getDepartTime().getTime()).equals(
-											status.getDeparts())) {
-	
+											sts.getDepartTime().getTime())
+											.equals(status.getDeparts())) {
+
 									} else {
-										System.out.println("not a match " + sts + " vs " + status.getDeparts());
+										System.out.println("not a match " + sts
+												+ " vs " + status.getDeparts());
 									}
-									tripIdToTrainStatus.put(sts.blockId, status);
+									tripIdToTrainStatus
+											.put(sts.blockId, status);
 								}
 							}
 						}
 					} else {
 						for (TrainStatus status : s) {
 							Log.d(FragmentDaySchedule.class.getSimpleName(),
-									status.getTrain() + " : " + status.getStatus());
+									status.getTrain() + " : "
+											+ status.getStatus());
 							tripIdToTrainStatus.put(status.getTrain(), status);
 						}
 					}
@@ -381,8 +431,8 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 				});
 				handler.post(populateAdpter);
 				try {
-					String str = Streams
-							.readFully(Streams.getStream("config.json"));
+					String str = Streams.readFully(Streams
+							.getStream("config.json"));
 					// Log.d(TAG, str);
 					appConfig = new AppConfig(new JSONObject(str));
 				} catch (Exception e) {
@@ -390,6 +440,23 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 					Log.e(TAG, "can't parse appConfig", e);
 				}
 				ThreadHelper.getScheduler().submit(r);
+				ThreadHelper.getScheduler().submit(new Runnable() {
+					@Override
+					public void run() {
+						try {
+							// TripInfo info =
+							// ScheduleDao.get().getStationTimesForTripId(sts.tripId,0,Integer.MAX_VALUE);
+							Map<String, FareType> f = poller
+									.getFareTypes(schedule.getGoodStations());
+							for (Map.Entry<String, FareType> e : f.entrySet()) {
+								System.out.println(e.getKey() + " "
+										+ e.getValue().name());
+							}
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+				});
 				Log.i(TAG, "SUCCESSFUL SCHEDULE");
 			} catch (Exception e) {
 				Log.e(TAG, "UNSUCCESSFUL SCHEDULE", e);
@@ -786,6 +853,15 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 		}
 		if (item.getItemId() == R.id.menu_departurevision) {
 			onDepartureVision.onDepartureVision(from, to);
+			return true;
+		}
+		if (item.getItemId() == R.id.menu_rate) {
+			FlurryAgent.logEvent("Rate",
+					Collections.singletonMap("time", new Date().toString()));
+			Intent i = new Intent(Intent.ACTION_VIEW);
+			i.setData(Uri.parse(getActivity().getString(R.string.share)
+					+ getActivity().getPackageName()));
+			startActivity(i);
 			return true;
 		}
 		if (item.getItemId() == R.id.menu_share) {

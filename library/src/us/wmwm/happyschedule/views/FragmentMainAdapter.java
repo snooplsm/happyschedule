@@ -141,19 +141,19 @@ public class FragmentMainAdapter extends FragmentStatePagerAdapter {
 	@Override
 	public CharSequence getPageTitle(int position) {
 		if (position == 0) {
-			return "History";
+			return " History ";
 		}
 		if (position == 1) {
-			return "Schedule";
+			return " Schedule ";
 		}
 		if (position > 1) {
 			Station station = getDepartureVision(position);
 			if (station == null) {
-				return "Departurevision";
+				return " Departurevision ";
 			}
-			return station.getName();
+			return " " + station.getName() + " ";
 		}
-		return "Schedule";
+		return " Schedule ";
 	}
 
 }

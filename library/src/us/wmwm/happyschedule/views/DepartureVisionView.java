@@ -10,6 +10,7 @@ import us.wmwm.happyschedule.model.TrainStatus;
 
 import android.content.Context;
 import android.text.TextUtils;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.RelativeLayout;
@@ -23,6 +24,7 @@ public class DepartureVisionView extends RelativeLayout {
 	TextView track;
 	View trackContainer;
 	TextView time;
+	float one,two,three,four;
 
 	public DepartureVisionView(Context context) {
 		super(context);
@@ -34,6 +36,10 @@ public class DepartureVisionView extends RelativeLayout {
 		track = (TextView) findViewById(R.id.track);
 		trackContainer = findViewById(R.id.track_container);
 		time = (TextView) findViewById(R.id.time);
+		one = getResources().getDimensionPixelSize(R.dimen.departure_vision_one);
+		two = getResources().getDimensionPixelSize(R.dimen.departure_vision_two);
+		three = getResources().getDimensionPixelSize(R.dimen.departure_vision_three);
+		four = getResources().getDimensionPixelSize(R.dimen.departure_vision_four);
 	}
 
 	public void setData(TrainStatus status, Map<String,LineStyle> keyToColor) {
@@ -55,6 +61,19 @@ public class DepartureVisionView extends RelativeLayout {
 		} else {
 			track.setVisibility(View.VISIBLE);
 			track.setText(status.getTrack());
+			int len = status.getTrack().length();
+			float size;
+			if(len==1) {
+				size = one;
+			}else
+			if(len==2) {
+				size = two;
+			} else if (len==3){
+				size = three;
+			} else {
+				size = four;
+			}
+			track.setTextSize(size);
 		}
 		time.setText(status.getDeparts());
 		

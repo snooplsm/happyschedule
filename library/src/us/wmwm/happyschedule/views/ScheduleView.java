@@ -37,6 +37,8 @@ public class ScheduleView extends RelativeLayout {
 	View trainInfoContainer;
 	TextView connections;
 	RelativeLayout.LayoutParams trainInfoContainerParams;
+	float one,two,three,four;
+	
 
 	static DateFormat TIME = DateFormat.getTimeInstance(DateFormat.SHORT);
 	public static DateFormat times = new SimpleDateFormat("h:mm aa");
@@ -65,6 +67,10 @@ public class ScheduleView extends RelativeLayout {
 		trainInfoContainer = findViewById(R.id.train_info_container);
 		trainInfoContainerParams = (RelativeLayout.LayoutParams) trainInfoContainer.getLayoutParams();
 		bg = getBackground();
+		one = getResources().getDimensionPixelSize(R.dimen.departure_vision_one);
+		two = getResources().getDimensionPixelSize(R.dimen.departure_vision_two);
+		three = getResources().getDimensionPixelSize(R.dimen.departure_vision_three);
+		four = getResources().getDimensionPixelSize(R.dimen.departure_vision_four);
 	}
 
 	public ScheduleView(Context context, AttributeSet attrs) {
@@ -285,6 +291,20 @@ public class ScheduleView extends RelativeLayout {
 					track2.setVisibility(View.GONE);
 					track.setVisibility(View.VISIBLE);
 				}
+				int len = trainStatus.getTrack().trim().length();
+				float size;
+				if(len==1) {
+					size = one;
+				}else
+				if(len==2) {
+					size = two;
+				} else if (len==2){
+					size = three;
+				} else {
+					size = four;
+				}
+				track2.setTextSize(size);
+				track.setTextSize(size);
 				track.setText(trainStatus.getTrack().trim());
 				track2.setText(trainStatus.getTrack().trim());
 			} else {

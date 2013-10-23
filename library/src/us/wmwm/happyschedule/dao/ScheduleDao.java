@@ -20,6 +20,7 @@ import us.wmwm.happyschedule.model.ConnectionInterval;
 import us.wmwm.happyschedule.model.Favorite;
 import us.wmwm.happyschedule.model.Schedule;
 import us.wmwm.happyschedule.model.Service;
+import us.wmwm.happyschedule.model.StationToStation;
 import us.wmwm.happyschedule.model.StopTime;
 import us.wmwm.happyschedule.model.TripInfo;
 import android.content.Context;
@@ -71,7 +72,7 @@ public class ScheduleDao {
 		}
 		return null;
 	}
-
+	
 	public TripInfo getStationTimesForTripId(String tripId, int departSequence, int arriveSequence) {
 		Cursor c = Db.get().db.rawQuery("select stop_id,depart,arrive,route_id from nested_trip where trip_id=? and lft between ? and ? order by lft asc", new String[]{tripId, String.valueOf(departSequence), String.valueOf(arriveSequence)});
 		TripInfo info = new TripInfo();
@@ -84,7 +85,8 @@ public class ScheduleDao {
 			String routeId = c.getString(3);
 			info.routeId = routeId;
 			TripInfo.Stop stop = new TripInfo.Stop();
-			whatis.put(stopId, stop);		
+			whatis.put(stopId, stop);
+			stop.id = stopId;
 			try {
 				Calendar cal = Calendar.getInstance();
 				cal.setTime(timeFormat.parse(departure));

@@ -1,6 +1,8 @@
 package us.wmwm.happyschedule.fragment;
 
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
 import twitter4j.Status;
 import twitter4j.URLEntity;
@@ -21,6 +23,7 @@ import android.webkit.WebViewClient;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.flurry.android.FlurryAgent;
 import com.squareup.picasso.Picasso;
 
 public class FragmentTweet extends HappyFragment {
@@ -91,7 +94,10 @@ public class FragmentTweet extends HappyFragment {
 		if(url!=null) {
 			webView.loadUrl(url);
 		}
-		
+		Map<String,String> k = new HashMap<String,String>();
+		k.put("url", String.format("https://twitter.com/%s/status/%s",status.getUser().getScreenName(),status.getId()));
+		k.put("status", text.toString());
+		FlurryAgent.logEvent("TweetView", k);
 	}
 
 	public static FragmentTweet newInstance(Status status) {

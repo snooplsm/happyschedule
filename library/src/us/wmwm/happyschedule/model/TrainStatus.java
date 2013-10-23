@@ -87,6 +87,9 @@ public class TrainStatus implements Serializable {
 	}
 
 	public String getStatus() {
+		if(status==null) {
+			return "";
+		}
 		return status;
 	}
 

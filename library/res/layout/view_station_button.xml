@@ -7,7 +7,7 @@
     <TextView
         android:layout_marginLeft="@dimen/view_station_button_marginLeft"
         android:layout_marginRight="@dimen/view_station_button_marginRight"
-        android:id="@+id/departure_id"
+        android:id="@+id/text_id"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center_vertical"

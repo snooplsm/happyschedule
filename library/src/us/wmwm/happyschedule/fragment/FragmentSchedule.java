@@ -56,8 +56,8 @@ public class FragmentSchedule extends Fragment {
 						.beginTransaction()
 						.replace(
 								R.id.fragment_date_picker,
-								FragmentDepartureVision.newInstance(station, 
-										arrival,null, true))
+								FragmentDepartureVision.newInstance(station,
+										arrival, null, true))
 						.addToBackStack(null)
 						.setBreadCrumbTitle(
 								"DepartureVision @ " + station.getName())
@@ -69,11 +69,11 @@ public class FragmentSchedule extends Fragment {
 	};
 
 	OnGetSchedule onGetSchedule;
-	
+
 	public void setOnGetSchedule(OnGetSchedule onGetSchedule) {
 		this.onGetSchedule = onGetSchedule;
 	}
-	
+
 	ScheduleControlListener controlListener = new ScheduleControlListener() {
 
 		@Override
@@ -81,7 +81,8 @@ public class FragmentSchedule extends Fragment {
 			FragmentTrip t = FragmentTrip.newInstance(from, to,
 					stationToStation, schedule);
 			getFragmentManager().beginTransaction()
-					.replace(R.id.fragment_date_picker, t).addToBackStack(null).setBreadCrumbTitle(from.getName() + " to " + to.getName())
+					.replace(R.id.fragment_date_picker, t).addToBackStack(null)
+					.setBreadCrumbTitle(from.getName() + " to " + to.getName())
 					.commit();
 		}
 
@@ -108,8 +109,9 @@ public class FragmentSchedule extends Fragment {
 			// TODO Auto-generated method stub
 
 		}
-		
-		public void onShare(Schedule schedule, StationToStation stationToStation) {};
+
+		public void onShare(Schedule schedule, StationToStation stationToStation) {
+		};
 	};
 
 	private static final String TAG = FragmentSchedule.class.getSimpleName();
@@ -128,10 +130,10 @@ public class FragmentSchedule extends Fragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 	}
-	
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		FlurryAgent.logEvent(item.getTitle()+"MenuItemSelected");
+		FlurryAgent.logEvent(item.getTitle() + "MenuItemSelected");
 		if (item.getItemId() == R.id.menu_change_day) {
 			final FragmentDatePicker picker = FragmentDatePicker
 					.newInstance(adapter.getCalendar(pager.getCurrentItem())
@@ -142,10 +144,10 @@ public class FragmentSchedule extends Fragment {
 				@Override
 				public void onDateSelected(Date date) {
 					getFragmentManager().popBackStack();
-//					FragmentTransaction ft = getFragmentManager()
-//							.beginTransaction();
-//					ft.remove(picker);
-//					ft.commit();
+					// FragmentTransaction ft = getFragmentManager()
+					// .beginTransaction();
+					// ft.remove(picker);
+					// ft.commit();
 					pager.setCurrentItem(adapter.getPositionFor(date));
 				}
 			});
@@ -158,7 +160,7 @@ public class FragmentSchedule extends Fragment {
 		if (item.getItemId() == R.id.menu_go_to_today) {
 			pager.setCurrentItem(adapter.getTodaysPosition());
 		}
-		if(item.getItemId()==R.id.menu_reverse_in) {
+		if (item.getItemId() == R.id.menu_reverse_in) {
 			onGetSchedule.onGetSchedule(to, from);
 		}
 		return super.onOptionsItemSelected(item);
@@ -181,13 +183,15 @@ public class FragmentSchedule extends Fragment {
 				pager.setCurrentItem(adapter.getTodaysPosition());
 			}
 		});
-		
+
 		ThreadHelper.getScheduler().submit(new Runnable() {
 			@Override
 			public void run() {
 				try {
-					AppConfig config = new AppConfig(new JSONObject(Streams.readFully(Streams.getStream("config.json"))));
-					final AppAd ad = config.getBestAd(getActivity(),FragmentSchedule.class);
+					AppConfig config = new AppConfig(new JSONObject(Streams
+							.readFully(Streams.getStream("config.json"))));
+					final AppAd ad = config.getBestAd(getActivity(),
+							FragmentSchedule.class);
 					if (ad != null) {
 						handler.post(new Runnable() {
 							@Override
@@ -229,9 +233,15 @@ public class FragmentSchedule extends Fragment {
 					@Override
 					public void run() {
 						try {
-							FragmentGoogleAd gad = new FragmentGoogleAd();
-							getFragmentManager().beginTransaction()
-									.replace(R.id.fragment_schedule_ad, gad).commit();
+							if (getView() != null
+									&& getView().findViewById(R.id.fragment_schedule_ad) != null) {
+								FragmentGoogleAd gad = new FragmentGoogleAd();
+								
+								getFragmentManager().beginTransaction()
+										.replace(R.id.fragment_schedule_ad, gad)
+										.commit();
+							}
+							
 						} catch (Exception e) {
 
 						}
@@ -239,8 +249,16 @@ public class FragmentSchedule extends Fragment {
 				});
 			}
 		});
-		getFragmentManager().beginTransaction().replace(R.id.fragment_schedule_ad, ad)
-				.commit();
+
+		if (getView() != null
+				&& getView().findViewById(R.id.fragment_schedule_ad) != null) {
+			try {
+				getFragmentManager().beginTransaction()
+						.replace(R.id.fragment_schedule_ad, ad).commit();
+			} catch (Exception e) {
+
+			}
+		}
 
 	}
 
