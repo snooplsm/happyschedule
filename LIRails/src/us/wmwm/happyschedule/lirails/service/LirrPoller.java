@@ -7,18 +7,26 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import us.wmwm.happyschedule.dao.ScheduleDao;
 import us.wmwm.happyschedule.model.AppConfig;
+import us.wmwm.happyschedule.model.StationInterval;
 import us.wmwm.happyschedule.model.TrainStatus;
+import us.wmwm.happyschedule.model.TripInfo;
+import us.wmwm.happyschedule.model.TripInfo.Stop;
+import us.wmwm.happyschedule.service.FareType;
 import us.wmwm.happyschedule.service.Poller;
 import android.util.Log;
 
@@ -32,6 +40,79 @@ public class LirrPoller implements Poller {
 	private static final String TO = "TO";
 	private static final String ARRIVE = "Sched Arr";
 	private static final String DEPARTS = "Departs";
+	
+	private static Set<String> NEW_YORK_IDS = new HashSet<String>();
+	
+	static {
+		NEW_YORK_IDS.add("8");//PENN STATION
+		NEW_YORK_IDS.add("9");//WOODSIDE
+		NEW_YORK_IDS.add("1");//LONG ISLAND CITY
+		NEW_YORK_IDS.add("2");//HUNTERSPOINT AVE
+		NEW_YORK_IDS.add("17");//METS-willet
+		NEW_YORK_IDS.add("10");//forrest hills
+		NEW_YORK_IDS.add("11");//kew gardens
+		NEW_YORK_IDS.add("15");//jamaica
+		NEW_YORK_IDS.add("14");//east new york
+		NEW_YORK_IDS.add("13");//nostrand ave
+		NEW_YORK_IDS.add("12");//atlatnci terminal
+	}	
+	
+	public Map<String, FareType> getFareTypes(Map<String,StationInterval> inter) {
+		Map<String,FareType> tinfo = new HashMap<String,FareType>();
+		for(Map.Entry<String, StationInterval> e : inter.entrySet()) {
+			TripInfo info = ScheduleDao.get().getStationTimesForTripId(e.getKey(), 0, Integer.MAX_VALUE);
+			if(info.stops!=null && info.stops.size()>0) {
+				Stop first = info.stops.get(0);
+				Stop last = info.stops.get(info.stops.size()-1);
+				Calendar arrive = last.arrive;
+				Calendar depart = first.depart;
+				if(arrive.get(Calendar.DAY_OF_WEEK)==Calendar.SATURDAY||arrive.get(Calendar.DAY_OF_WEEK)==Calendar.SUNDAY) {
+					if(depart.get(Calendar.DAY_OF_WEEK)==Calendar.SATURDAY||depart.get(Calendar.DAY_OF_WEEK)==Calendar.SUNDAY) {
+						tinfo.put(e.getKey(), FareType.OFFPEAK);
+						continue;
+					}
+				}
+				if(NEW_YORK_IDS.contains(first.id)) {
+					int departHour = depart.get(Calendar.HOUR_OF_DAY);
+					int day = depart.get(Calendar.DAY_OF_WEEK);
+					if(departHour>=16 && departHour<=20) {
+						if(day!=Calendar.SUNDAY && day!=Calendar.MONDAY) {
+							tinfo.put(e.getKey(), FareType.PEAK);
+							continue;
+						}
+					} else {
+						tinfo.put(e.getKey(), FareType.OFFPEAK);
+					}
+				}
+				Stop earliestNYC = null;
+				for(int i = info.stops.size()-1; i>0; i--) {
+					Stop stop = info.stops.get(i);
+					if(NEW_YORK_IDS.contains(stop.id)) {
+						earliestNYC = stop;
+					} else {
+						break;
+					}
+				}
+				if(earliestNYC==null) {
+					tinfo.put(e.getKey(), FareType.OFFPEAK);
+					continue;
+				}
+				int arriveHour = earliestNYC.arrive.get(Calendar.HOUR_OF_DAY);
+				int day = earliestNYC.arrive.get(Calendar.DAY_OF_WEEK);
+				if(arriveHour>=6 && arriveHour<=10) {
+					if(day!=Calendar.SUNDAY && day!=Calendar.MONDAY) {
+						tinfo.put(e.getKey(), FareType.PEAK);
+						continue;
+					}
+				} else {
+					tinfo.put(e.getKey(), FareType.OFFPEAK);
+				}
+				
+			}
+		}
+		
+		return tinfo;
+	}
 	
 	@Override
 	public List<TrainStatus> getTrainStatuses(AppConfig config, String station, String stationB) throws IOException {
@@ -134,7 +215,7 @@ public class LirrPoller implements Poller {
 					tstatus.setTrack(track.text().trim());
 					tstatus.setTrain(train.trim());
 					tstatus.setLine(lline.text().trim());
-					//tstatus.setDest(to.text());
+					tstatus.setDest(lline.text().trim());
 					tstatus.setDeparts(departs.text().replaceAll("AM", "").replaceAll("PM", "").trim());
 					tstatus.setArrives(arrives.text().replaceAll("AM", "").replaceAll("PM", "").trim());
 					statuses.add(tstatus);

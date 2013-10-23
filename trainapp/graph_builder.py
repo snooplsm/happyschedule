@@ -364,6 +364,7 @@ def buildGraph(agencies) :
 		exceptionType = headers["exception_type"]
 		dateServices = []
 #		print headers
+		c = conn.cursor()
 		for row in serviceReader:
 			if(len(row)!=3):
 				continue
@@ -372,69 +373,69 @@ def buildGraph(agencies) :
 			service["date"] = row[date]
 			service["exceptionType"] = row[exceptionType]
 			dateServices.append(service)
-			c.execute("INSERT INTO service(service_id,date) values(?,?)",(prepend+row[serviceIdPos],row[date]))
+			# c.execute("INSERT INTO service(service_id,date) values(?,?)",(prepend+row[serviceIdPos],row[date]))
+			# 		conn.commit()
+		if os.path.exists(folder+"/calendar.txt"):
+			calServices = []
+			serviceReader = csv.reader(open(folder+"/calendar.txt","rb"))
+			headers = {}
+			for row in serviceReader:
+				for i in range(len(row)):
+					headers[row[i].lower().split(" ")[0]] = i
+				break
+			serviceIdPos = headers["service_id"]	
+			mondayPos = headers["monday"]
+			tuesdayPos = headers["tuesday"]
+			wednesdayPos = headers["wednesday"]
+			thursdayPos = headers["thursday"]
+			fridayPos = headers["friday"]
+			saturdayPos = headers["saturday"]
+			sundayPos = headers["sunday"]
+			startPos = headers["start_date"]
+			endPos = headers["end_date"]
+			newServices = []
+			for row in serviceReader:
+				startDate = datetime.strptime(row[startPos],"%Y%m%d")
+				endDate = datetime.strptime(row[endPos],"%Y%m%d")
+				print startDate,endDate
+				curr = startDate					
+				while(tk.mktime(curr.timetuple()) <= tk.mktime(endDate.timetuple())):
+					print curr						
+					day = curr.isoweekday()
+					if(day==1 and row[mondayPos]=="1"
+					or day==2 and row[tuesdayPos]=="1"
+					or day==3 and row[wednesdayPos]=="1"
+					or day==4 and row[thursdayPos]=="1"
+					or day==5 and row[fridayPos]=="1"
+					or day==6 and row[saturdayPos]=="1"
+					or day==7 and row[sundayPos]=="1"):
+						s = {}
+						s["id"] = row[serviceIdPos]
+						s["date"] = curr.strftime("%Y%m%d")
+						s["exceptionType"] = "1"
+						newServices.append(s)
+					curr += timedelta(days=1)
+				calServices.append(newServices)
+			for dateService in dateServices:
+				if dateService["exceptionType"]=="2":
+					print len(newServices)
+					todelete = []				
+					for k in range(0,len(newServices)):
+						check = newServices[k]					
+						if(check["id"]==dateService["id"] and check["date"]==dateService["date"]):
+							todelete.append(k)
+					print todelete
+					todelete.reverse()
+					print todelete
+#					raw_input("wha?")
+					for k in range(0, len(todelete)):
+						print len(newServices)
+						# raw_input("deleting "+str(todelete[k]))
+						del newServices[todelete[k]]
+			dateServices.extend(newServices)
+		for service in dateServices:
+			c.execute("INSERT INTO service(service_id,date) values(?,?)",(service["id"],service["date"]))
 		conn.commit()
-		# if os.path.exists(folder+"/calendar.txt"):
-		# 	calServices = []
-		# 	serviceReader = csv.reader(open(folder+"/calendar.txt","rb"))
-		# 	headers = {}
-		# 	for row in serviceReader:
-		# 		for i in range(len(row)):
-		# 			headers[row[i].lower().split(" ")[0]] = i
-		# 		break
-		# 	serviceIdPos = headers["service_id"]	
-		# 	mondayPos = headers["monday"]
-		# 	tuesdayPos = headers["tuesday"]
-		# 	wednesdayPos = headers["wednesday"]
-		# 	thursdayPos = headers["thursday"]
-		# 	fridayPos = headers["friday"]
-		# 	saturdayPos = headers["saturday"]
-		# 	sundayPos = headers["sunday"]
-		# 	startPos = headers["start_date"]
-		# 	endPos = headers["end_date"]
-		# 	newServices = []
-		# 	for row in serviceReader:
-		# 		startDate = datetime.strptime(row[startPos],"%Y%m%d")
-		# 		endDate = datetime.strptime(row[endPos],"%Y%m%d")
-		# 		print startDate,endDate
-		# 		curr = startDate					
-		# 		while(tk.mktime(curr.timetuple()) <= tk.mktime(endDate.timetuple())):
-		# 			print curr						
-		# 			day = curr.isoweekday()
-		# 			if(day==1 and row[mondayPos]=="1"
-		# 			or day==2 and row[tuesdayPos]=="1"
-		# 			or day==3 and row[wednesdayPos]=="1"
-		# 			or day==4 and row[thursdayPos]=="1"
-		# 			or day==5 and row[fridayPos]=="1"
-		# 			or day==6 and row[saturdayPos]=="1"
-		# 			or day==7 and row[sundayPos]=="1"):
-		# 				s = {}
-		# 				s["id"] = row[serviceIdPos]
-		# 				s["date"] = curr.strftime("%Y%m%d")
-		# 				s["exceptionType"] = "1"
-		# 				newServices.append(s)
-		# 			curr += timedelta(days=1)
-		# 		calServices.append(newServices)
-		# for dateService in dateServices:
-		# 	if dateService["exceptionType"]=="2":
-		# 		print len(newServices)
-		# 		todelete = []				
-		# 		for k in range(0,len(newServices)):
-		# 			check = newServices[k]					
-		# 			if(check["id"]==dateService["id"] and check["date"]==dateService["date"]):
-		# 				todelete.append(k)
-		# 		print todelete
-		# 		todelete.reverse()
-		# 		print todelete
-		# 		raw_input("wha?")
-		# 		for k in range(0, len(todelete)):
-		# 			print len(newServices)
-		# 			raw_input("deleting "+str(todelete[k]))
-		# 			del newServices[todelete[k]]
-#		dateServices.extend(newServices)
-#		for service in dateServices:
-#			c.execute("INSERT INTO service(service_id,date) values(?,?)",(service["id"],service["date"]))
-#		conn.commit()
 #		print dateServices
 #		raw_input("ok")
 		tripReader = csv.reader(open(folder+"/trips.txt","rb"))
@@ -449,6 +450,7 @@ def buildGraph(agencies) :
 		directionPos = headers["direction_id"] if "direction_id" in headers else None
 		shapePos = headers["shape_id"]
 		servicePos = headers["service_id"]
+		shortNamePos = headers["trip_short_name"]
 		tripPos = headers["trip_id"]
 		routePos = headers["route_id"]
 		for row in tripReader:
@@ -465,6 +467,7 @@ def buildGraph(agencies) :
 			routeId = prepend+row[routePos].split(" ")[0]
 			trip['service_id'] = serviceId
 			trip['route_id'] = routeId
+			trip['trip_short_name'] = row[shortNamePos].split(" ")[0]
 			routeInfo[routeId] = {}
 			trips[tripId] = trip
 		stopReader = csv.reader(open(folder+"/stop_times.txt","rb"))
@@ -616,8 +619,8 @@ def buildGraph(agencies) :
 	# 	for trip in routeToTrips[routeId]:			
 	# 		stops = tripToStops[trip["id"]]
 						
-	print "strongly connected stations: ",networkx.algorithms.components.strongly_connected.number_strongly_connected_components(G)
-	print "strongly connected routes: ",networkx.algorithms.components.strongly_connected.number_strongly_connected_components(H)
+	# print "strongly connected stations: ",networkx.algorithms.components.strongly_connected.number_strongly_connected_components(G)
+	# print "strongly connected routes: ",networkx.algorithms.components.strongly_connected.number_strongly_connected_components(H)
 #	draw(G,"stations_before.dot")
 #	draw(H,"route_before.dot")
 #	print "transfers"
@@ -751,8 +754,8 @@ def buildGraph(agencies) :
 						H.add_node(sRoute)
 						if(H.has_edge(route,sRoute)==False):
 							H.add_edge(route,sRoute,{"weight":weight})
-	print "strongly connected stations: ",networkx.algorithms.components.strongly_connected.number_strongly_connected_components(G)
-	print "strongly connected routes: ",networkx.algorithms.components.strongly_connected.number_strongly_connected_components(H)
+	# print "strongly connected stations: ",networkx.algorithms.components.strongly_connected.number_strongly_connected_components(G)
+	# print "strongly connected routes: ",networkx.algorithms.components.strongly_connected.number_strongly_connected_components(H)
 #	draw(G,"stations_after.dot")
 #	draw(H,"routes_after.dot")
 #	raw_input("k?")			
@@ -772,7 +775,7 @@ def buildGraph(agencies) :
 				c.execute("INSERT INTO station_route(station,route) values(?,?)",(stationKey,route))
 		conn.commit()
 				
-	polymap(minLat,minLon,maxLat,maxLon,stations,walks,None,True)
+	# polymap(minLat,minLon,maxLat,maxLon,stations,walks,None,True)
 #	print "trips storage"	
 	tripCount = {}
 	for tripId in tripToStops:
@@ -801,15 +804,18 @@ def buildGraph(agencies) :
 				day = ahour / 24 + 1
 			arriveTime = datetime(1970,1,day,ahour%24,amin,asec)
 			blockId = None
-			if "block_id" in trip:
-				blockId = trip["block_id"]
+			if folder.endswith("metro-north"):
+				blockId = trip["trip_short_name"]
 			else:
-				split = tripId.split("_")
-				if len(split)==1:
-					split = split[0]
+				if "block_id" in trip and len(trip["block_id"])!=0:
+					blockId = trip["block_id"]
 				else:
-					split = split[len(split)-1]
-				blockId = split[-4:]
+					split = tripId.split("_")
+					if len(split)==1:
+						split = split[0]
+					else:
+						split = split[len(split)-1]
+					blockId = split[-4:]
 			c.execute("INSERT INTO nested_trip(lft,rgt,trip_id,service_id,stop_id,depart,arrive,block_id,route_id) values(?,?,?,?,?,?,?,?,?)",(id+1,len(tripToStops[tripId]),tripId,trip["service_id"],stop["id"],stop["depart"],stop["arrive"],blockId,trip["route_id"]))
 			lastStation = stop
 		conn.commit()
@@ -829,7 +835,9 @@ def buildGraph(agencies) :
 			tripId = tripCount[id][ids2]["trip"]
 			if count <= 4:
 				print stations[id]["name"],stations[ids2]["name"],count,tripId
+				
 	patharray = [networkx.algorithms.shortest_paths.weighted.all_pairs_dijkstra_path(G),networkx.algorithms.shortest_paths.unweighted.all_pairs_shortest_path(G)]
+		
 
 	for level in range(0,1):
 		paths = patharray[level]
@@ -1049,7 +1057,7 @@ c.execute("""CREATE TABLE stop (
 		name varchar(150),
         lat integer,
 		lon integer,
-		departure_vision varchar(5),
+		departure_vision varchar(100),
 		alternate_id varchar(100)
 );""")
 c.execute("""CREATE TABLE stop_abbreviations (
@@ -1124,5 +1132,5 @@ for agency,G,H,stations,walks,stopRoutes,tripToStops in results:
 						D.add_edge(agency,agencyp)						
 					c.execute("INSERT INTO agency_transfer_edge(agency_source,agency_target,source,target,duration) values(?,?,?,?,?)",(agency,agencyp,station["id"],stationp["id"],int(round(dist*1.389))))
 		conn.commit()				
-paths = networkx.algorithms.shortest_paths.unweighted.all_pairs_shortest_path(D)
+# paths = networkx.algorithms.shortest_paths.unweighted.all_pairs_shortest_path(D)
 #print paths
