@@ -161,6 +161,8 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 	NotificationManager notifs;
 
 	List<StationToStation> o = null;
+	
+	Map<String,FareType> fareTypes = Collections.emptyMap();
 
 	OnDateChange onDateChange;
 
@@ -446,12 +448,15 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 						try {
 							// TripInfo info =
 							// ScheduleDao.get().getStationTimesForTripId(sts.tripId,0,Integer.MAX_VALUE);
-							Map<String, FareType> f = poller
+							final Map<String, FareType> f = poller
 									.getFareTypes(schedule.getGoodStations());
-							for (Map.Entry<String, FareType> e : f.entrySet()) {
-								System.out.println(e.getKey() + " "
-										+ e.getValue().name());
-							}
+							handler.post(new Runnable() {
+								public void run() {
+									fareTypes = f;
+									adapter.notifyDataSetChanged();
+								};
+							});
+							
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
@@ -694,7 +699,7 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 						}
 
 					});
-					v.setData(tripIdToAlarm.get(sts), schedule, sts);
+					v.setData(tripIdToAlarm.get(sts), schedule, sts,fareTypes!=null ? fareTypes.get(sts.tripId) : null);
 					return v;
 				}
 				return null;
@@ -763,6 +768,7 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 				view.setData(sts, from, to);
 				view.setAlarm(tripIdToAlarm.get(sts));
 				view.setStatus(tripIdToTrainStatus.get(sts.blockId));
+				//view.setFareType(fareTypes.get(sts.tripId));
 				return view;
 			}
 

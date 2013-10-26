@@ -16,6 +16,7 @@ public class StationToStation implements Serializable {
 		public String blockId;
 		public String tripId;
 		public String routeId;
+		public String fareType;
 		
 		public StationToStation(){}
 		
@@ -31,6 +32,7 @@ public class StationToStation implements Serializable {
 			blockId = o.optString("blockId");
 			tripId = o.optString("tripId");
 			routeId = o.optString("routeId");
+			fareType = o.optString("fareType");
 		}
 		
 		public String toJSON() {

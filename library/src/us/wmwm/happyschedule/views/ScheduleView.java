@@ -11,6 +11,7 @@ import us.wmwm.happyschedule.model.Station;
 import us.wmwm.happyschedule.model.StationInterval;
 import us.wmwm.happyschedule.model.StationToStation;
 import us.wmwm.happyschedule.model.TrainStatus;
+import us.wmwm.happyschedule.service.FareType;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
@@ -38,6 +39,7 @@ public class ScheduleView extends RelativeLayout {
 	TextView connections;
 	RelativeLayout.LayoutParams trainInfoContainerParams;
 	float one,two,three,four;
+	TextView peakOffpeak;
 	
 
 	static DateFormat TIME = DateFormat.getTimeInstance(DateFormat.SHORT);
@@ -71,6 +73,7 @@ public class ScheduleView extends RelativeLayout {
 		two = getResources().getDimensionPixelSize(R.dimen.departure_vision_two);
 		three = getResources().getDimensionPixelSize(R.dimen.departure_vision_three);
 		four = getResources().getDimensionPixelSize(R.dimen.departure_vision_four);
+		peakOffpeak = (TextView) findViewById(R.id.peak);
 	}
 
 	public ScheduleView(Context context, AttributeSet attrs) {
@@ -117,6 +120,13 @@ public class ScheduleView extends RelativeLayout {
 			time.setText(shrink(sts.departTime) + " - " + shrink(sts.arriveTime));
 		}
 		
+		if(!TextUtils.isEmpty(sts.fareType)) {
+			this.peakOffpeak.setText(sts.fareType);
+			this.peakOffpeak.setVisibility(View.VISIBLE);
+		} else {
+			this.peakOffpeak.setVisibility(View.GONE);
+		}
+
 	}
 	
 	private void populateExtraInfo(StationInterval sts) {
@@ -312,6 +322,6 @@ public class ScheduleView extends RelativeLayout {
 			}
 		} else {
 			status.setVisibility(View.GONE);
-		}
+		}		
 	}
 }

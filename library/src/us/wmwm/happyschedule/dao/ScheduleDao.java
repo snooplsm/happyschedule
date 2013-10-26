@@ -74,7 +74,7 @@ public class ScheduleDao {
 	}
 	
 	public TripInfo getStationTimesForTripId(String tripId, int departSequence, int arriveSequence) {
-		Cursor c = Db.get().db.rawQuery("select stop_id,depart,arrive,route_id from nested_trip where trip_id=? and lft between ? and ? order by lft asc", new String[]{tripId, String.valueOf(departSequence), String.valueOf(arriveSequence)});
+		Cursor c = Db.get().db.rawQuery("select stop_id,depart,arrive,route_id,fare_type from nested_trip where trip_id=? and lft between ? and ? order by lft asc", new String[]{tripId, String.valueOf(departSequence), String.valueOf(arriveSequence)});
 		TripInfo info = new TripInfo();
 		info.stops = new ArrayList<TripInfo.Stop>(c.getCount());
 		Map<String,TripInfo.Stop> whatis = new HashMap<String,TripInfo.Stop>();
@@ -208,7 +208,7 @@ public class ScheduleDao {
 		Set<String> tripIds = new HashSet<String>();
 		Map<String, String> routeIds = new HashMap<String, String>();
 		String stationsFragment = "stop_id=" + join(p, " or stop_id=");
-		String query = "select a1.depart,a1.arrive,a1.service_id,a1.trip_id,a1.block_id,a1.route_id,a1.stop_id,a1.lft from nested_trip a1 where a1.stop_id=? or a1.stop_id=? and a1.service_id in (select service_id from service where date in(:foo))";
+		String query = "select a1.depart,a1.arrive,a1.service_id,a1.trip_id,a1.block_id,a1.route_id,a1.stop_id,a1.lft,a1.fare_type from nested_trip a1 where a1.stop_id=? or a1.stop_id=? and a1.service_id in (select service_id from service where date in(:foo))";
 		for(int j = 0; j < levels; j++) {
 			//System.out.println("level " + j);
 			for (int i = 0; i < pairs.get(j).length; i++) {
@@ -243,8 +243,9 @@ public class ScheduleDao {
 					String tripId = qur.getString(3);
 					String blockId = qur.getString(4);
 					String routeId = qur.getString(5);
-					String stopId = qur.getString(6);
+					String stopId = qur.getString(6);					
 					int seq = qur.getInt(7);
+					String fareType = qur.getString(8);
 					routeIds.put(routeId, "");
 					ConnectionInterval interval = new ConnectionInterval();
 					interval.tripId = tripId;
@@ -257,6 +258,7 @@ public class ScheduleDao {
 					interval.sourceId = stopId;
 					interval.targetId = stopId;
 					interval.blockId = blockId;
+					interval.fareType = fareType;
 					serviceIds.add(serviceId);
 					//System.out.println(tripToConnectionIntervals.size() + " " + tripId);
 					List<ConnectionInterval> cin = tripToConnectionIntervals

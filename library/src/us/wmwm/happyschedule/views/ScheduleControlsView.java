@@ -4,14 +4,15 @@ package us.wmwm.happyschedule.views;
 import java.util.List;
 
 import us.wmwm.happyschedule.R;
-import us.wmwm.happyschedule.dao.WDb;
 import us.wmwm.happyschedule.model.Alarm;
 import us.wmwm.happyschedule.model.Schedule;
 import us.wmwm.happyschedule.model.StationToStation;
+import us.wmwm.happyschedule.service.FareType;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 public class ScheduleControlsView extends LinearLayout {
 
@@ -55,6 +56,8 @@ public class ScheduleControlsView extends LinearLayout {
 	
 	View share;
 	
+	TextView fareType;
+	
 	public ScheduleControlsView(Context context) {
 		super(context);
 		LayoutInflater.from(context).inflate(R.layout.view_schedule_controls, this);
@@ -67,9 +70,10 @@ public class ScheduleControlsView extends LinearLayout {
 		share = findViewById(R.id.share);
 		share.setOnClickListener(onClick);
 		alarms = (LinearLayout) findViewById(R.id.alarms);
+		fareType = (TextView) findViewById(R.id.peak);
 	}
 	
-	public void setData(List<Alarm> alarms, Schedule schedule, StationToStation sts) {
+	public void setData(List<Alarm> alarms, Schedule schedule, StationToStation sts,FareType fareType) {
 		this.schedule = schedule;
 		this.stationToStation = sts;
 		if(alarms==null) {
@@ -86,6 +90,9 @@ public class ScheduleControlsView extends LinearLayout {
 //		if(notifs) {
 //			//pin.setI
 //		}
+		if(fareType!=null) {
+			
+		}
 	}
 	
 	public void setListener(ScheduleControlListener listener) {

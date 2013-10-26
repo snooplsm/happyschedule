@@ -13,4 +13,5 @@ public class ConnectionInterval implements Serializable {
 	public String blockId;
 	public int sequence;
 	public String routeId;
+	public String fareType;
 }

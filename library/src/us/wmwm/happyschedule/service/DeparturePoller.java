@@ -6,8 +6,12 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,17 +35,38 @@ public class DeparturePoller implements Poller {
 	private static final String LINE = "LINE";
 	private static final String TO = "TO";
 	private static final String DEPARTS = "DEP";
+	private static final DateFormat DF = new SimpleDateFormat("h:mm");
 	
 	@Override
 	public List<TrainStatus> getTrainStatuses(AppConfig config, String station, String stationB) throws IOException {
+		String[] t = station.split(",");
+		List<TrainStatus> ss = new ArrayList<TrainStatus>();
+		for(String v : t) {
+			ss.addAll(getLittleStatuses(config,v));
+		}
+		Collections.sort(ss,comparator);
+		return ss;
+	}
+	
+	Comparator<TrainStatus> comparator = new Comparator<TrainStatus>() {
+
+		@Override
+		public int compare(TrainStatus arg0, TrainStatus arg1) {
+			try {
+				return DF.parse(arg0.getDeparts()).compareTo(DF.parse(arg1.getDeparts()));
+			} catch (ParseException e) {
+				return 0;
+			}
+		}
+		
+	};
+	
+	private List<TrainStatus> getLittleStatuses(AppConfig config, String station) throws IOException {
 		URL url = null;
 		try {
 			Log.d("DeparturePoller", config+"");
 			Log.d("DeparturePoller", config.getDepartureVision());
 			String u = config.getDepartureVision().replaceAll("\\$stop_id", station);
-			if(stationB!=null) {
-				u = u.replaceAll("\\$end_id", stationB);
-			}
 			Log.d("DeparturePoller", u);
 			url = new URL(u);
 		} catch (MalformedURLException e) {

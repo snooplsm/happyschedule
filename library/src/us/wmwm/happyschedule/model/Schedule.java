@@ -280,6 +280,7 @@ public class Schedule implements Serializable {
 								si.blockId = a.blockId;
 								si.tripId = tripId;
 								si.routeId = a.routeId;
+								si.fareType = a.fareType;
 								si.sequence = i;
 								si.level = level;
 								si.schedule = this;

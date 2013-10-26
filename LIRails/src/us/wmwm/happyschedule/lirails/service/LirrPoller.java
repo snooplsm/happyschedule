@@ -75,13 +75,22 @@ public class LirrPoller implements Poller {
 				if(NEW_YORK_IDS.contains(first.id)) {
 					int departHour = depart.get(Calendar.HOUR_OF_DAY);
 					int day = depart.get(Calendar.DAY_OF_WEEK);
+					int min = depart.get(Calendar.MINUTE);
 					if(departHour>=16 && departHour<=20) {
+						boolean can = true;
+						if(departHour==20) {
+							can = min==0;
+						}
 						if(day!=Calendar.SUNDAY && day!=Calendar.MONDAY) {
-							tinfo.put(e.getKey(), FareType.PEAK);
-							continue;
+							if(can) {
+								tinfo.put(e.getKey(), FareType.PEAK);
+								continue;
+							}
+							
 						}
 					} else {
 						tinfo.put(e.getKey(), FareType.OFFPEAK);
+						continue;
 					}
 				}
 				Stop earliestNYC = null;
@@ -99,10 +108,19 @@ public class LirrPoller implements Poller {
 				}
 				int arriveHour = earliestNYC.arrive.get(Calendar.HOUR_OF_DAY);
 				int day = earliestNYC.arrive.get(Calendar.DAY_OF_WEEK);
+				int min = earliestNYC.arrive.get(Calendar.MINUTE);
 				if(arriveHour>=6 && arriveHour<=10) {
+					boolean can = true;
+					if(arriveHour==10) {
+						can = min==0;
+					}
 					if(day!=Calendar.SUNDAY && day!=Calendar.MONDAY) {
-						tinfo.put(e.getKey(), FareType.PEAK);
-						continue;
+						if(can) {
+							tinfo.put(e.getKey(), FareType.PEAK);
+							continue;
+						} else {
+							tinfo.put(e.getKey(), FareType.OFFPEAK);
+						}
 					}
 				} else {
 					tinfo.put(e.getKey(), FareType.OFFPEAK);
