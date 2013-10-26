@@ -381,12 +381,17 @@ public class HappyStream {
 				JSONArray a = o.getJSONArray("results");
 				List<Long> successfuls = new ArrayList<Long>();
 				List<Long> notRegistered = new ArrayList<Long>();
+				Map<Long,String> replace = new HashMap<Long,String>();
+				
 				for (int i = 0; i < a.length(); i++) {
 					JSONObject ob = a.getJSONObject(i);
 					System.out.println(ob);
 					boolean success = !ob.has("error");
 					if (success) {
-						successfuls.add(userIds.get(i));						
+						successfuls.add(userIds.get(i));
+						if(ob.has("registration_id")) {
+							replace.put(userIds.get(i),ob.getString("registration_id"));
+						}
 					} else {
 						if("NotRegistered".equals(ob.opt("error"))) {
 							notRegistered.add(userIds.get(i));							
@@ -396,6 +401,7 @@ public class HappyStream {
 				}
 				//saveSentNotification(status, successfuls);
 				deletePushIds(HappyStream.conn, notRegistered);
+				fixPushIds(HappyStream.conn,replace);
 			} else {
 				in = conn.getErrorStream();
 				System.err.println(Streams.readFully(in));
@@ -416,6 +422,8 @@ public class HappyStream {
 		}
 		return 0;
 	}
+
+
 
 	public static long processStatus(Status status, Long lastUserId, int offset) throws Exception {
 		HttpURLConnection conn = null;
@@ -540,6 +548,46 @@ public class HappyStream {
 			}
 		}
 		return 0;
+	}
+	
+	private static void fixPushIds(Connection conn, Map<Long, String> replace) throws Exception {
+		System.out.println("trying to fix push ids");
+		PreparedStatement query = conn.prepareStatement("select from user where push_id=?");
+		PreparedStatement update = conn.prepareStatement("update user set push_id=? where user_id=?");
+		boolean before = conn.getAutoCommit();
+		conn.setAutoCommit(false);
+		try {
+			for(Map.Entry<Long, String> e : replace.entrySet()) {
+				query.setString(1, e.getValue());
+				query.execute();
+				ResultSet rs = query.getResultSet();
+				try {
+					if(rs.next()) {
+						String pushId = rs.getString(1);
+						System.out.println("can't replace " + pushId + " for user id " + e.getKey());
+						continue;
+					}
+				} finally {
+					rs.close();
+				}
+				System.out.println("replacing " + e.getKey() + " " + e.getValue());
+				update.setString(1, e.getValue());
+				update.setLong(2, e.getKey());
+				update.addBatch();
+			}
+			update.executeBatch();
+			//stat.executeBatch();
+			//stat2.executeBatch();
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.err.println("rolling back");
+			conn.rollback();
+		} finally {
+			conn.commit();
+			conn.setAutoCommit(before);
+			query.close();
+			update.close();
+		}
 	}
 
 	public static void deletePushIds(Connection conn, List<Long> userIds) throws Exception {
