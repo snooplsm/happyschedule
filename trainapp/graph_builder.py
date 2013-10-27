@@ -8,6 +8,7 @@ import os
 import shutil
 import math
 
+
 def dict_factory(cursor, row):
     d = {}
     for idx, col in enumerate(cursor.description):
@@ -343,7 +344,9 @@ def buildGraph(agencies) :
 			break
 		routeIdPos = headers["route_id"]
 		routeNamePos = headers["route_long_name"]
-		routeShortNamePos = headers["route_short_name"]		
+		routeShortNamePos = None
+		if "route_short_name" in headers:
+			routeShortNamePos =  headers["route_short_name"]
 		for row in routesReader:
 			name = row[routeNamePos]
 			routeId = row[routeIdPos]
@@ -365,12 +368,14 @@ def buildGraph(agencies) :
 		dateServices = []
 #		print headers
 		c = conn.cursor()
+		dateDict = {}
 		for row in serviceReader:
 			if(len(row)!=3):
 				continue
 			service = {}
 			service["id"] = row[serviceIdPos]
 			service["date"] = row[date]
+			service["dateTime"] = datetime.strptime(row[date],"%Y%m%d")
 			service["exceptionType"] = row[exceptionType]
 			dateServices.append(service)
 			# c.execute("INSERT INTO service(service_id,date) values(?,?)",(prepend+row[serviceIdPos],row[date]))
@@ -412,6 +417,7 @@ def buildGraph(agencies) :
 						s = {}
 						s["id"] = row[serviceIdPos]
 						s["date"] = curr.strftime("%Y%m%d")
+						s["dateTime"] = curr
 						s["exceptionType"] = "1"
 						newServices.append(s)
 					curr += timedelta(days=1)
@@ -434,6 +440,7 @@ def buildGraph(agencies) :
 						del newServices[todelete[k]]
 			dateServices.extend(newServices)
 		for service in dateServices:
+			dateDict[service["id"]] = service
 			c.execute("INSERT INTO service(service_id,date) values(?,?)",(service["id"],service["date"]))
 		conn.commit()
 #		print dateServices
@@ -450,7 +457,9 @@ def buildGraph(agencies) :
 		directionPos = headers["direction_id"] if "direction_id" in headers else None
 		shapePos = headers["shape_id"]
 		servicePos = headers["service_id"]
-		shortNamePos = headers["trip_short_name"]
+		shortNamePos = None
+		if "trip_short_name" in headers:
+			shortNamePos = headers["trip_short_name"]
 		tripPos = headers["trip_id"]
 		routePos = headers["route_id"]
 		for row in tripReader:
@@ -467,7 +476,10 @@ def buildGraph(agencies) :
 			routeId = prepend+row[routePos].split(" ")[0]
 			trip['service_id'] = serviceId
 			trip['route_id'] = routeId
-			trip['trip_short_name'] = row[shortNamePos].split(" ")[0]
+			if shortNamePos!=None:
+				trip['trip_short_name'] = row[shortNamePos].split(" ")[0]
+			else:
+				trip['trip_short_name'] = None
 			routeInfo[routeId] = {}
 			trips[tripId] = trip
 		stopReader = csv.reader(open(folder+"/stop_times.txt","rb"))
@@ -507,6 +519,12 @@ def buildGraph(agencies) :
 				stops = tripToStops[tripId]
 			stops.insert(int(sequence),stop)
 	print stations
+	sys.path.append(os.path.abspath('.')+"/overrides/"+sys.argv[1])
+	try :
+		import peak
+	except:
+		sys.path.append(os.path.abspath('.')+"/failover/")
+		import peak
 	for tripId in tripToStops:
 		stops = tripToStops[tripId]
 		trip = trips[tripId]
@@ -516,7 +534,7 @@ def buildGraph(agencies) :
 		routeToTrips[route].append(trip)
 		source = None
 		day = 1
-		lhour = None
+		lhour = None		
 		for position in range(len(stops)):
 			target = stops[position]
 			if source != None:
@@ -582,6 +600,8 @@ def buildGraph(agencies) :
 			else:
 				lhour = target['depart'].split(":")[0]
 			source = target
+			stops[position]["departTime"] = departTime
+			stops[position]["arriveTime"] = arriveTime
 			#				G.add_edge(source,target,{"direction":trips[tripId]['direction'],"route":trips[tripId]['route_id']})
 	# for routeId in routeInfo:
 	# 	raw_input("u mad bro?")
@@ -737,6 +757,8 @@ def buildGraph(agencies) :
 		trip = trips[tripId]
 		stops = tripToStops[tripId]
 		route = trip['route_id']
+		service = trip['service_id']
+		date = dateDict[service]["dateTime"]		
 		weight = 0
 		lastStop = None
 		for position in range(len(stops)):
@@ -783,7 +805,8 @@ def buildGraph(agencies) :
 		ids = set()
 		firstStation = tripToStops[tripId][0]
 		lastStation = firstStation
-		ids.add(lastStation["id"])
+		ids.add(lastStation["id"])		
+		fareType = peak.isPeak(tripId,tripToStops[tripId],dateDict[trip["service_id"]]["dateTime"])
 		for id in range(len(tripToStops[tripId])):       
 			stop = tripToStops[tripId][id]
 			ids.add(stop["id"])			
@@ -816,7 +839,7 @@ def buildGraph(agencies) :
 					else:
 						split = split[len(split)-1]
 					blockId = split[-4:]
-			c.execute("INSERT INTO nested_trip(lft,rgt,trip_id,service_id,stop_id,depart,arrive,block_id,route_id) values(?,?,?,?,?,?,?,?,?)",(id+1,len(tripToStops[tripId]),tripId,trip["service_id"],stop["id"],stop["depart"],stop["arrive"],blockId,trip["route_id"]))
+			c.execute("INSERT INTO nested_trip(lft,rgt,trip_id,service_id,stop_id,depart,arrive,block_id,route_id,fare_type) values(?,?,?,?,?,?,?,?,?,?)",(id+1,len(tripToStops[tripId]),tripId,trip["service_id"],stop["id"],stop["depart"],stop["arrive"],blockId,trip["route_id"],fareType))
 			lastStation = stop
 		conn.commit()
 		for id in ids:
@@ -1010,6 +1033,7 @@ c.execute("""CREATE TABLE nested_trip (
         stop_id VARCHAR(20) NOT NULL,
 		service_id VARCHAR(20) NOT NULL,
 		route_id VARCHAR(20) NOT NULL,
+		fare_type varchar(10),
 		depart VARCHAR(10),
 		arrive VARCHAR(10),
 		block_id VARCHAR(10),

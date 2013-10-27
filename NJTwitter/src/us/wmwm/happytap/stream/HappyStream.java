@@ -515,20 +515,27 @@ public class HappyStream {
 				JSONArray a = o.getJSONArray("results");
 				List<Long> successfuls = new ArrayList<Long>();
 				List<Long> notRegistered = new ArrayList<Long>();
+				Map<Long,String> replace = new HashMap<Long,String>();
 				for (int i = 0; i < a.length(); i++) {
 					JSONObject ob = a.getJSONObject(i);
 					System.out.println(ob);
 					boolean success = !ob.has("error");
 					if (success) {
-						successfuls.add(userIds.get(i));						
+						successfuls.add(userIds.get(i));		
+						if(ob.has("registration_id")) {
+							replace.put(userIds.get(i),ob.getString("registration_id"));
+						}
 					} else {
 						if("NotRegistered".equals(ob.opt("error"))) {
 							notRegistered.add(userIds.get(i));							
 						}
 					}
-				}
+				}				
 				saveSentNotification(status, successfuls);
 				deletePushIds(HappyStream.conn,notRegistered);
+				if(!replace.isEmpty()) {
+					fixPushIds(HappyStream.conn, replace);
+				}
 			} else {
 				in = conn.getErrorStream();
 				System.err.println(Streams.readFully(in));
