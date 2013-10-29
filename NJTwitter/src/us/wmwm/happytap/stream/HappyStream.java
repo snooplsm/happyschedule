@@ -154,6 +154,9 @@ public class HappyStream {
 						System.out.println("handling " + lastUserId + " to " + (lastUserId+1000));
 						lastUserId = processStatus(status,lastUserId, result);
 						hasMore = lastUserId!=0;
+						if(hasMore) {
+							System.out.println("what");
+						}
 						
 					}
 				} catch (Exception e) {
