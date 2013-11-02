@@ -233,11 +233,10 @@ public class FragmentSchedule extends Fragment {
 					@Override
 					public void run() {
 						try {
-							if (getView() != null
+							if (getActivity()!=null && getView() != null
 									&& getView().findViewById(R.id.fragment_schedule_ad) != null) {
 								FragmentGoogleAd gad = new FragmentGoogleAd();
-								
-								getFragmentManager().beginTransaction()
+								getChildFragmentManager().beginTransaction()
 										.replace(R.id.fragment_schedule_ad, gad)
 										.commit();
 							}
@@ -250,10 +249,10 @@ public class FragmentSchedule extends Fragment {
 			}
 		});
 
-		if (getView() != null
+		if (getActivity()!=null && getView() != null
 				&& getView().findViewById(R.id.fragment_schedule_ad) != null) {
 			try {
-				getFragmentManager().beginTransaction()
+				getChildFragmentManager().beginTransaction()
 						.replace(R.id.fragment_schedule_ad, ad).commit();
 			} catch (Exception e) {
 

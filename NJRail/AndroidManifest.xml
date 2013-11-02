@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="us.wmwm.njrail"
-    android:versionCode="2013102400"
-    android:versionName="2013-10-10" >
+    android:versionCode="2013110200"
+    android:versionName="2013-11-02" >
 
     <uses-sdk
         android:minSdkVersion="14"

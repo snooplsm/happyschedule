@@ -281,7 +281,7 @@ public class FragmentHistory extends HappyFragment implements IPrimary {
 							if (getView() != null
 									&& getView().findViewById(
 											R.id.fragment_history_ad) != null) {
-								getFragmentManager().beginTransaction()
+								getChildFragmentManager().beginTransaction()
 										.replace(R.id.fragment_history_ad, gad)
 										.commit();
 							}
@@ -295,7 +295,7 @@ public class FragmentHistory extends HappyFragment implements IPrimary {
 		if (getView() != null
 				&& getView().findViewById(R.id.fragment_history_ad) != null) {
 			try {
-				getFragmentManager().beginTransaction()
+				getChildFragmentManager().beginTransaction()
 						.replace(R.id.fragment_history_ad, ad).commit();
 			} catch (Exception e) {
 

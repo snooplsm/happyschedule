@@ -492,7 +492,10 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 			handler.post(hideProgress);
 			handler.postDelayed(new Runnable() {
 				public void run() {
-					getActivity().invalidateOptionsMenu();
+					Activity activity = getActivity();
+					if(activity!=null) {
+						activity.invalidateOptionsMenu();
+					}
 				};
 			}, 50);
 			updateSchedulePeriodically();

@@ -1,14 +1,20 @@
 package us.wmwm.happyschedule.activity;
 
+import java.util.Collections;
+
 import twitter4j.Status;
 import twitter4j.TwitterException;
+import twitter4j.User;
 import twitter4j.json.DataObjectFactory;
 import us.wmwm.happyschedule.R;
 import us.wmwm.happyschedule.fragment.FragmentTweet;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 
-public class TweetActivity extends HappyActivity {
+import com.flurry.android.FlurryAgent;
+
+public class TweetActivity extends FragmentActivity {
 
 	@Override
 	protected void onCreate(Bundle bundle) {
@@ -19,6 +25,9 @@ public class TweetActivity extends HappyActivity {
 		Status status;
 		try {
 			status = (Status) DataObjectFactory.createStatus(json);
+			User user = status.getUser();
+			String url = "https://twitter.com/%s/status/%s";
+			FlurryAgent.logEvent("TweetActivity", Collections.singletonMap("url", String.format(url,user.getScreenName(),status.getId())));
 		} catch (TwitterException e) {
 			throw new RuntimeException(e);
 		}

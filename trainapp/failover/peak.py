@@ -1,2 +1,2 @@
-def isPeak(stops,date):
+def isPeak(id,stops,date):
 	return None

@@ -594,7 +594,7 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary,
 					public void run() {
 						try {
 							FragmentGoogleAd gad = new FragmentGoogleAd();
-							getFragmentManager().beginTransaction()
+							getChildFragmentManager().beginTransaction()
 									.replace(R.id.fragment_departurevision_ad, gad).commit();
 						} catch (Exception e) {
 
@@ -603,7 +603,7 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary,
 				});
 			}
 		});
-		getFragmentManager().beginTransaction().replace(R.id.fragment_departurevision_ad, ad)
+		getChildFragmentManager().beginTransaction().replace(R.id.fragment_departurevision_ad, ad)
 		.commit();
 
 	}

@@ -24,12 +24,12 @@
             android:layout_marginRight="@dimen/activity_horizontal_margin" />
     </android.support.v4.view.ViewPager>
 
-    <RelativeLayout
+    <FrameLayout
         android:id="@+id/fragment_schedule_ad"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true" >
-    </RelativeLayout>
+    </FrameLayout>
 
     <RelativeLayout
         android:id="@+id/loading_container"
