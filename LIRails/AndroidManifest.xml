@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.lirr"
-    android:versionCode="2013110100"
-    android:versionName="2013-11-01" >
+    android:versionCode="2013110200"
+    android:versionName="2013-11-02" >
 
     <uses-sdk
         android:minSdkVersion="14"

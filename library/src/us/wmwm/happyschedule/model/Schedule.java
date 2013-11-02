@@ -3,13 +3,13 @@ package us.wmwm.happyschedule.model;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -89,8 +89,26 @@ public class Schedule implements Serializable {
 		LinkedHashSet<Integer> toRemove = new LinkedHashSet<Integer>();
 		List<Double> time = new ArrayList<Double>();
 		Map<StationInterval, Integer> cache = new HashMap<StationInterval, Integer>();
-		System.out.println("the size is " + size);
-		int removingCount = 0;
+		int removingCount = 0; 
+		
+		Set<StationInterval> added = new HashSet<StationInterval>();
+		List<Integer> toRemoves = new ArrayList<Integer>();
+		for(int i = 0; i < size; i++) {
+			StationInterval s = (StationInterval) stationToStations.get(i);
+//			System.out.println(s.getClass().getSimpleName() + " " + (s.getDepartTime()!=null ? s.getDepartTime().getTime() : "") + " - " + (s.getArriveTime()!=null ? s.getArriveTime().getTime(): ""));
+			if(!added.contains(s)) {
+				added.add(s);				
+			} else {
+				toRemoves.add(i);
+			}
+		}
+		Collections.reverse(toRemoves);
+		for(Iterator<Integer> d = toRemoves.iterator();d.hasNext();) {
+			int pos = d.next();
+			stationToStations.remove(pos);
+		}
+		size = stationToStations.size();
+		nsize = size;
 		for (int i = 0; i < size; i++) {
 			StationInterval s = (StationInterval) stationToStations.get(i);
 			if (s.totalMinutes() < 0) {
@@ -360,7 +378,6 @@ public class Schedule implements Serializable {
 			String[][] t = transfers.get(i);
 			for(int j = 0; j < t.length; j++) {
 				String[] seq = t[j];
-				System.out.println(i + " " + seq[0] + " - " + seq[1]);
 			}
 		}
 		Calendar now = Calendar.getInstance();

@@ -196,7 +196,40 @@ public class StationInterval extends StationToStation {
 	public int getConnections() {
 		return connections;
 	}
+
+	Calendar depart;
+	Calendar arrive;
 	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = prime + ((getDepartTime() == null) ? 0 : getDepartTime().getTime().toString().hashCode());
+		result = prime * result + ((getArriveTime() == null) ? 0 : getArriveTime().getTime().toString().hashCode());
+		
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (getClass() != obj.getClass())
+			return false;
+		
+		StationInterval other = (StationInterval) obj;
+		if (getArriveTime() == null) {
+			if (other.getArriveTime() != null)
+				return false;
+		} else if (!getArriveTime().equals(other.getArriveTime()))
+			return false;
+		if (getDepartTime() == null) {
+			if (other.getDepartTime() != null)
+				return false;
+		} else if (!getDepartTime().equals(other.getDepartTime()))
+			return false;
+		return true;
+	}
+
 	public Calendar getArriveTime() {
 		if(arriveTimeCached!=null) {
 			return arriveTimeCached;
