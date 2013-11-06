@@ -562,7 +562,7 @@ public class HappyStream {
 	
 	private static void fixPushIds(Connection conn, Map<Long, String> replace) throws Exception {
 		System.out.println("trying to fix push ids");
-		PreparedStatement query = conn.prepareStatement("select from user where push_id=?");
+		PreparedStatement query = conn.prepareStatement("select id from user where push_id=?");
 		PreparedStatement update = conn.prepareStatement("update user set push_id=? where user_id=?");
 		boolean before = conn.getAutoCommit();
 		conn.setAutoCommit(false);
