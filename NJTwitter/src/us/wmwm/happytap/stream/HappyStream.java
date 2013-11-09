@@ -476,8 +476,13 @@ public class HappyStream {
 			}
 			fields.put("data", data);
 			// fields.put("dry_run", Boolean.TRUE);
-			System.out.println(Boolean.getBoolean("dry_run"));
-			fields.put("dry_run", Boolean.getBoolean("dry_run"));
+			Boolean dryRun = Boolean.getBoolean("dry_run");
+			if(Boolean.FALSE.equals(dryRun)) {
+				if(status.getText().startsWith("dry") || status.getText().startsWith("test")) {
+					dryRun = Boolean.TRUE;
+				}
+			}
+			fields.put("dry_run", dryRun);
 			Map<String, String> headers = new HashMap<String, String>();
 			headers.put("Authorization", "key=" + apiKey);
 			headers.put("Content-Type", "application/json");
