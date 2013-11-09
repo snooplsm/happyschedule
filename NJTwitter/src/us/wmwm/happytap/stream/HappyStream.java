@@ -12,12 +12,16 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import twitter4j.DirectMessage;
 import twitter4j.StallWarning;
@@ -46,14 +50,14 @@ public class HappyStream {
 	private static Connection conn;
 
 	private static String apiKey;
-	
+
 	private static String screenname;
 
 	public static void main(String[] args) {
 		Connection connection = null;
 		try {
 			Class.forName("org.sqlite.JDBC");
-			connection = DriverManager.getConnection("jdbc:sqlite:"+args[5]);
+			connection = DriverManager.getConnection("jdbc:sqlite:" + args[5]);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -72,165 +76,154 @@ public class HappyStream {
 			@Override
 			public void onDeletionNotice(StatusDeletionNotice arg0) {
 
-
 			}
 
 			@Override
 			public void onScrubGeo(long arg0, long arg1) {
-
 
 			}
 
 			@Override
 			public void onStallWarning(StallWarning arg0) {
 
-
 			}
 
 			@Override
 			public void onStatus(Status status) {
-
-				System.out.println(status.getUser().getName() + " : "
-						+ status.getText());
-				File file = new File("njtransit.json");
-				JSONArray a = null;
-				if (file.exists()) {
-					FileInputStream fin = null;
-					try {
-						fin = new FileInputStream(file);
-						String data = Streams.readFully(fin);
-						a = new JSONArray(data);
-					} catch (Exception e) {
-						e.printStackTrace();
-					} finally {
-						if (fin != null) {
+				synchronized (this) {
+					System.out.println(status.getUser().getName() + " : "
+							+ status.getText());
+					File file = new File("njtransit.json");
+					JSONArray a = null;
+					if (file.exists()) {
+						FileInputStream fin = null;
+						try {
+							fin = new FileInputStream(file);
+							String data = Streams.readFully(fin);
+							a = new JSONArray(data);
+						} catch (Exception e) {
+							e.printStackTrace();
+						} finally {
+							if (fin != null) {
+								try {
+									fin.close();
+								} catch (IOException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+							}
+						}
+					} else {
+						a = new JSONArray();
+					}
+					if (a.length() > 3) {
+						JSONArray b = new JSONArray();
+						int j = 0;
+						for (int i = 1; i < a.length(); i++) {
 							try {
-								fin.close();
-							} catch (IOException e) {
+								b.put(i - 1, a.getJSONObject(i));
+							} catch (JSONException e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
 							}
 						}
+						a = b;
 					}
-				} else {
-					a = new JSONArray();
-				}
-				if (a.length() > 3) {
-					JSONArray b = new JSONArray();
-					int j = 0;
-					for (int i = 1; i < a.length(); i++) {
+					try {
+						a.put(new JSONObject(DataObjectFactory
+								.getRawJSON(status)));
+					} catch (JSONException e) {
+						e.printStackTrace();
+					}
+					FileOutputStream fos = null;
+					try {
+						fos = new FileOutputStream(file);
+						fos.write(a.toString().getBytes());
+					} catch (Exception e) {
+						e.printStackTrace();
+					} finally {
 						try {
-							b.put(i - 1, a.getJSONObject(i));
-						} catch (JSONException e) {
-							// TODO Auto-generated catch block
+							fos.close();
+						} catch (Exception e) {
 							e.printStackTrace();
 						}
 					}
-					a = b;
-				}
-				try {
-					a.put(new JSONObject(DataObjectFactory.getRawJSON(status)));
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
-				FileOutputStream fos = null;
-				try {
-					fos = new FileOutputStream(file);
-					fos.write(a.toString().getBytes());
-				} catch (Exception e) {
-					e.printStackTrace();
-				} finally {
+					saveStatus(status);
 					try {
-						fos.close();
+						int result = 0;
+						boolean hasMore = true;
+						Long lastUserId = 0L;
+						while (hasMore) {
+							System.out.println("handling " + lastUserId
+									+ " to " + (lastUserId + 1000));
+							lastUserId = processStatus(status, lastUserId,
+									result);
+							hasMore = lastUserId != 0;
+						}
+						System.out.println("DONE");
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
-				}
-				saveStatus(status);
-				try {
-					int result = 0;
-					boolean hasMore = true;
-					Long lastUserId = 0L;
-					while(hasMore) {
-						System.out.println("handling " + lastUserId + " to " + (lastUserId+1000));
-						lastUserId = processStatus(status,lastUserId, result);
-						hasMore = lastUserId!=0;
-						
-					}
-				} catch (Exception e) {
-					e.printStackTrace();
 				}
 			}
 
 			@Override
 			public void onTrackLimitationNotice(int arg0) {
 
-
 			}
 
 			@Override
 			public void onException(Exception arg0) {
-
 
 			}
 
 			@Override
 			public void onBlock(User arg0, User arg1) {
 
-
 			}
 
 			@Override
 			public void onDeletionNotice(long arg0, long arg1) {
-
 
 			}
 
 			@Override
 			public void onDirectMessage(DirectMessage arg0) {
 
-
 			}
 
 			@Override
 			public void onFavorite(User arg0, User arg1, Status arg2) {
-
 
 			}
 
 			@Override
 			public void onFollow(User arg0, User arg1) {
 
-
 			}
 
 			@Override
 			public void onFriendList(long[] arg0) {
-
 
 			}
 
 			@Override
 			public void onUnblock(User arg0, User arg1) {
 
-
 			}
 
 			@Override
 			public void onUnfavorite(User arg0, User arg1, Status arg2) {
-
 
 			}
 
 			@Override
 			public void onUserListCreation(User arg0, UserList arg1) {
 
-
 			}
 
 			@Override
 			public void onUserListDeletion(User arg0, UserList arg1) {
-
 
 			}
 
@@ -238,13 +231,11 @@ public class HappyStream {
 			public void onUserListMemberAddition(User arg0, User arg1,
 					UserList arg2) {
 
-
 			}
 
 			@Override
 			public void onUserListMemberDeletion(User arg0, User arg1,
 					UserList arg2) {
-
 
 			}
 
@@ -252,25 +243,21 @@ public class HappyStream {
 			public void onUserListSubscription(User arg0, User arg1,
 					UserList arg2) {
 
-
 			}
 
 			@Override
 			public void onUserListUnsubscription(User arg0, User arg1,
 					UserList arg2) {
 
-
 			}
 
 			@Override
 			public void onUserListUpdate(User arg0, UserList arg1) {
 
-
 			}
 
 			@Override
 			public void onUserProfileUpdate(User arg0) {
-
 
 			}
 
@@ -281,36 +268,30 @@ public class HappyStream {
 			@Override
 			public void onException(Exception arg0) {
 
-
 			}
 
 			@Override
 			public void onTrackLimitationNotice(int arg0) {
-
 
 			}
 
 			@Override
 			public void onStatus(Status arg0) {
 
-
 			}
 
 			@Override
 			public void onStallWarning(StallWarning arg0) {
-
 
 			}
 
 			@Override
 			public void onScrubGeo(long arg0, long arg1) {
 
-
 			}
 
 			@Override
 			public void onDeletionNotice(StatusDeletionNotice arg0) {
-
 
 			}
 		};
@@ -330,25 +311,25 @@ public class HappyStream {
 		}
 		return true;
 	}
-	
-	public static int sendAppUpdated(int version, Long lastUserId) throws Exception {
+
+	public static int sendAppUpdated(int version, Long lastUserId)
+			throws Exception {
 		HttpURLConnection conn = null;
 		InputStream in = null;
 		ResultSet users = null;
-		try {			
-			
-			users = findAllUsers(HappyStream.conn, lastUserId,1000);
-			
-			
+		try {
+
+			users = findAllUsers(HappyStream.conn, lastUserId, 1000);
+
 			JSONArray regs = new JSONArray();
 			List<Long> userIds = new ArrayList<Long>();
 			JSONObject fields = new JSONObject();
 			fields.put("time_to_live", 1800);
 			JSONObject data = new JSONObject();
-			data.put("type","upgrade_alert");
+			data.put("type", "upgrade_alert");
 			data.put("version", version);
 			fields.put("data", data);
-			//fields.put("dry_run", Boolean.TRUE);
+			fields.put("dry_run", Boolean.getBoolean("dry_run"));
 			Map<String, String> headers = new HashMap<String, String>();
 			headers.put("Authorization", "key=" + apiKey);
 			headers.put("Content-Type", "application/json");
@@ -382,31 +363,42 @@ public class HappyStream {
 				JSONArray a = o.getJSONArray("results");
 				List<Long> successfuls = new ArrayList<Long>();
 				List<Long> notRegistered = new ArrayList<Long>();
-				Map<Long,String> replace = new HashMap<Long,String>();
-				
+				Map<Long, String> replace = new HashMap<Long, String>();
+				StringBuilder sb = new StringBuilder("Successful: (");
+				StringBuilder nb = new StringBuilder("Not Registered: (");
+				StringBuilder replaceb = new StringBuilder("Need to replace: (");
 				for (int i = 0; i < a.length(); i++) {
 					JSONObject ob = a.getJSONObject(i);
-					System.out.println(ob);
+					// System.out.println(ob);
 					boolean success = !ob.has("error");
 					if (success) {
 						successfuls.add(userIds.get(i));
-						if(ob.has("registration_id")) {
-							replace.put(userIds.get(i),ob.getString("registration_id"));
+						sb.append(userIds.get(i)).append(",");
+						if (ob.has("registration_id")) {
+							replaceb.append(userIds.get(i)).append(":")
+									.append(ob.getString("registration_id"))
+									.append(",");
+							replace.put(userIds.get(i),
+									ob.getString("registration_id"));
 						}
 					} else {
-						if("NotRegistered".equals(ob.opt("error"))) {
-							notRegistered.add(userIds.get(i));							
+						if ("NotRegistered".equals(ob.opt("error"))) {
+							notRegistered.add(userIds.get(i));
+							nb.append(userIds.get(i)).append(",");
 						}
 					}
-					//if(ob.has("registration_id"))
+					// if(ob.has("registration_id"))
 				}
-				//saveSentNotification(status, successfuls);
+				System.out.println(sb);
+				System.out.println(nb);
+				System.out.println(replaceb);
+				// saveSentNotification(status, successfuls);
 				deletePushIds(HappyStream.conn, notRegistered);
-				fixPushIds(HappyStream.conn,replace);
+				fixPushIds(HappyStream.conn, replace);
 			} else {
 				in = conn.getErrorStream();
 				System.err.println(Streams.readFully(in));
-			}	
+			}
 			return regs.length();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -424,22 +416,22 @@ public class HappyStream {
 		return 0;
 	}
 
-
-
-	public static long processStatus(Status status, Long lastUserId, int offset) throws Exception {
+	public static long processStatus(Status status, Long lastUserId, int offset)
+			throws Exception {
 		HttpURLConnection conn = null;
 		InputStream in = null;
 		ResultSet users = null;
-		try {			
+		try {
 			if (status.getUser().getScreenName().equalsIgnoreCase(screenname)) {
-				users = findAllUsers(status,lastUserId, 1000);
+				users = findAllUsers(status, lastUserId, 1000);
 			} else {
 				Calendar cal = Calendar.getInstance();
 				int hour = cal.get(Calendar.HOUR_OF_DAY);
 				int day = cal.get(Calendar.DAY_OF_WEEK);
-				users = findUsersForService(status, lastUserId, day, hour,offset,1000);
+				users = findUsersForService(status, lastUserId, day, hour,
+						offset, 1000);
 			}
-			
+
 			JSONArray regs = new JSONArray();
 			List<Long> userIds = new ArrayList<Long>();
 			JSONObject fields = new JSONObject();
@@ -453,36 +445,39 @@ public class HappyStream {
 					text.replace(e.getStart(), e.getEnd(), e.getDisplayURL());
 				}
 			}
-			JSONObject tweet = new JSONObject(DataObjectFactory.getRawJSON(status));
+			JSONObject tweet = new JSONObject(
+					DataObjectFactory.getRawJSON(status));
 			data.put("tweet", tweet);
 			data.put("message", text);
-			data.put("type","alert");
-			if(!checkSize(data)) {
+			data.put("type", "alert");
+			if (!checkSize(data)) {
 				tweet.remove("source");
 				tweet.remove("lang");
 				tweet.remove("truncated");
 				tweet.remove("possibly_sensitive");
 				tweet.remove("favorited");
 				tweet.remove("filter_level");
-				if(!checkSize(data)) {
-					JSONObject user = tweet.getJSONObject("user");				
+				if (!checkSize(data)) {
+					JSONObject user = tweet.getJSONObject("user");
 					user.remove("default_profile");
 					user.remove("verified");
 					user.remove("contributors_enabled");
 					user.remove("profile_image_url_https");
 					user.remove("follower_request_sent");
 					user.remove("is_translator");
-					if(!checkSize(data)) {
-						user.remove("description");				
+					if (!checkSize(data)) {
+						user.remove("description");
 					}
-					
+
 				}
 			}
-			if(!checkSize(data)) {
+			if (!checkSize(data)) {
 				data.remove("tweet");
 			}
 			fields.put("data", data);
-			//fields.put("dry_run", Boolean.TRUE);
+			// fields.put("dry_run", Boolean.TRUE);
+			System.out.println(Boolean.getBoolean("dry_run"));
+			fields.put("dry_run", Boolean.getBoolean("dry_run"));
 			Map<String, String> headers = new HashMap<String, String>();
 			headers.put("Authorization", "key=" + apiKey);
 			headers.put("Content-Type", "application/json");
@@ -516,32 +511,42 @@ public class HappyStream {
 				JSONArray a = o.getJSONArray("results");
 				List<Long> successfuls = new ArrayList<Long>();
 				List<Long> notRegistered = new ArrayList<Long>();
-				Map<Long,String> replace = new HashMap<Long,String>();
+				Map<Long, String> replace = new HashMap<Long, String>();
+				StringBuilder sb = new StringBuilder("Successful: (");
+				StringBuilder nb = new StringBuilder("Not Registered: (");
+				StringBuilder replaceb = new StringBuilder("Need to replace: (");
 				for (int i = 0; i < a.length(); i++) {
 					JSONObject ob = a.getJSONObject(i);
-					System.out.println(ob);
+					// System.out.println(ob);
 					boolean success = !ob.has("error");
 					if (success) {
-						successfuls.add(userIds.get(i));		
-						if(ob.has("registration_id")) {
-							replace.put(userIds.get(i),ob.getString("registration_id"));
+						successfuls.add(userIds.get(i));
+						sb.append(userIds.get(i)).append(",");
+						if (ob.has("registration_id")) {
+							replaceb.append(userIds.get(i)).append(":")
+									.append(ob.getString("registration_id"))
+									.append(",");
+							replace.put(userIds.get(i),
+									ob.getString("registration_id"));
 						}
 					} else {
-						if("NotRegistered".equals(ob.opt("error"))) {
-							notRegistered.add(userIds.get(i));							
+						if ("NotRegistered".equals(ob.opt("error"))) {
+							notRegistered.add(userIds.get(i));
+							nb.append(userIds.get(i)).append(",");
 						}
 					}
-				}				
+					// if(ob.has("registration_id"))
+				}
 				saveSentNotification(status, successfuls);
-				deletePushIds(HappyStream.conn,notRegistered);
-				if(!replace.isEmpty()) {
+				deletePushIds(HappyStream.conn, notRegistered);
+				if (!replace.isEmpty()) {
 					fixPushIds(HappyStream.conn, replace);
 				}
 			} else {
 				in = conn.getErrorStream();
 				System.err.println(Streams.readFully(in));
-			}	
-			return userIds.get(userIds.size()-1);
+			}
+			return userIds.get(userIds.size() - 1);
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -557,35 +562,93 @@ public class HappyStream {
 		}
 		return 0;
 	}
-	
-	private static void fixPushIds(Connection conn, Map<Long, String> replace) throws Exception {
+
+	private static void fixPushIds(Connection conn, Map<Long, String> replace)
+			throws Exception {
 		System.out.println("trying to fix push ids");
-		PreparedStatement query = conn.prepareStatement("select id from user where push_id=?");
-		PreparedStatement update = conn.prepareStatement("update user set push_id=? where user_id=?");
+		PreparedStatement query = conn
+				.prepareStatement("select id from user where push_id=?");
+		PreparedStatement update = conn
+				.prepareStatement("update user set push_id=? where id=?");
+		PreparedStatement services = conn
+				.prepareStatement("select screenname,day,hour,strftime('%s',created) from services where user_id=?");
+		PreparedStatement deleteServices = conn
+				.prepareStatement("delete from services where user_id in(?,?)");
+		PreparedStatement addServices = conn
+				.prepareStatement("insert into services(user_id,screenname,created,day,hour) values(?,?,?,?,?)");
 		boolean before = conn.getAutoCommit();
 		conn.setAutoCommit(false);
 		try {
-			for(Map.Entry<Long, String> e : replace.entrySet()) {
+			for (Map.Entry<Long, String> e : replace.entrySet()) {
 				query.setString(1, e.getValue());
 				query.execute();
 				ResultSet rs = query.getResultSet();
+				Set<Service> servicesForReplacement = new HashSet<Service>();
+				Long id = 0L;
 				try {
-					if(rs.next()) {
-						String pushId = rs.getString(1);
-						System.out.println("can't replace " + pushId + " for user id " + e.getKey());
+					while (rs.next()) {
+						id = rs.getLong(1);
+						System.out.println("can't replace " + id
+								+ " for user id " + e.getKey());
+						services.setLong(1, id);
+						services.execute();
+						ResultSet servicesResultSet = services.getResultSet();
+						while (servicesResultSet.next()) {
+							Service service = new Service();
+							service.screenname = servicesResultSet.getString(1);
+							service.day = servicesResultSet.getInt(2);
+							service.hour = servicesResultSet.getInt(3);
+							servicesForReplacement.add(service);
+						}
+						System.out.println(servicesForReplacement.size());
+						servicesResultSet.close();
+						services.setLong(1, e.getKey());
+						services.execute();
+						servicesResultSet = services.getResultSet();
+						while (servicesResultSet.next()) {
+							Service service = new Service();
+							service.screenname = servicesResultSet.getString(1);
+							service.day = servicesResultSet.getInt(2);
+							service.hour = servicesResultSet.getInt(3);
+							service.created = servicesResultSet.getLong(4);
+							servicesForReplacement.add(service);
+						}
+						servicesResultSet.close();
+						System.out.println(servicesForReplacement.size());
+						deleteServices.setLong(1, id);
+						deleteServices.setLong(2, e.getKey());
+						deleteServices.execute();
+						for (Service service : servicesForReplacement) {
+							addServices.setLong(1, id);
+							addServices.setString(2, service.screenname);
+							addServices.setLong(3, service.created);
+							addServices.setInt(4, service.day);
+							addServices.setInt(5, service.hour);
+							addServices.addBatch();
+						}
+						addServices.executeBatch();
 						continue;
 					}
 				} finally {
 					rs.close();
 				}
-				System.out.println("replacing " + e.getKey() + " " + e.getValue());
+				System.out.println("updating " + e.getKey() + " with "
+						+ e.getValue());
 				update.setString(1, e.getValue());
 				update.setLong(2, e.getKey());
-				update.addBatch();
+				try {
+					update.executeUpdate();
+				} catch (SQLException ex) {
+					if (ex.getErrorCode() == 19) {
+						update = conn
+								.prepareStatement("update user set push_id=? where id=?");
+						deletePushIds(conn,
+								Collections.singletonList(e.getKey()));
+					}
+				}
 			}
-			update.executeBatch();
-			//stat.executeBatch();
-			//stat2.executeBatch();
+			// stat.executeBatch();
+			// stat2.executeBatch();
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.err.println("rolling back");
@@ -598,13 +661,16 @@ public class HappyStream {
 		}
 	}
 
-	public static void deletePushIds(Connection conn, List<Long> userIds) throws Exception {
-		PreparedStatement stat = conn.prepareStatement("delete from services where user_id=?");
-		PreparedStatement stat2 = conn.prepareStatement("delete from user where id=?");
+	public static void deletePushIds(Connection conn, List<Long> userIds)
+			throws Exception {
+		PreparedStatement stat = conn
+				.prepareStatement("delete from services where user_id=?");
+		PreparedStatement stat2 = conn
+				.prepareStatement("delete from user where id=?");
 		boolean before = conn.getAutoCommit();
 		conn.setAutoCommit(false);
 		try {
-			for(Long userId : userIds) {
+			for (Long userId : userIds) {
 				stat.setLong(1, userId);
 				stat2.setLong(1, userId);
 				System.out.println("trying to delete " + userId);
@@ -631,15 +697,16 @@ public class HappyStream {
 		boolean before = conn.getAutoCommit();
 		conn.setAutoCommit(false);
 		try {
-			StringBuilder b = new StringBuilder("saving " + status.getText() + " for (");
+			StringBuilder b = new StringBuilder("saving " + status.getText()
+					+ " for (");
 			Iterator<Long> iter = userIds.iterator();
-			while(iter.hasNext()) {
+			while (iter.hasNext()) {
 				Long userId = iter.next();
 				stat.setLong(1, userId);
 				stat.setLong(2, status.getId());
 				stat.addBatch();
 				b.append(userId);
-				if(iter.hasNext()) {
+				if (iter.hasNext()) {
 					b.append(",");
 				}
 			}
@@ -657,14 +724,16 @@ public class HappyStream {
 		}
 	}
 
-	public static ResultSet findUsersForService(Status status,Long lastUserId, int day, int hour, int offset, int limit)
-			throws Exception {
+	public static ResultSet findUsersForService(Status status, Long lastUserId,
+			int day, int hour, int offset, int limit) throws Exception {
 		PreparedStatement stat = conn
-				.prepareStatement(String.format("select u.push_id, u.id from USER u where u.id>? and u.id not in (select sb.user_id from SENT sb where sb.user_id=u.id and sb.status_id=?) and u.id in (select sv.user_id from SERVICES sv where sv.screenname=? and sv.day=? and sv.hour=?) group by u.id limit %s, %s",offset,limit));
-		if(lastUserId==null) {
+				.prepareStatement(String
+						.format("select u.push_id, u.id from USER u where u.id>? and u.id not in (select sb.user_id from SENT sb where sb.user_id=u.id and sb.status_id=?) and u.id in (select sv.user_id from SERVICES sv where sv.screenname=? and sv.day=? and sv.hour=?) group by u.id limit %s, %s",
+								offset, limit));
+		if (lastUserId == null) {
 			lastUserId = 0L;
 		}
-		stat.setLong(1,lastUserId);
+		stat.setLong(1, lastUserId);
 		stat.setLong(2, status.getId());
 		stat.setString(3, status.getUser().getScreenName());
 		stat.setInt(4, day);
@@ -673,10 +742,13 @@ public class HappyStream {
 		return stat.getResultSet();
 	}
 
-	public static ResultSet findAllUsers(Status status,Long lastUserId, int limit) throws Exception {
+	public static ResultSet findAllUsers(Status status, Long lastUserId,
+			int limit) throws Exception {
 		PreparedStatement stat = conn
-				.prepareStatement(String.format("select u.push_id, u.id from USER u where u.id > ? and u.id not in (select sb.user_id from SENT sb where sb.user_id=u.id and sb.status_id=:status_id) group by u.id order by u.id asc limit %s",limit));
-		if(lastUserId==null) {
+				.prepareStatement(String
+						.format("select u.push_id, u.id from USER u where u.id > ? and u.id not in (select sb.user_id from SENT sb where sb.user_id=u.id and sb.status_id=:status_id) group by u.id order by u.id asc limit %s",
+								limit));
+		if (lastUserId == null) {
 			lastUserId = 0L;
 		}
 		stat.setLong(1, lastUserId);
@@ -684,11 +756,14 @@ public class HappyStream {
 		stat.execute();
 		return stat.getResultSet();
 	}
-	
-	public static ResultSet findAllUsers(Connection conn, Long afterUserId, int limit) throws Exception {
+
+	public static ResultSet findAllUsers(Connection conn, Long afterUserId,
+			int limit) throws Exception {
 		PreparedStatement stat = conn
-				.prepareStatement(String.format("select u.push_id, u.id from USER u where u.id > ? group by u.id order by u.id asc limit %s",limit));
-		if(afterUserId==null) {
+				.prepareStatement(String
+						.format("select u.push_id, u.id from USER u where u.id > ? group by u.id order by u.id asc limit %s",
+								limit));
+		if (afterUserId == null) {
 			afterUserId = 0L;
 		}
 		stat.setLong(1, afterUserId);
