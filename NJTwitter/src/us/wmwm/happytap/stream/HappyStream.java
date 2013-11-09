@@ -15,6 +15,7 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -154,9 +155,6 @@ public class HappyStream {
 						System.out.println("handling " + lastUserId + " to " + (lastUserId+1000));
 						lastUserId = processStatus(status,lastUserId, result);
 						hasMore = lastUserId!=0;
-						if(hasMore) {
-							System.out.println("what");
-						}
 						
 					}
 				} catch (Exception e) {
@@ -439,7 +437,7 @@ public class HappyStream {
 				Calendar cal = Calendar.getInstance();
 				int hour = cal.get(Calendar.HOUR_OF_DAY);
 				int day = cal.get(Calendar.DAY_OF_WEEK);
-				users = findUsersForService(status, day, hour,offset,1000);
+				users = findUsersForService(status, lastUserId, day, hour,offset,1000);
 			}
 			
 			JSONArray regs = new JSONArray();
@@ -633,13 +631,20 @@ public class HappyStream {
 		boolean before = conn.getAutoCommit();
 		conn.setAutoCommit(false);
 		try {
-			for(Long userId : userIds) {
-				
+			StringBuilder b = new StringBuilder("saving " + status.getText() + " for (");
+			Iterator<Long> iter = userIds.iterator();
+			while(iter.hasNext()) {
+				Long userId = iter.next();
 				stat.setLong(1, userId);
 				stat.setLong(2, status.getId());
 				stat.addBatch();
-				System.out.println("saving " + status.getText() + " for " + userId);
+				b.append(userId);
+				if(iter.hasNext()) {
+					b.append(",");
+				}
 			}
+			b.append(")");
+			System.out.println(b.toString());
 			stat.executeBatch();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -652,14 +657,18 @@ public class HappyStream {
 		}
 	}
 
-	public static ResultSet findUsersForService(Status status, int day, int hour, int offset, int limit)
+	public static ResultSet findUsersForService(Status status,Long lastUserId, int day, int hour, int offset, int limit)
 			throws Exception {
 		PreparedStatement stat = conn
-				.prepareStatement(String.format("select u.push_id, u.id from USER u where u.id not in (select sb.user_id from SENT sb where sb.user_id=u.id and sb.status_id=?) and u.id in (select sv.user_id from SERVICES sv where sv.screenname=? and sv.day=? and sv.hour=?) group by u.id limit %s, %s",offset,limit));
-		stat.setLong(1, status.getId());
-		stat.setString(2, status.getUser().getScreenName());
-		stat.setInt(3, day);
-		stat.setInt(4, hour);
+				.prepareStatement(String.format("select u.push_id, u.id from USER u where u.id>? and u.id not in (select sb.user_id from SENT sb where sb.user_id=u.id and sb.status_id=?) and u.id in (select sv.user_id from SERVICES sv where sv.screenname=? and sv.day=? and sv.hour=?) group by u.id limit %s, %s",offset,limit));
+		if(lastUserId==null) {
+			lastUserId = 0L;
+		}
+		stat.setLong(1,lastUserId);
+		stat.setLong(2, status.getId());
+		stat.setString(3, status.getUser().getScreenName());
+		stat.setInt(4, day);
+		stat.setInt(5, hour);
 		stat.execute();
 		return stat.getResultSet();
 	}
