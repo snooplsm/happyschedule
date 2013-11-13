@@ -17,10 +17,9 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import android.util.Log;
-
 import us.wmwm.happyschedule.model.AppConfig;
 import us.wmwm.happyschedule.model.TrainStatus;
+import android.util.Log;
 
 /**
  * Hello world!

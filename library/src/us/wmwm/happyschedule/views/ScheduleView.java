@@ -11,7 +11,6 @@ import us.wmwm.happyschedule.model.Station;
 import us.wmwm.happyschedule.model.StationInterval;
 import us.wmwm.happyschedule.model.StationToStation;
 import us.wmwm.happyschedule.model.TrainStatus;
-import us.wmwm.happyschedule.service.FareType;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;

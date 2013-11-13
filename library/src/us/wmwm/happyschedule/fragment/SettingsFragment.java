@@ -37,6 +37,8 @@ public class SettingsFragment extends PreferenceFragment implements com.squareup
 	CheckBoxPreference pushNotifications;
 	PreferenceCategory debugScreen;
 	Preference pushId;
+	Preference version;
+	Preference packageName;
 
 	
 	@Override
@@ -53,7 +55,8 @@ public class SettingsFragment extends PreferenceFragment implements com.squareup
 		Object o = findPreference(getString(R.string.settings_key_debug));
 		debugScreen = (PreferenceCategory) o;
 		pushId = (Preference) findPreference(getString(R.string.settings_key_debug_push));
-		
+		version = (Preference) findPreference(getString(R.string.settings_key_debug_version));
+		packageName = (Preference) findPreference(getString(R.string.settings_key_debug_package));
 		
 		railLine.setIntent(new Intent(getActivity(), RailLinesActivity.class));
 		refreshInterval.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
@@ -109,6 +112,8 @@ public class SettingsFragment extends PreferenceFragment implements com.squareup
 		} else {
 			pushId.setIntent(Intent.createChooser(new Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT,pushId.getSummary().toString()), "Share"));
 		}
+		version.setSummary(getAppVersionName() + " / " + getAppVersion());
+		packageName.setSummary(getActivity().getPackageName());
 	};
 	
 	BroadcastReceiver packageInstalledReceiver;
@@ -172,6 +177,19 @@ public class SettingsFragment extends PreferenceFragment implements com.squareup
 	        throw new RuntimeException("Could not get package name: " + e);
 	    }
 	}
+	
+	public static String getAppVersionName() {
+	    try {
+	    	Context context = HappyApplication.get();
+	        PackageInfo packageInfo = context.getPackageManager()
+	                .getPackageInfo(context.getPackageName(), 0);
+	        return packageInfo.versionName;
+	    } catch (NameNotFoundException e) {
+	        // should never happen
+	        throw new RuntimeException("Could not get package name: " + e);
+	    }
+	}
+
 
 	public static void saveRegistrationId(String id) {
 		WDb.get().savePreference("gcm_registration_id_"+getAppVersion(), id);

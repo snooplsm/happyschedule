@@ -1,8 +1,6 @@
 package us.wmwm.happyschedule.views;
 
 import us.wmwm.happyschedule.R;
-import us.wmwm.happyschedule.R.id;
-import us.wmwm.happyschedule.R.layout;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.widget.RelativeLayout;

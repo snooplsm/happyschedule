@@ -59,6 +59,13 @@
             android:summary="@string/settings_description_debug_names"
             android:title="@string/settings_title_debug_names" >
         </CheckBoxPreference>
+
+        <Preference
+            android:key="@string/settings_key_debug_version"
+            android:title="Version" />
+        <Preference
+            android:key="@string/settings_key_debug_package"
+            android:title="Package" />
     </PreferenceCategory>
 
 </PreferenceScreen>

@@ -2,8 +2,6 @@ package us.wmwm.happyschedule.views;
 
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
-import android.graphics.Canvas;
-import android.graphics.drawable.BitmapDrawable;
 import android.util.Log;
 import android.view.DragEvent;
 import android.view.View;

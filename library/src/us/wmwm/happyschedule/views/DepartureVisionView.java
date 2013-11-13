@@ -3,14 +3,10 @@ package us.wmwm.happyschedule.views;
 import java.util.Map;
 
 import us.wmwm.happyschedule.R;
-import us.wmwm.happyschedule.R.id;
-import us.wmwm.happyschedule.R.layout;
 import us.wmwm.happyschedule.model.LineStyle;
 import us.wmwm.happyschedule.model.TrainStatus;
-
 import android.content.Context;
 import android.text.TextUtils;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.RelativeLayout;

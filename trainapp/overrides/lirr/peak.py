@@ -38,16 +38,16 @@ def isPeak(tripId,trip,date):
 	first = trip[0]
 	weekday = date.isoweekday()
 	print tripId[-4:]
-	if tripId[-4:]=="1618":
+	if tripId[-4:]=="161800":
 		raw_input("foo")
 	if weekday>5:
-		if tripId[-4:]=="1618":
+		if tripId[-4:]=="161800":
 			raw_input("weekend")
 		return "offpeak"
 	print "date " + date.strftime("%m/%d/%y")
 	if date.strftime("%m/%d/%y") in HOLIDAYS:
 		print "holiday"
-		if tripId[-4:]=="1618":
+		if tripId[-4:]=="161800":
 			raw_input("holiday")
 		return "offpeak"
 	firstEarliest = None
@@ -64,7 +64,7 @@ def isPeak(tripId,trip,date):
 		except:
 			hour = 1
 			minute = 0
-		if tripId[-4:]=="1618":
+		if tripId[-4:]=="161800":
 			raw_input("earliest is " + earliest["name"] + "," + earliest["depart"])
 		# print "NY",first["depart"],hour,minute
 		if hour>=16 and hour<=20:
@@ -72,7 +72,7 @@ def isPeak(tripId,trip,date):
 			if hour==20:
 				can = minute==0
 			if can:
-				if tripId[-4:]=="1618":
+				if tripId[-4:]=="161800":
 					raw_input("hour>=16 and hour<=20")
 				return "peak"
 	firstEarliest = earliest
@@ -86,7 +86,7 @@ def isPeak(tripId,trip,date):
 	# 			break
 	if earliest==None:
 		return "offpeak"	
-	if tripId[-4:]=="1618":
+	if tripId[-4:]=="161800":
 		raw_input("earliest is " + earliest["name"] + "," + earliest["arrive"])		
 	try:
 		arriveTime = datetime.strptime(earliest["arrive"],"%H:%M:%S")
@@ -103,9 +103,9 @@ def isPeak(tripId,trip,date):
 			if hour==10:
 				can = min==0
 			if can:
-				if tripId[-4:]=="1618":
+				if tripId[-4:]=="161800":
 					raw_input("hour>=6 and hour<=10")
 				return "peak"	
-		if tripId[-4:]=="1618":
+		if tripId[-4:]=="161800":
 			raw_input("offpeak")		
 	return "offpeak"

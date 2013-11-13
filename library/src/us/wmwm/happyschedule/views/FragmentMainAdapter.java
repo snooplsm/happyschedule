@@ -9,8 +9,9 @@ import us.wmwm.happyschedule.fragment.FragmentDepartureVision;
 import us.wmwm.happyschedule.fragment.FragmentHistory;
 import us.wmwm.happyschedule.fragment.FragmentHistory.OnHistoryListener;
 import us.wmwm.happyschedule.fragment.FragmentPickStations;
-import us.wmwm.happyschedule.fragment.IPrimary;
 import us.wmwm.happyschedule.fragment.FragmentPickStations.OnGetSchedule;
+import us.wmwm.happyschedule.fragment.IPrimary;
+import us.wmwm.happyschedule.fragment.ISecondary;
 import us.wmwm.happyschedule.model.Station;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
@@ -74,6 +75,9 @@ public class FragmentMainAdapter extends FragmentStatePagerAdapter {
 	public void setPrimaryItem(ViewGroup container, int position, Object object) {
 		super.setPrimaryItem(container, position, object);
 		if (object != last) {
+			if(last!=null && last instanceof ISecondary) {
+				((ISecondary)last).setSecondary();
+			}
 			last = object;
 			if (object instanceof IPrimary) {
 				((IPrimary) object).setPrimaryItem();

@@ -20,7 +20,6 @@ import us.wmwm.happyschedule.model.ConnectionInterval;
 import us.wmwm.happyschedule.model.Favorite;
 import us.wmwm.happyschedule.model.Schedule;
 import us.wmwm.happyschedule.model.Service;
-import us.wmwm.happyschedule.model.StationToStation;
 import us.wmwm.happyschedule.model.StopTime;
 import us.wmwm.happyschedule.model.TripInfo;
 import android.content.Context;

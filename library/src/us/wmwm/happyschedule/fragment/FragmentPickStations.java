@@ -10,6 +10,7 @@ import us.wmwm.happyschedule.R;
 import us.wmwm.happyschedule.ThreadHelper;
 import us.wmwm.happyschedule.activity.ActivityPickStation;
 import us.wmwm.happyschedule.activity.SettingsActivity;
+import us.wmwm.happyschedule.adapter.FareAdapter;
 import us.wmwm.happyschedule.dao.Db;
 import us.wmwm.happyschedule.dao.ScheduleDao;
 import us.wmwm.happyschedule.dao.WDb;
@@ -26,6 +27,7 @@ import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.DragEvent;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -33,16 +35,20 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.DragShadowBuilder;
 import android.view.View.OnClickListener;
+import android.view.View.OnKeyListener;
 import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.MarginLayoutParams;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.GridView;
 import android.widget.TextView;
 
 import com.flurry.android.FlurryAgent;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout.PanelSlideListener;
 
-public class FragmentPickStations extends Fragment implements IPrimary {
+public class FragmentPickStations extends Fragment implements IPrimary, ISecondary {
 
 	StationButton departureButton;
 	StationButton arrivalButton;
@@ -52,9 +58,12 @@ public class FragmentPickStations extends Fragment implements IPrimary {
 	View reverseButtonContainer;
 	View reverseHolder;
 	TextView fare;
+	GridView fares;
 
 	Handler handler = new Handler();
 
+	boolean canEatBack;
+	
 	public static interface OnGetSchedule {
 		void onGetSchedule(Station from, Station to);
 	}
@@ -73,6 +82,7 @@ public class FragmentPickStations extends Fragment implements IPrimary {
 
 	View root;
 	
+	SlidingUpPanelLayout upPanelLayout;
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -87,6 +97,8 @@ public class FragmentPickStations extends Fragment implements IPrimary {
 		reverseButtonContainer = root.findViewById(R.id.reverse_container);
 		reverseHolder = root.findViewById(R.id.reverse_holder);
 		fare = (TextView) root.findViewById(R.id.fare);
+		upPanelLayout = (SlidingUpPanelLayout) root.findViewById(R.id.sliding_up_layout);
+		fares = (GridView) root.findViewById(R.id.fares);
 		return root;
 	}
 
@@ -136,7 +148,7 @@ public class FragmentPickStations extends Fragment implements IPrimary {
 				} else {
 					return;
 				}
-				Map<String, Double> fares = ScheduleDao.get().getFairs(
+				final Map<String, Double> fares = ScheduleDao.get().getFairs(
 						departureButton.getStation().getId(),
 						arrivalButton.getStation().getId());
 				Map<String,String> k = new HashMap<String,String>();
@@ -156,6 +168,9 @@ public class FragmentPickStations extends Fragment implements IPrimary {
 					public void run() {
 						fare.setText("Fare: " + adult);
 						fare.setVisibility(View.VISIBLE);
+						FareAdapter adapter = new FareAdapter();
+						adapter.setData(fares);
+						FragmentPickStations.this.fares.setAdapter(adapter);
 					}
 				});
 			}
@@ -341,6 +356,60 @@ public class FragmentPickStations extends Fragment implements IPrimary {
 		};
 
 		getScheduleButton.setOnClickListener(onClickGetSchedule);
+		
+        SlidingUpPanelLayout layout = upPanelLayout;
+        layout.setShadowDrawable(getResources().getDrawable(R.drawable.above_shadow));
+        layout.setAnchorPoint(0.75f);
+        layout.setEnableDragViewTouchEvents(true);
+        layout.setPanelSlideListener(new PanelSlideListener() {
+
+            @Override
+            public void onPanelSlide(View panel, float slideOffset) {
+                if (slideOffset < 0.2) {
+//                    if (getActionBar().isShowing()) {
+//                        getActionBar().hide();
+//                    }
+                } else {
+//                    if (!getActionBar().isShowing()) {
+//                        getActionBar().show();
+//                    }
+                }
+            }                        
+
+            @Override
+            public void onPanelExpanded(View panel) {
+            	FlurryAgent.logEvent("onPanelExpanded");
+            }
+
+            @Override
+            public void onPanelCollapsed(View panel) {
+            	FlurryAgent.logEvent("onPanelCollapsed");
+            }
+
+            @Override
+            public void onPanelAnchored(View panel) {
+            	FlurryAgent.logEvent("onPanelAnchored");
+            }
+        });
+        getView().setFocusableInTouchMode(true); // this line is important
+		getView().requestFocus();
+        getView().setOnKeyListener(new OnKeyListener() {
+
+			@Override
+			public boolean onKey(View arg0, int keyCode, KeyEvent arg2) {
+				if(!canEatBack) {
+					return false;
+				}
+				if(keyCode==KeyEvent.KEYCODE_BACK) {
+					if(upPanelLayout.isAnchored()||upPanelLayout.isExpanded()) {
+						upPanelLayout.collapsePane();
+						return true;
+					}
+				}
+				return false;
+			}
+        	
+        });
 	}
 
 	protected boolean canGetSchedule() {
@@ -391,6 +460,12 @@ public class FragmentPickStations extends Fragment implements IPrimary {
 	@Override
 	public void setPrimaryItem() {
 		getActivity().getActionBar().setSubtitle(null);
+		canEatBack = true;
+	}
+	
+	@Override
+	public void setSecondary() {
+		canEatBack = false;
 	}
 
 }

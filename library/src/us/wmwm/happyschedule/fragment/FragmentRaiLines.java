@@ -6,8 +6,6 @@ import java.util.List;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.flurry.android.FlurryAgent;
-
 import us.wmwm.happyschedule.R;
 import us.wmwm.happyschedule.ThreadHelper;
 import us.wmwm.happyschedule.application.HappyApplication;
@@ -29,6 +27,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListView;
+
+import com.flurry.android.FlurryAgent;
 
 public class FragmentRaiLines extends HappyFragment {
 

@@ -19,14 +19,11 @@ import android.view.animation.Animation.AnimationListener;
 import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
 
-import com.google.ads.Ad;
-import com.google.ads.AdListener;
 import com.google.ads.AdRequest;
 import com.google.ads.AdRequest.ErrorCode;
-import com.google.ads.AdSize;
-import com.google.ads.AdView;
+import com.google.android.gms.ads.AdView;
 
-public class FragmentGoogleAd extends HappyFragment implements AdListener {
+public class FragmentGoogleAd extends HappyFragment {
 
 	private ViewGroup adViewContainer; // View group to which the ad view will
 										// be added
@@ -74,7 +71,7 @@ public class FragmentGoogleAd extends HappyFragment implements AdListener {
 		if (nextAdView == null) { // Create and configure a new ad if the next
 									// ad doesn't currently exist
 			try {
-				nextAdView = new AdView(getActivity(),AdSize.SMART_BANNER,getString(R.string.admob_app_key));
+				nextAdView = new AdView(getActivity());
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -98,11 +95,11 @@ public class FragmentGoogleAd extends HappyFragment implements AdListener {
 			nextAdView.setLayoutParams(layoutParams);
 			// Register our ad handler that will receive call-backs for state
 			// changes during the ad life cycle
-			nextAdView.setAdListener(this);
+			//nextAdView.setAdListener(this);
 		}
 
 		// Load the ad with the appropriate ad options.
-		nextAdView.loadAd(new AdRequest());
+		//nextAdView.loadAd(new AdRequest());
 	}
 
 	@Override
@@ -148,33 +145,33 @@ public class FragmentGoogleAd extends HappyFragment implements AdListener {
 		}
 	}
 
-	@Override
-	public void onReceiveAd(Ad arg0) {
-		Activity a = getActivity();
-		if (a == null) {
-			return;
-		}
-
-		// If there is an ad currently being displayed, swap the ad that just
-		// loaded
-		// with ad currently being displayed, else display the ad that just
-		// loaded.
-		if (currentAdView != null) {
-			SwapCurrentAd();
-		} else {
-			// This is the first time we're loading an ad, so set the
-			// current ad view to the ad we just loaded and set the next to null
-			// so that we can load a new ad in the background.
-			currentAdView = nextAdView;
-			nextAdView = null;
-			ShowCurrentAd();
-		}
-		failureCount = 0;
-		if(happyAdListener!=null) {
-			happyAdListener.onAd();
-		}
-		Log.d(getClass().getSimpleName(), "onAdLoaded ");
-	}
+//	@Override
+//	public void onReceiveAd(Ad arg0) {
+//		Activity a = getActivity();
+//		if (a == null) {
+//			return;
+//		}
+//
+//		// If there is an ad currently being displayed, swap the ad that just
+//		// loaded
+//		// with ad currently being displayed, else display the ad that just
+//		// loaded.
+//		if (currentAdView != null) {
+//			SwapCurrentAd();
+//		} else {
+//			// This is the first time we're loading an ad, so set the
+//			// current ad view to the ad we just loaded and set the next to null
+//			// so that we can load a new ad in the background.
+//			currentAdView = nextAdView;
+//			nextAdView = null;
+//			ShowCurrentAd();
+//		}
+//		failureCount = 0;
+//		if(happyAdListener!=null) {
+//			happyAdListener.onAd();
+//		}
+//		Log.d(getClass().getSimpleName(), "onAdLoaded ");
+//	}
 
 	private void SwapCurrentAd() {
 		Activity a = getActivity();
@@ -220,31 +217,32 @@ public class FragmentGoogleAd extends HappyFragment implements AdListener {
 		currentAdView.startAnimation(slideUp);
 	}
 
-	@Override
-	public void onDismissScreen(Ad arg0) {
-		// TODO Auto-generated method stub
-		
-	}
+//	@Override
+//	public void onDismissScreen(Ad arg0) {
+//		// TODO Auto-generated method stub
+//		
+//	}
+//
+//	@Override
+//	public void onFailedToReceiveAd(Ad arg0, ErrorCode error) {
+//		failureCount++;
+//		if(happyAdListener!=null) {
+//			happyAdListener.onAdFailed(failureCount, error==ErrorCode.NO_FILL);
+//		}
+//	}
+//
+//	@Override
+//	public void onLeaveApplication(Ad arg0) {
+//		// TODO Auto-generated method stub
+//		
+//	}
 
-	@Override
-	public void onFailedToReceiveAd(Ad arg0, ErrorCode error) {
-		failureCount++;
-		if(happyAdListener!=null) {
-			happyAdListener.onAdFailed(failureCount, error==ErrorCode.NO_FILL);
-		}
-	}
+//	@Override
+//	public void onPresentScreen(Ad arg0) {
+//		// TODO Auto-generated method stub
+//		
+//	}
 
-	@Override
-	public void onLeaveApplication(Ad arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void onPresentScreen(Ad arg0) {
-		// TODO Auto-generated method stub
-		
-	}
 	
 }
 

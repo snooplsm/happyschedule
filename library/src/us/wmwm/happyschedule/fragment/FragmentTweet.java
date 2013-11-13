@@ -10,6 +10,7 @@ import us.wmwm.happyschedule.R;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.SpannableStringBuilder;
 import android.text.style.ClickableSpan;
 import android.text.util.Linkify;
@@ -34,6 +35,8 @@ public class FragmentTweet extends HappyFragment {
 	TextView ago;
 	TextView text;
 	WebView webView;
+	
+	Handler handler = new Handler();
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -98,6 +101,43 @@ public class FragmentTweet extends HappyFragment {
 		k.put("url", String.format("https://twitter.com/%s/status/%s",status.getUser().getScreenName(),status.getId()));
 		k.put("status", text.toString());
 		FlurryAgent.logEvent("TweetView", k);
+		
+		FragmentAmazonAd ad = new FragmentAmazonAd();
+		ad.setHappyAdListener(new HappyAdListener() {
+			@Override
+			public void onAd() {
+			}
+
+			@Override
+			public void onAdFailed(int count, boolean noFill) {
+				handler.post(new Runnable() {
+					@Override
+					public void run() {
+						try {
+							FragmentGoogleAd gad = new FragmentGoogleAd();
+							if (getView() != null
+									&& getView().findViewById(
+											R.id.fragment_tweet_ad) != null) {
+								getChildFragmentManager().beginTransaction()
+										.replace(R.id.fragment_tweet_ad, gad)
+										.commit();
+							}
+						} catch (Exception e) {
+
+						}
+					}
+				});
+			}
+		});
+		if (getView() != null
+				&& getView().findViewById(R.id.fragment_tweet_ad) != null) {
+			try {
+				getChildFragmentManager().beginTransaction()
+						.replace(R.id.fragment_tweet_ad, ad).commit();
+			} catch (Exception e) {
+
+			}
+		}
 	}
 
 	public static FragmentTweet newInstance(Status status) {

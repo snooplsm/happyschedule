@@ -5,11 +5,7 @@ import us.wmwm.happyschedule.fragment.FragmentLoad;
 import us.wmwm.happyschedule.fragment.FragmentLoad.OnLoadListener;
 import us.wmwm.happyschedule.fragment.FragmentMain;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
-
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
 
 public class MainActivity extends HappyActivity {
 

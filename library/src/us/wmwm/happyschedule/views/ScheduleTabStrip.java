@@ -1,6 +1,5 @@
 package us.wmwm.happyschedule.views;
 
-import us.wmwm.happyschedule.R;
 import android.content.Context;
 import android.support.v4.view.PagerTabStrip;
 import android.util.AttributeSet;

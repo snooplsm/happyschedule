@@ -2,7 +2,6 @@ package us.wmwm.happyschedule.model;
 
 import java.io.Serializable;
 import java.util.Calendar;
-import java.util.UUID;
 
 import org.json.JSONObject;
 
