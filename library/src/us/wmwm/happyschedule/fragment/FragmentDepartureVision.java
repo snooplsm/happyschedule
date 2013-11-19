@@ -25,6 +25,7 @@ import us.wmwm.happyschedule.model.StationToStation;
 import us.wmwm.happyschedule.model.TrainStatus;
 import us.wmwm.happyschedule.service.Poller;
 import us.wmwm.happyschedule.util.Streams;
+import us.wmwm.happyschedule.views.DepartureVisionView;
 import us.wmwm.happyschedule.views.OnStationSelectedListener;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -45,6 +46,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView;
 import android.widget.TextView;
 
 import com.emilsjolander.components.stickylistheaders.StickyListHeadersListView;
@@ -93,9 +96,22 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary,
 	boolean canLoad;
 
 	boolean activityCreated;
+	
+	public interface DepartureVisionListener {
+		void onTrip(String tripId);
+	}
 
-	public void setOnStationSelected(OnStationSelectedListener onStationSelected) {
+	DepartureVisionListener departureVisionListener;
+	
+	public FragmentDepartureVision setDepartureVisionListener(
+			DepartureVisionListener departureVisionListener) {
+		this.departureVisionListener = departureVisionListener;
+		return this;
+	}
+	
+	public FragmentDepartureVision setOnStationSelected(OnStationSelectedListener onStationSelected) {
 		this.onStationSelected = onStationSelected;
+		return this;
 	}
 
 	BroadcastReceiver connectionReceiver = new BroadcastReceiver() {
@@ -373,6 +389,7 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary,
 		if(stationArrive!=null) {
 			stationSelect.setVisibility(View.GONE);
 		}
+		
 		loadInitial();
 		// FragmentAmazonAd ad = new FragmentAmazonAd();
 		// ad.setHappyAdListener(new HappyAdListener() {
@@ -399,6 +416,17 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary,
 		// getFragmentManager().beginTransaction().replace(R.id.fragment_ad, ad)
 		// .commit();
 		activityCreated = true;
+		if(canLoad && departureVisionListener!=null) {
+			list.setOnItemClickListener(new OnItemClickListener() {
+				@Override
+				public void onItemClick(AdapterView<?> arg0, View arg1,
+						int arg2, long arg3) {
+					DepartureVisionView v = (DepartureVisionView) arg1;
+					TrainStatus status = v.getTrainStatus();
+					departureVisionListener.onTrip(status.getTrain());
+				}
+			});
+		}
 	}
 
 	private void loadInitial() {

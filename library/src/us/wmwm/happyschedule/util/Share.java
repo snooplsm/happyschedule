@@ -126,7 +126,8 @@ public class Share {
 		}
 		i.setType("text/plain");
 		i.putExtra(Intent.EXTRA_SUBJECT, "#NJRails Schedule");
-		i.putExtra(Intent.EXTRA_TEXT, b.toString());	
+		i.putExtra(Intent.EXTRA_TEXT, b.toString());
+		i.putExtra(Intent.EXTRA_TITLE, b.toString());
 		return i;
 	}
 

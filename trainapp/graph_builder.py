@@ -293,8 +293,9 @@ def buildGraph(agencies) :
 		for row in stopReader:
 #			print "find stop headers"
 			for i in range(len(row)):
-				headers[row[i].lower().split(" ")[0]] = i
+				headers[row[i].lower().strip().split(" ")[0]] = i
 			break
+		print headers
 		stopIdPos = headers["stop_id"]
 		stopNamePos = headers["stop_name"]
 		stopLatPos = headers["stop_lat"]
@@ -558,9 +559,13 @@ def buildGraph(agencies) :
 					alltimes[source['id']] = {}
 				if target['id'] not in alltimes[source['id']]:
 					alltimes[source['id']][target['id']] = []
-				alltimes[source['id']][target['id']].append(tk.mktime(arriveTime.timetuple())-tk.mktime(departTime.timetuple()))
-#				if alltimes[key][len(alltimes[key])-1] < 0 :
-#					print "arrive",arriveTime,"-","depart",departTime
+				ktime = tk.mktime(arriveTime.timetuple())-tk.mktime(departTime.timetuple());
+				# print ktime
+				alltimes[source['id']][target['id']].append(ktime)
+				if ktime < 0:
+					print "arrive["+target["id"]+"]",target['arrive'],"-","depart["+source['id']+"]",source['depart']
+					for k in stops:
+						print k
 				source['name'] = stations[source['id']]['name']
 				target['name'] = stations[target['id']]['name']
 				source['label'] = stations[source['id']]['name']
@@ -735,6 +740,9 @@ def buildGraph(agencies) :
 			maxy = 0
 			total = 0.0
 			for time in alltimes[a][b]:
+				if time < 0:
+					# raw_input("da fuqqq? " + str(time) + "a: " + a + " b:" + b)
+					time = -1*time
 				total = total + time
 				if miny>time:
 					miny = time		
@@ -750,6 +758,8 @@ def buildGraph(agencies) :
 				maxtimes[a] = {}
 			maxtimes[a][b] = maxy
 			#print mintimes[key], avgtimes[key]
+			if mintimes[a][b] < 0:
+				raw_input("da fuq?")
 			G[a][b]['weight'] = mintimes[a][b]
 #			G[a][b] = avgtimes[key]
 #			G[a][b] = maxtimes[key]
@@ -765,6 +775,8 @@ def buildGraph(agencies) :
 			stop = stops[position]
 			if lastStop!=None:
 				time = mintimes[lastStop["id"]][stop["id"]]
+				if time < 0:
+					print time
 				weight = weight + time
 			lastStop = stop
 			stopId = stop['id']
@@ -775,6 +787,8 @@ def buildGraph(agencies) :
 						H.add_node(route)
 						H.add_node(sRoute)
 						if(H.has_edge(route,sRoute)==False):
+							if weight < 0:
+								print weight,time
 							H.add_edge(route,sRoute,{"weight":weight})
 	# print "strongly connected stations: ",networkx.algorithms.components.strongly_connected.number_strongly_connected_components(G)
 	# print "strongly connected routes: ",networkx.algorithms.components.strongly_connected.number_strongly_connected_components(H)

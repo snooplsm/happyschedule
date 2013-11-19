@@ -7,7 +7,9 @@ import org.json.JSONObject;
 
 import us.wmwm.happyschedule.R;
 import us.wmwm.happyschedule.ThreadHelper;
+import us.wmwm.happyschedule.dao.ScheduleDao;
 import us.wmwm.happyschedule.dao.WDb;
+import us.wmwm.happyschedule.fragment.FragmentDepartureVision.DepartureVisionListener;
 import us.wmwm.happyschedule.fragment.FragmentHistory.OnHistoryListener;
 import us.wmwm.happyschedule.fragment.FragmentPickStations.OnGetSchedule;
 import us.wmwm.happyschedule.model.AppAd;
@@ -175,6 +177,12 @@ public class FragmentMain extends Fragment {
 								}
 							}
 						}.start();
+					}
+				});
+				fma.setDepartureVisionListener(new DepartureVisionListener() {
+					@Override
+					public void onTrip(String tripId) {
+						
 					}
 				});
 				// fma.setOnStationSelectedListener(new

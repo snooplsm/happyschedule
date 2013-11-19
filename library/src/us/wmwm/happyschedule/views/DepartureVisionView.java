@@ -21,6 +21,11 @@ public class DepartureVisionView extends RelativeLayout {
 	View trackContainer;
 	TextView time;
 	float one,two,three,four;
+	TrainStatus status;
+	
+	public TrainStatus getTrainStatus() {
+		return status;
+	}
 
 	public DepartureVisionView(Context context) {
 		super(context);
@@ -39,6 +44,7 @@ public class DepartureVisionView extends RelativeLayout {
 	}
 
 	public void setData(TrainStatus status, Map<String,LineStyle> keyToColor) {
+		this.status = status;
 		LineStyle line = keyToColor.get(status.getLine().toLowerCase());
 		if(line!=null) {
 			lineIndicator.setBackgroundColor(line.color);
