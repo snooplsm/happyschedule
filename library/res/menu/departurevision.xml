@@ -1,35 +1,30 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <item
-        android:id="@+id/menu_change_station"
-        android:orderInCategory="100"
-        android:showAsAction="always|withText"
-        android:title="Change Station "/>
-        <item
-        android:id="@+id/menu_change_arrival_station"
-        android:orderInCategory="100"
-        android:showAsAction="always|withText"
-        android:visible="false"
-        android:title="Change Station "/>
-    <item
-        android:id="@+id/menu_add_station"
-        android:orderInCategory="100"
-        android:showAsAction="never"
-        android:title="Add Station "
-        android:visible="false"/>
-    <item
         android:id="@+id/menu_remove_station"
         android:orderInCategory="100"
-        android:showAsAction="never"
-        android:title="Remove"
-        android:visible="false"/>
-    
+        android:showAsAction="ifRoom"
+        android:title="Remove Station"
+        android:icon="@drawable/ic_action_discard"
+        android:visible="true"/>
     <item
-        android:id="@+id/menu_refresh"
+        android:id="@+id/menu_change_station"
+        android:icon="@drawable/ic_action_view_as_grid"
         android:orderInCategory="100"
         android:showAsAction="always"
-        android:icon="@drawable/ic_action_refresh"
-        android:title="Refresh"
+        android:title="Change Station "/>
+    <item
+        android:id="@+id/menu_change_arrival_station"
+        android:icon="@drawable/ic_action_view_as_grid"
+        android:orderInCategory="100"
+        android:showAsAction="always"
+        android:title="Change Station "
+        android:visible="false"/>
+    <item
+        android:id="@+id/menu_add_station"
+        android:icon="@drawable/ic_action_new"
+        android:orderInCategory="100"
+        android:showAsAction="always"
+        android:title="New DepartureVision"
         android:visible="true"/>
-
 </menu>

@@ -19,19 +19,25 @@
             android:textColor="@color/error_text"
             android:visibility="gone" />
 
-        <com.emilsjolander.components.stickylistheaders.StickyListHeadersListView
-            android:id="@+id/list"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+        <uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout
             android:layout_below="@id/no_internet"
-            android:divider="@null"
-            android:dividerHeight="0dp" />
+            android:id="@+id/pull_to_refresh"           
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
 
-        <LinearLayout
+            <com.emilsjolander.components.stickylistheaders.StickyListHeadersListView
+                android:id="@+id/list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                
+                android:divider="@null"
+                android:dividerHeight="0dp" />
+        </uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout>
+
+        <LinearLayout            
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"
-             >
+            android:orientation="vertical" >
 
             <TextView
                 android:id="@+id/departure"

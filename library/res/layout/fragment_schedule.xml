@@ -5,7 +5,14 @@
     android:background="?android:attr/windowBackground" >
 
     <RelativeLayout
+        android:id="@+id/fragment_schedule_ad_top"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+    </RelativeLayout>
+
+    <RelativeLayout
         android:id="@+id/top_ad"
+        android:layout_below="@id/fragment_schedule_ad_top"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
     </RelativeLayout>

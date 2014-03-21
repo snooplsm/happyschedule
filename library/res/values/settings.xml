@@ -40,8 +40,11 @@
 
     <string name="settings_category_notifications">Alerts</string>
     <string name="settings_title_notifications_enable">Enable Alerts</string>
-    <string name="settings_summary_notifications">Alerts are dispatched when train abnormalities arise.</string>
+    <string name="settings_title_notifications_editorial_enable">Enable Editorial Alerts</string>
+    <string name="settings_summary_notifications">Alerts are dispatched every time a person sends a message.  Disabling them will no longer show the notification.  Doing this makes this app pointless.</string>
+    <string name="settings_summary_notifications_editorial">Messages from Happy Tap</string>
     <string name="settings_key_push_on">push_notifications_enabled</string>
+    <string name="settings_key_push_editorial_on">push_notifications_editorial_enabled</string>
     <string name="settings_key_rail_lines">push_notifications_rail_lines</string>
     <string name="settings_summary_rail_lines">Select which rail lines you want to receive alerts on.</string>
 

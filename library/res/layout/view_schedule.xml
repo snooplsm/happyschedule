@@ -35,7 +35,7 @@
                     android:layout_marginLeft="6dp"
                     android:text="11:30p - 12:15a"
                     android:textColor="#2a2a2a"
-                    android:textSize="16dp"
+                    android:textSize="16sp"
                     android:textStyle="bold" />
 
                 <LinearLayout

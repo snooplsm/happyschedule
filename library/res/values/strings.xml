@@ -19,8 +19,14 @@
     <string name="amazon_app_key">3045443539525247434a305056575358</string>
     <string name="admob_app_key">a14cbf2b9d15c90</string>
     <string name="flurry_app_key">4PZTPTTB4BVFXHYVQWWP</string>
-	<string name="view_report_error">There was a problem, but maybe you can help.</string>
-	<string name="poller">us.wmwm.happyschedule.service.DeparturePoller</string>
-	<string name="share">https://play.google.com/store/apps/details?id=</string>
-	<string name="market">play</string>
+    <string name="view_report_error">There was a problem, but maybe you can help.</string>
+    <string name="poller">us.wmwm.happyschedule.service.DeparturePoller</string>
+    <string name="share">https://play.google.com/store/apps/details?id=</string>
+    <string name="market">play</string>
+    <string name="app_id">1395783304015419</string>
+    <string name="pull_to_refresh_pull_label">Swipe down to refresh</string>
+    <string name="pull_to_refresh_release_label">Release to refresh</string>
+    <string name="pull_to_refresh_refreshing_label">Refreshing train statuses</string>
+    <string name="promotional_account">nj_rails</string>
+
 </resources>

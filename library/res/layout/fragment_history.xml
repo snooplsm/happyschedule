@@ -10,8 +10,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/fragment_history_ad"
-        android:divider="@null"
-        android:dividerHeight="0dp" />
+        android:divider="@drawable/fragment_history"
+        android:dividerHeight="1px" />
 
     <RelativeLayout
         android:id="@id/fragment_history_ad"

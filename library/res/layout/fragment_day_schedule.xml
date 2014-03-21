@@ -11,7 +11,9 @@
         android:divider="@null"
         android:dividerHeight="0dp"
         android:drawSelectorOnTop="true"        
-        android:groupIndicator="@null" >
+        android:groupIndicator="@null"
+        android:fitsSystemWindows="true"
+        android:clipToPadding="false" >
     </ExpandableListView>
 
     <RelativeLayout

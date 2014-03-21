@@ -8,7 +8,7 @@
         android:id="@+id/text"
         android:layout_marginLeft="@dimen/header_margin"
         android:layout_centerVertical="true"
-        android:textSize="15dp"
+        android:textSize="15sp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
