@@ -18,8 +18,10 @@ Generating a schedule
 
 navigate to the trainapp folder
 
-type <code>python trainapp njtransit</code>  
+type <code>python graph_builder.py njtransit</code>  
 
 this will create a file called database.db in trainapp/target/njtransit
+
+compress the database.db into a file named database.db.zip and copy it into the raw folder of the app you are working on.
 
 again you could also do this for lirr, metro-north, septa.  Each agency is the folder name found in gtfs and overrides where you can put your gtfs data and custom overriding code respectively.
