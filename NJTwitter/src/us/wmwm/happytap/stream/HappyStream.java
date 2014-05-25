@@ -153,13 +153,7 @@ public class HappyStream {
 					}
 					saveStatus(status);
 					try {
-						int result = 0;
-						boolean hasMore = true;
-						Long lastUserId = 0L;
-						while (hasMore) {
-							processStatus(status);
-							hasMore = lastUserId != 0;
-						}
+						processStatus(status);
 						System.out.println("DONE");
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -312,7 +306,7 @@ public class HappyStream {
 		return true;
 	}
 
-	public static DBCursor processStatus(Status status) throws Exception {
+	public static void processStatus(Status status) throws Exception {
 		HttpURLConnection conn = null;
 		InputStream in = null;
 		DBCursor users = null;
@@ -382,11 +376,16 @@ public class HappyStream {
 			headers.put("Content-Type", "application/json");
 			regs = new JSONArray();
 			while (users.hasNext()) {
-				DBObject user = users.next();
-				String pushId = (String) user.get("push_id");
-				regs.put(pushId);
+				int count = 0;
+				while(users.hasNext() && count<1000) {
+					DBObject user = users.next();
+					String pushId = (String) user.get("push_id");
+					regs.put(pushId);
+					count++;
+				}		
 				if (regs.length() == 0) {
-					return users;
+					users.close();
+					return;
 				}
 				fields.put("registration_ids", regs);
 				URL u = new URL("https://android.googleapis.com/gcm/send");
@@ -445,8 +444,7 @@ public class HappyStream {
 					in = conn.getErrorStream();
 					System.err.println(Streams.readFully(in));
 				}
-			}
-			return users;
+			}			
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -460,7 +458,6 @@ public class HappyStream {
 				users.close();
 			}
 		}
-		return users;
 	}
 
 	/**
