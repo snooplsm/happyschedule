@@ -8,8 +8,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -18,7 +18,6 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -41,27 +40,31 @@ import twitter4j.internal.org.json.JSONException;
 import twitter4j.internal.org.json.JSONObject;
 import twitter4j.json.DataObjectFactory;
 
+import com.mongodb.BasicDBList;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DB;
+import com.mongodb.DBCollection;
+import com.mongodb.DBCursor;
+import com.mongodb.DBObject;
+import com.mongodb.MongoClient;
+import com.mongodb.WriteResult;
+
 public class HappyStream {
 
-	/**
-	 * @param args
-	 */
-
-	private static Connection conn;
+	private static DB db;
 
 	private static String apiKey;
 
 	private static String screenname;
 
 	public static void main(String[] args) {
-		Connection connection = null;
+		MongoClient client;
 		try {
-			Class.forName("org.sqlite.JDBC");
-			connection = DriverManager.getConnection("jdbc:sqlite:" + args[5]);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
+			client = new MongoClient();
+		} catch (UnknownHostException e1) {
+			throw new RuntimeException(e1);
 		}
-		conn = connection;
+		db = client.getDB("njrails");
 		ConfigurationBuilder cb = new ConfigurationBuilder();
 		cb.setGZIPEnabled(true);
 		cb.setJSONStoreEnabled(true);
@@ -154,10 +157,7 @@ public class HappyStream {
 						boolean hasMore = true;
 						Long lastUserId = 0L;
 						while (hasMore) {
-							System.out.println("handling " + lastUserId
-									+ " to " + (lastUserId + 1000));
-							lastUserId = processStatus(status, lastUserId,
-									result);
+							processStatus(status);
 							hasMore = lastUserId != 0;
 						}
 						System.out.println("DONE");
@@ -312,128 +312,21 @@ public class HappyStream {
 		return true;
 	}
 
-	public static int sendAppUpdated(int version, Long lastUserId)
-			throws Exception {
+	public static DBCursor processStatus(Status status) throws Exception {
 		HttpURLConnection conn = null;
 		InputStream in = null;
-		ResultSet users = null;
-		try {
-
-			users = findAllUsers(HappyStream.conn, lastUserId, 1000);
-
-			JSONArray regs = new JSONArray();
-			List<Long> userIds = new ArrayList<Long>();
-			JSONObject fields = new JSONObject();
-			fields.put("time_to_live", 1800);
-			JSONObject data = new JSONObject();
-			data.put("type", "upgrade_alert");
-			data.put("version", version);
-			fields.put("data", data);
-			fields.put("dry_run", Boolean.getBoolean("dry_run"));
-			Map<String, String> headers = new HashMap<String, String>();
-			headers.put("Authorization", "key=" + apiKey);
-			headers.put("Content-Type", "application/json");
-			while (users.next()) {
-				String pushId = users.getString(1);
-				long userId = users.getLong(2);
-				regs.put(pushId);
-				userIds.add(userId);
-			}
-			if (regs.length() == 0) {
-				return 0;
-			}
-			fields.put("registration_ids", regs);
-			URL u = new URL("https://android.googleapis.com/gcm/send");
-			conn = (HttpURLConnection) u.openConnection();
-			for (Map.Entry<String, String> e : headers.entrySet()) {
-				conn.setRequestProperty(e.getKey(), e.getValue());
-			}
-			conn.setRequestMethod("POST");
-			conn.setDoInput(true);
-			conn.setDoOutput(true);
-			OutputStream out = conn.getOutputStream();
-			out.write(fields.toString().getBytes());
-			out.close();
-			int code = conn.getResponseCode();
-
-			if (code == 200) {
-				in = conn.getInputStream();
-				String response = Streams.readFully(in);
-				JSONObject o = new JSONObject(response);
-				JSONArray a = o.getJSONArray("results");
-				List<Long> successfuls = new ArrayList<Long>();
-				List<Long> notRegistered = new ArrayList<Long>();
-				Map<Long, String> replace = new HashMap<Long, String>();
-				StringBuilder sb = new StringBuilder("Successful: (");
-				StringBuilder nb = new StringBuilder("Not Registered: (");
-				StringBuilder replaceb = new StringBuilder("Need to replace: (");
-				for (int i = 0; i < a.length(); i++) {
-					JSONObject ob = a.getJSONObject(i);
-					// System.out.println(ob);
-					boolean success = !ob.has("error");
-					if (success) {
-						successfuls.add(userIds.get(i));
-						sb.append(userIds.get(i)).append(",");
-						if (ob.has("registration_id")) {
-							replaceb.append(userIds.get(i)).append(":")
-									.append(ob.getString("registration_id"))
-									.append(",");
-							replace.put(userIds.get(i),
-									ob.getString("registration_id"));
-						}
-					} else {
-						if ("NotRegistered".equals(ob.opt("error"))) {
-							notRegistered.add(userIds.get(i));
-							nb.append(userIds.get(i)).append(",");
-						}
-					}
-					// if(ob.has("registration_id"))
-				}
-				System.out.println(sb);
-				System.out.println(nb);
-				System.out.println(replaceb);
-				// saveSentNotification(status, successfuls);
-				deletePushIds(HappyStream.conn, notRegistered);
-				fixPushIds(HappyStream.conn, replace);
-			} else {
-				in = conn.getErrorStream();
-				System.err.println(Streams.readFully(in));
-			}
-			return regs.length();
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			if (in != null) {
-				in.close();
-			}
-			if (conn != null) {
-				conn.disconnect();
-			}
-			if (users != null) {
-				users.close();
-			}
-		}
-		return 0;
-	}
-
-	public static long processStatus(Status status, Long lastUserId, int offset)
-			throws Exception {
-		HttpURLConnection conn = null;
-		InputStream in = null;
-		ResultSet users = null;
+		DBCursor users = null;
 		try {
 			if (status.getUser().getScreenName().equalsIgnoreCase(screenname)) {
-				users = findAllUsers(status, lastUserId, 1000);
+				users = findAllUsers(status);
 			} else {
 				Calendar cal = Calendar.getInstance();
 				int hour = cal.get(Calendar.HOUR_OF_DAY);
 				int day = cal.get(Calendar.DAY_OF_WEEK);
-				users = findUsersForService(status, lastUserId, day, hour,
-						offset, 1000);
+				users = findUsersForService(status, day, hour);
 			}
 
 			JSONArray regs = new JSONArray();
-			List<Long> userIds = new ArrayList<Long>();
 			JSONObject fields = new JSONObject();
 			fields.put("time_to_live", 1800);
 			JSONObject data = new JSONObject();
@@ -477,8 +370,9 @@ public class HappyStream {
 			fields.put("data", data);
 			// fields.put("dry_run", Boolean.TRUE);
 			Boolean dryRun = Boolean.getBoolean("dry_run");
-			if(Boolean.FALSE.equals(dryRun)) {
-				if(status.getText().startsWith("dry") || status.getText().startsWith("test")) {
+			if (Boolean.FALSE.equals(dryRun)) {
+				if (status.getText().startsWith("dry")
+						|| status.getText().startsWith("test")) {
 					dryRun = Boolean.TRUE;
 				}
 			}
@@ -486,72 +380,73 @@ public class HappyStream {
 			Map<String, String> headers = new HashMap<String, String>();
 			headers.put("Authorization", "key=" + apiKey);
 			headers.put("Content-Type", "application/json");
-			while (users.next()) {
-				String pushId = users.getString(1);
-				long userId = users.getLong(2);
+			regs = new JSONArray();
+			while (users.hasNext()) {
+				DBObject user = users.next();
+				String pushId = (String) user.get("push_id");
 				regs.put(pushId);
-				userIds.add(userId);
-			}
-			if (regs.length() == 0) {
-				return 0;
-			}
-			fields.put("registration_ids", regs);
-			URL u = new URL("https://android.googleapis.com/gcm/send");
-			conn = (HttpURLConnection) u.openConnection();
-			for (Map.Entry<String, String> e : headers.entrySet()) {
-				conn.setRequestProperty(e.getKey(), e.getValue());
-			}
-			conn.setRequestMethod("POST");
-			conn.setDoInput(true);
-			conn.setDoOutput(true);
-			OutputStream out = conn.getOutputStream();
-			out.write(fields.toString().getBytes());
-			out.close();
-			int code = conn.getResponseCode();
+				if (regs.length() == 0) {
+					return users;
+				}
+				fields.put("registration_ids", regs);
+				URL u = new URL("https://android.googleapis.com/gcm/send");
+				conn = (HttpURLConnection) u.openConnection();
+				for (Map.Entry<String, String> e : headers.entrySet()) {
+					conn.setRequestProperty(e.getKey(), e.getValue());
+				}
+				conn.setRequestMethod("POST");
+				conn.setDoInput(true);
+				conn.setDoOutput(true);
+				OutputStream out = conn.getOutputStream();
+				out.write(fields.toString().getBytes());
+				out.close();
+				int code = conn.getResponseCode();
 
-			if (code == 200) {
-				in = conn.getInputStream();
-				String response = Streams.readFully(in);
-				JSONObject o = new JSONObject(response);
-				JSONArray a = o.getJSONArray("results");
-				List<Long> successfuls = new ArrayList<Long>();
-				List<Long> notRegistered = new ArrayList<Long>();
-				Map<Long, String> replace = new HashMap<Long, String>();
-				StringBuilder sb = new StringBuilder("Successful: (");
-				StringBuilder nb = new StringBuilder("Not Registered: (");
-				StringBuilder replaceb = new StringBuilder("Need to replace: (");
-				for (int i = 0; i < a.length(); i++) {
-					JSONObject ob = a.getJSONObject(i);
-					// System.out.println(ob);
-					boolean success = !ob.has("error");
-					if (success) {
-						successfuls.add(userIds.get(i));
-						sb.append(userIds.get(i)).append(",");
-						if (ob.has("registration_id")) {
-							replaceb.append(userIds.get(i)).append(":")
-									.append(ob.getString("registration_id"))
-									.append(",");
-							replace.put(userIds.get(i),
-									ob.getString("registration_id"));
+				if (code == 200) {
+					in = conn.getInputStream();
+					String response = Streams.readFully(in);
+					JSONObject o = new JSONObject(response);
+					JSONArray a = o.getJSONArray("results");
+					List<String> successfuls = new ArrayList<String>();
+					List<String> notRegistered = new ArrayList<String>();
+					Map<String, String> replace = new HashMap<String, String>();
+					StringBuilder sb = new StringBuilder("Successful: (");
+					StringBuilder nb = new StringBuilder("Not Registered: (");
+					StringBuilder replaceb = new StringBuilder(
+							"Need to replace: (");
+					for (int i = 0; i < a.length(); i++) {
+						JSONObject ob = a.getJSONObject(i);
+						// System.out.println(ob);
+						boolean success = !ob.has("error");
+						if (success) {
+							successfuls.add(regs.getString(i));
+							sb.append(regs.getString(i)).append(",");
+							if (ob.has("registration_id")) {
+								replaceb.append(regs.getString(i))
+										.append(":")
+										.append(ob.getString("registration_id"))
+										.append(",");
+								replace.put(regs.getString(i),
+										ob.getString("registration_id"));
+							}
+						} else {
+							if ("NotRegistered".equals(ob.opt("error"))) {
+								notRegistered.add(regs.getString(i));
+								nb.append(regs.getString(i)).append(",");
+							}
 						}
-					} else {
-						if ("NotRegistered".equals(ob.opt("error"))) {
-							notRegistered.add(userIds.get(i));
-							nb.append(userIds.get(i)).append(",");
-						}
+						// if(ob.has("registration_id"))
 					}
-					// if(ob.has("registration_id"))
+					deletePushIds(HappyStream.db, notRegistered);
+					if (!replace.isEmpty()) {
+						fixPushIds(HappyStream.db, replace);
+					}
+				} else {
+					in = conn.getErrorStream();
+					System.err.println(Streams.readFully(in));
 				}
-				saveSentNotification(status, successfuls);
-				deletePushIds(HappyStream.conn, notRegistered);
-				if (!replace.isEmpty()) {
-					fixPushIds(HappyStream.conn, replace);
-				}
-			} else {
-				in = conn.getErrorStream();
-				System.err.println(Streams.readFully(in));
 			}
-			return userIds.get(userIds.size() - 1);
+			return users;
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -565,201 +460,57 @@ public class HappyStream {
 				users.close();
 			}
 		}
-		return 0;
+		return users;
 	}
 
-	private static void fixPushIds(Connection conn, Map<Long, String> replace)
+	/**
+	 * replace string key is to be updated with the value.
+	 * 
+	 * @param db
+	 * @param replace
+	 * @throws Exception
+	 */
+	private static void fixPushIds(DB db, Map<String, String> replace)
 			throws Exception {
-		System.out.println("trying to fix push ids");
-		PreparedStatement query = conn
-				.prepareStatement("select id from user where push_id=?");
-		PreparedStatement update = conn
-				.prepareStatement("update user set push_id=? where id=?");
-		PreparedStatement services = conn
-				.prepareStatement("select screenname,day,hour,strftime('%s',created) from services where user_id=?");
-		PreparedStatement deleteServices = conn
-				.prepareStatement("delete from services where user_id in(?,?)");
-		PreparedStatement addServices = conn
-				.prepareStatement("insert into services(user_id,screenname,created,day,hour) values(?,?,?,?,?)");
-		boolean before = conn.getAutoCommit();
-		conn.setAutoCommit(false);
-		try {
-			for (Map.Entry<Long, String> e : replace.entrySet()) {
-				query.setString(1, e.getValue());
-				query.execute();
-				ResultSet rs = query.getResultSet();
-				Set<Service> servicesForReplacement = new HashSet<Service>();
-				Long id = 0L;
-				try {
-					while (rs.next()) {
-						id = rs.getLong(1);
-						System.out.println("can't replace " + id
-								+ " for user id " + e.getKey());
-						services.setLong(1, id);
-						services.execute();
-						ResultSet servicesResultSet = services.getResultSet();
-						while (servicesResultSet.next()) {
-							Service service = new Service();
-							service.screenname = servicesResultSet.getString(1);
-							service.day = servicesResultSet.getInt(2);
-							service.hour = servicesResultSet.getInt(3);
-							servicesForReplacement.add(service);
-						}
-						System.out.println(servicesForReplacement.size());
-						servicesResultSet.close();
-						services.setLong(1, e.getKey());
-						services.execute();
-						servicesResultSet = services.getResultSet();
-						while (servicesResultSet.next()) {
-							Service service = new Service();
-							service.screenname = servicesResultSet.getString(1);
-							service.day = servicesResultSet.getInt(2);
-							service.hour = servicesResultSet.getInt(3);
-							service.created = servicesResultSet.getLong(4);
-							servicesForReplacement.add(service);
-						}
-						servicesResultSet.close();
-						System.out.println(servicesForReplacement.size());
-						deleteServices.setLong(1, id);
-						deleteServices.setLong(2, e.getKey());
-						deleteServices.execute();
-						for (Service service : servicesForReplacement) {
-							addServices.setLong(1, id);
-							addServices.setString(2, service.screenname);
-							addServices.setLong(3, service.created);
-							addServices.setInt(4, service.day);
-							addServices.setInt(5, service.hour);
-							addServices.addBatch();
-						}
-						addServices.executeBatch();
-						continue;
-					}
-				} finally {
-					rs.close();
-				}
-				System.out.println("updating " + e.getKey() + " with "
-						+ e.getValue());
-				update.setString(1, e.getValue());
-				update.setLong(2, e.getKey());
-				try {
-					update.executeUpdate();
-				} catch (SQLException ex) {
-					if (ex.getErrorCode() == 19) {
-						update = conn
-								.prepareStatement("update user set push_id=? where id=?");
-						deletePushIds(conn,
-								Collections.singletonList(e.getKey()));
-					}
-				}
+		DBCollection users = db.getCollection("users");
+		for (Map.Entry<String, String> entry : replace.entrySet()) {
+			DBObject original = users.findOne(new BasicDBObject("push_id",
+					entry.getKey()));
+			DBObject newUser = users.findOne(new BasicDBObject("push_id", entry
+					.getValue()));
+			if (newUser != null && original != null) {
+				users.remove(original);
+			} else {
+				Map k = original.toMap();
+				k.put("push_id", entry.getValue());
+				k.put("_id", entry.getValue());
+				BasicDBObject replacement = new BasicDBObject(k);
+				users.save(replacement);
+				users.remove(original);
 			}
-			// stat.executeBatch();
-			// stat2.executeBatch();
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.err.println("rolling back");
-			conn.rollback();
-		} finally {
-			conn.commit();
-			conn.setAutoCommit(before);
-			query.close();
-			update.close();
 		}
+
 	}
 
-	public static void deletePushIds(Connection conn, List<Long> userIds)
+	public static void deletePushIds(DB conn, List<String> pushIds)
 			throws Exception {
-		PreparedStatement stat = conn
-				.prepareStatement("delete from services where user_id=?");
-		PreparedStatement stat2 = conn
-				.prepareStatement("delete from user where id=?");
-		boolean before = conn.getAutoCommit();
-		conn.setAutoCommit(false);
-		try {
-			for (Long userId : userIds) {
-				stat.setLong(1, userId);
-				stat2.setLong(1, userId);
-				System.out.println("trying to delete " + userId);
-				stat.addBatch();
-				stat2.addBatch();
-			}
-			stat.executeBatch();
-			stat2.executeBatch();
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.err.println("rolling back");
-			conn.rollback();
-		} finally {
-			conn.commit();
-			conn.setAutoCommit(before);
-			stat.close();
-		}
+		BasicDBList userList = new BasicDBList();
+		userList.addAll(pushIds);
+		WriteResult res = conn.getCollection("users").remove(
+				new BasicDBObject("push_id", userList));
 	}
 
-	private static void saveSentNotification(Status status, List<Long> userIds)
+	public static DBCursor findUsersForService(Status status, int day, int hour)
 			throws Exception {
-		PreparedStatement stat = conn
-				.prepareStatement("insert into SENT(user_id,status_id) values(?,?)");
-		boolean before = conn.getAutoCommit();
-		conn.setAutoCommit(false);
-		try {
-			StringBuilder b = new StringBuilder("saving " + status.getText()
-					+ " for (");
-			Iterator<Long> iter = userIds.iterator();
-			while (iter.hasNext()) {
-				Long userId = iter.next();
-				stat.setLong(1, userId);
-				stat.setLong(2, status.getId());
-				stat.addBatch();
-				b.append(userId);
-				if (iter.hasNext()) {
-					b.append(",");
-				}
-			}
-			b.append(")");
-			System.out.println(b.toString());
-			stat.executeBatch();
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.err.println("rolling back");
-			conn.rollback();
-		} finally {
-			conn.commit();
-			conn.setAutoCommit(before);
-			stat.close();
-		}
+		BasicDBObject query = new BasicDBObject("service.screenname", status
+				.getUser().getScreenName()).append("service.day", day).append(
+				"service.hour", hour);
+		return db.getCollection("users").find(query);
 	}
 
-	public static ResultSet findUsersForService(Status status, Long lastUserId,
-			int day, int hour, int offset, int limit) throws Exception {
-		PreparedStatement stat = conn
-				.prepareStatement(String
-						.format("select u.push_id, u.id from USER u where u.id>? and u.id not in (select sb.user_id from SENT sb where sb.user_id=u.id and sb.status_id=?) and u.id in (select sv.user_id from SERVICES sv where sv.screenname=? and sv.day=? and sv.hour=?) group by u.id limit %s, %s",
-								offset, limit));
-		if (lastUserId == null) {
-			lastUserId = 0L;
-		}
-		stat.setLong(1, lastUserId);
-		stat.setLong(2, status.getId());
-		stat.setString(3, status.getUser().getScreenName());
-		stat.setInt(4, day);
-		stat.setInt(5, hour);
-		stat.execute();
-		return stat.getResultSet();
-	}
-
-	public static ResultSet findAllUsers(Status status, Long lastUserId,
-			int limit) throws Exception {
-		PreparedStatement stat = conn
-				.prepareStatement(String
-						.format("select u.push_id, u.id from USER u where u.id > ? and u.id not in (select sb.user_id from SENT sb where sb.user_id=u.id and sb.status_id=:status_id) group by u.id order by u.id asc limit %s",
-								limit));
-		if (lastUserId == null) {
-			lastUserId = 0L;
-		}
-		stat.setLong(1, lastUserId);
-		stat.setLong(2, status.getId());
-		stat.execute();
-		return stat.getResultSet();
+	public static DBCursor findAllUsers(Status status) throws Exception {
+		BasicDBObject fields = new BasicDBObject("services", 0);
+		return db.getCollection("users").find(new BasicDBObject(), fields);
 	}
 
 	public static ResultSet findAllUsers(Connection conn, Long afterUserId,
