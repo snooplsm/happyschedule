@@ -373,10 +373,10 @@ public class HappyStream {
 			fields.put("dry_run", dryRun);
 			Map<String, String> headers = new HashMap<String, String>();
 			headers.put("Authorization", "key=" + apiKey);
-			headers.put("Content-Type", "application/json");
-			regs = new JSONArray();
+			headers.put("Content-Type", "application/json");			
 			while (users.hasNext()) {
 				int count = 0;
+				regs = new JSONArray();
 				while(users.hasNext() && count<1000) {
 					DBObject user = users.next();
 					String pushId = (String) user.get("push_id");
