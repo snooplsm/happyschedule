@@ -429,13 +429,12 @@ public class HappyStream {
 								nb.append(regs.getString(i)).append(",");
 							}
 						}
-						System.out.println(sb);
-						System.out.println(nb);
-						System.out.println(replaceb);
-						// if(ob.has("registration_id"))
+						System.out.println("Sent " + successfuls.size());
+						System.out.println("Need to delete " + notRegistered.size());						
 					}
 					deletePushIds(HappyStream.db, notRegistered);
 					if (!replace.isEmpty()) {
+						System.out.println("Need to replace " + replace.size());
 						fixPushIds(HappyStream.db, replace);
 					}
 				} else {
