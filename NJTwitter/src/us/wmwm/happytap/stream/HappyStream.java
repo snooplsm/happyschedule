@@ -12,15 +12,11 @@ import java.net.UnknownHostException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import twitter4j.DirectMessage;
 import twitter4j.StallWarning;
@@ -121,7 +117,6 @@ public class HappyStream {
 					}
 					if (a.length() > 3) {
 						JSONArray b = new JSONArray();
-						int j = 0;
 						for (int i = 1; i < a.length(); i++) {
 							try {
 								b.put(i - 1, a.getJSONObject(i));
@@ -434,6 +429,9 @@ public class HappyStream {
 								nb.append(regs.getString(i)).append(",");
 							}
 						}
+						System.out.println(sb);
+						System.out.println(nb);
+						System.out.println(replaceb);
 						// if(ob.has("registration_id"))
 					}
 					deletePushIds(HappyStream.db, notRegistered);
@@ -467,6 +465,7 @@ public class HappyStream {
 	 * @param replace
 	 * @throws Exception
 	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private static void fixPushIds(DB db, Map<String, String> replace)
 			throws Exception {
 		DBCollection users = db.getCollection("users");
@@ -489,6 +488,7 @@ public class HappyStream {
 
 	}
 
+	@SuppressWarnings("unused")
 	public static void deletePushIds(DB conn, List<String> pushIds)
 			throws Exception {
 		BasicDBList userList = new BasicDBList();
