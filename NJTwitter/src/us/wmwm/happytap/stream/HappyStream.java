@@ -478,7 +478,6 @@ public class HappyStream {
 			} else {
 				Map k = original.toMap();
 				k.put("push_id", entry.getValue());
-				k.put("_id", entry.getValue());
 				BasicDBObject replacement = new BasicDBObject(k);
 				users.save(replacement);
 				users.remove(original);
@@ -498,9 +497,9 @@ public class HappyStream {
 
 	public static DBCursor findUsersForService(Status status, int day, int hour)
 			throws Exception {
-		BasicDBObject query = new BasicDBObject("service.screenname", status
-				.getUser().getScreenName()).append("service.day", day).append(
-				"service.hour", hour);
+		BasicDBObject query = new BasicDBObject("services.screenname", status
+				.getUser().getScreenName()).append("services.day", day).append(
+				"services.hour", hour);
 		return db.getCollection("users").find(query);
 	}
 
@@ -509,18 +508,18 @@ public class HappyStream {
 		return db.getCollection("users").find(new BasicDBObject(), fields);
 	}
 
-	public static ResultSet findAllUsers(Connection conn, Long afterUserId,
-			int limit) throws Exception {
-		PreparedStatement stat = conn
-				.prepareStatement(String
-						.format("select u.push_id, u.id from USER u where u.id > ? group by u.id order by u.id asc limit %s",
-								limit));
-		if (afterUserId == null) {
-			afterUserId = 0L;
-		}
-		stat.setLong(1, afterUserId);
-		stat.execute();
-		return stat.getResultSet();
-	}
+//	public static ResultSet findAllUsers(Connection conn, Long afterUserId,
+//			int limit) throws Exception {
+//		PreparedStatement stat = conn
+//				.prepareStatement(String
+//						.format("select u.push_id, u.id from USER u where u.id > ? group by u.id order by u.id asc limit %s",
+//								limit));
+//		if (afterUserId == null) {
+//			afterUserId = 0L;
+//		}
+//		stat.setLong(1, afterUserId);
+//		stat.execute();
+//		return stat.getResultSet();
+//	}
 
 }
