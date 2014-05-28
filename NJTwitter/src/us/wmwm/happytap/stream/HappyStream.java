@@ -487,7 +487,7 @@ public class HappyStream {
 	public static void deletePushIds(DB conn, List<String> pushIds)
 			throws Exception {
 		BasicDBObject doc = new BasicDBObject();
-		doc.put("push_id", pushIds);
+		doc.put("push_id", new BasicDBObject("$in", pushIds));
 		WriteResult res = conn.getCollection("users").remove(
 				doc);
 	}
