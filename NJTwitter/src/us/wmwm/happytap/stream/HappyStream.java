@@ -9,9 +9,6 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.UnknownHostException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -489,10 +486,10 @@ public class HappyStream {
 	@SuppressWarnings("unused")
 	public static void deletePushIds(DB conn, List<String> pushIds)
 			throws Exception {
-		BasicDBList userList = new BasicDBList();
-		userList.addAll(pushIds);
+		BasicDBObject doc = new BasicDBObject();
+		doc.put("push_id", pushIds);
 		WriteResult res = conn.getCollection("users").remove(
-				new BasicDBObject("push_id", userList));
+				doc);
 	}
 
 	public static DBCursor findUsersForService(Status status, int day, int hour)
@@ -500,11 +497,12 @@ public class HappyStream {
 		BasicDBObject query = new BasicDBObject("services.screenname", status
 				.getUser().getScreenName()).append("services.day", day).append(
 				"services.hour", hour);
-		return db.getCollection("users").find(query);
+		BasicDBObject fields = new BasicDBObject("push_id",1);
+		return db.getCollection("users").find(query,fields);
 	}
 
 	public static DBCursor findAllUsers(Status status) throws Exception {
-		BasicDBObject fields = new BasicDBObject("services", 0);
+		BasicDBObject fields = new BasicDBObject("push_id", 1);
 		return db.getCollection("users").find(new BasicDBObject(), fields);
 	}
 
