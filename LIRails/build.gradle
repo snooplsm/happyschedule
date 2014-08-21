@@ -1,0 +1,136 @@
+apply plugin: 'android'
+
+dependencies {
+    compile fileTree(dir: 'libs', include: '*.jar')
+    compile project(':libraries:library')
+}
+
+def computeVersionCode() {
+	def now = Calendar.getInstance()
+	def dateFormat = new java.text.SimpleDateFormat("yyyyMMddkk");
+	return Integer.parseInt(dateFormat.format(now.getTime()))
+}
+
+def computeVersionName() {
+	def now = Calendar.getInstance()
+	def dateFormat = new java.text.SimpleDateFormat("yyyy-MM-dd");
+	return dateFormat.format(now.getTime())
+}
+
+def splitDatabase(variant) {
+	def baseZip = file("${buildDir.absolutePath}/intermediates/res/${variant.dirName}/raw")
+	def zipFile =  file("${baseZip.absolutePath}/database_db.zip")
+	def outputDir = file("${baseZip.absolutePath}/")
+	copy {
+		
+		from zipTree(zipFile.absolutePath)
+		into outputDir
+	}
+	
+	delete {
+		delete zipFile.absolutePath
+	}
+	
+	{
+		def proc = "split -a 3 -b 125k ${outputDir.absolutePath}/database_db ${outputDir.absolutePath}/database_db_".execute()
+		proc.waitFor()
+	}
+	
+	delete {
+		delete "${outputDir.absolutePath}/database_db"
+	}
+}
+
+android {
+    compileSdkVersion 19
+    buildToolsVersion '19.1.0'
+    sourceSets {
+        main {
+            manifest.srcFile 'AndroidManifest.xml'
+            java.srcDirs = ['src']
+            resources.srcDirs = ['src']
+            aidl.srcDirs = ['src']
+            renderscript.srcDirs = ['src']
+            res.srcDirs = ['res']
+            assets.srcDirs = ['assets']
+        }
+
+        // Move the tests to tests/java, tests/res, etc...
+        instrumentTest.setRoot('tests')
+
+        // Move the build types to build-types/<type>
+        // For instance, build-types/debug/java, build-types/debug/AndroidManifest.xml, ...
+        // This moves them out of them default location under src/<type>/... which would
+        // conflict with src/ being used by the main source set.
+        // Adding new build types or product flavors should be accompanied
+        // by a similar customization.
+        debug.setRoot('build-types/debug')
+        release.setRoot('build-types/release')
+    }
+    defaultConfig {
+        versionCode computeVersionCode()
+        versionName computeVersionName()
+        minSdkVersion 9
+    }
+    productFlavors {
+        preIcs {
+            versionCode computeVersionCode()-2
+            minSdkVersion 9
+            targetSdkVersion 13
+            compileSdkVersion 13
+        }
+        postIcs {
+            minSdkVersion 14
+            targetSdkVersion 19
+            compileSdkVersion 19
+        }
+    }
+    dexOptions {
+        incremental true
+    }
+    signingConfigs {
+        release {
+			storeFile file(project.KEYSTORE)
+			storePassword project.KEYSTORE_PASSWORD
+			keyAlias project.KEYSTORE_ALIAS
+			keyPassword project.KEY_PASS
+        }
+    }
+    buildTypes {
+        release {
+            runProguard false
+			signingConfig signingConfigs.release
+			zipAlign true
+        }
+    }
+}
+
+//android.applicationVariants.all { variant ->
+
+//	variant.processManifest.doFirst {
+		
+//		if(variant.getMergedFlavor().getTargetSdkVersion()==13) {
+//			FileTree tree = fileTree("${buildDir}.absolutePath") {
+//				include '**/AndroidManifest.xml'			
+//			}
+		
+//			tree.each { File file ->
+//				println file
+//				String content = manifestFile.getText('UTF-8')
+//				content = content.replaceAll(/targetSdkVersion="19"/, 'targetSdkVersion=\"13\"')
+//				manifestFile.write(content, 'UTF-8')
+//			}
+//		}
+		
+//	}
+//}	
+android.applicationVariants.all { variant ->
+	variant.mergeResources.doLast {
+		if(variant.getMergedFlavor().getTargetSdkVersion().getApiLevel()>13) {
+			println("not of pre version")
+		} else {
+			println("of version : " + variant.getMergedFlavor().getTargetSdkVersion().getApiLevel())
+			splitDatabase(variant);
+		}
+	}
+}

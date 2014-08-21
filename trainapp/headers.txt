@@ -1,0 +1,7 @@
+HTTP/1.1 200 OK
+Date: Sat, 16 Aug 2014 13:32:45 GMT
+Content-disposition: attachment; filename=rail_data.zip;
+Content-Type: application/zip
+Content-Length: 4329085
+Connection: close
+

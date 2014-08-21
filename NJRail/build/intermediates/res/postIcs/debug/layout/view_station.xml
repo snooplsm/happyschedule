@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"    
+    android:minHeight="60dp" >
+
+    <TextView
+        android:id="@+id/text"
+        android:layout_marginLeft="@dimen/header_margin"
+        android:layout_centerVertical="true"
+        android:textSize="15sp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+</RelativeLayout><!-- From: file:/Users/gravener/AndroidStudioProjects/happyschedule/libraries/library/res/layout/view_station.xml --><!-- From: file:/Users/gravener/AndroidStudioProjects/happyschedule/NJRail/build/intermediates/exploded-aar/happyschedule.libraries/library/unspecified/res/layout/view_station.xml -->

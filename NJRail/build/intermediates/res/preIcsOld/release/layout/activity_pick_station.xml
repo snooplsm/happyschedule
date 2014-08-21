@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <fragment
+        android:name="us.wmwm.happyschedule.fragment.FragmentStationPicker"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/pickfrag"/>
+
+</LinearLayout>
+<!-- From: file:/Users/gravener/AndroidStudioProjects/happyschedule/libraries/library/res/layout/activity_pick_station.xml --><!-- From: file:/Users/gravener/AndroidStudioProjects/happyschedule/NJRail/build/intermediates/exploded-aar/happyschedule.libraries/library/unspecified/res/layout/activity_pick_station.xml -->

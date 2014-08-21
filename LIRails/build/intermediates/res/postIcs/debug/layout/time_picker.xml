@@ -1,0 +1,5 @@
+    <com.icechen1.microwavetimepicker.TimePicker xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:timepicker="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        timepicker:format_24="true" /><!-- From: file:/Users/gravener/AndroidStudioProjects/happyschedule/libraries/MicrowaveTimePicker/lib/res/layout/time_picker.xml --><!-- From: file:/Users/gravener/AndroidStudioProjects/happyschedule/LIRails/build/intermediates/exploded-aar/happyschedule.libraries.MicrowaveTimePicker/lib/unspecified/res/layout/time_picker.xml -->

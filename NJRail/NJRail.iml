@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module external.linked.project.path="$MODULE_DIR$" external.root.project.path="$MODULE_DIR$/.." external.system.id="GRADLE" external.system.module.group="happyschedule" external.system.module.version="unspecified" type="JAVA_MODULE" version="4">
+  <component name="FacetManager">
+    <facet type="android-gradle" name="Android-Gradle">
+      <configuration>
+        <option name="GRADLE_PROJECT_PATH" value=":NJRail" />
+      </configuration>
+    </facet>
+    <facet type="android" name="Android">
+      <configuration>
+        <option name="SELECTED_BUILD_VARIANT" value="postIcsDebug" />
+        <option name="ASSEMBLE_TASK_NAME" value="assemblePostIcsDebug" />
+        <option name="COMPILE_JAVA_TASK_NAME" value="compilePostIcsDebugJava" />
+        <option name="ASSEMBLE_TEST_TASK_NAME" value="assemblePostIcsDebugTest" />
+        <option name="SOURCE_GEN_TASK_NAME" value="generatePostIcsDebugSources" />
+        <option name="ALLOW_USER_CONFIGURATION" value="false" />
+      </configuration>
+    </facet>
+  </component>
+  <component name="NewModuleRootManager" inherit-compiler-output="false">
+    <output url="file://$MODULE_DIR$/build/intermediates/classes/postIcs/debug" />
+    <exclude-output />
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/r/postIcs/debug" isTestSource="false" generated="true" />
+      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/aidl/postIcs/debug" isTestSource="false" generated="true" />
+      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/buildConfig/postIcs/debug" isTestSource="false" generated="true" />
+      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/rs/postIcs/debug" isTestSource="false" generated="true" />
+      <sourceFolder url="file://$MODULE_DIR$/build/generated/res/rs/postIcs/debug" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/src/postIcsDebug/res" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/src/postIcsDebug/resources" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/src/postIcsDebug/aidl" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/postIcsDebug/assets" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/postIcsDebug/java" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/postIcsDebug/jni" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/postIcsDebug/rs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/r/test/postIcs/debug" isTestSource="true" generated="true" />
+      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/aidl/test/postIcs/debug" isTestSource="true" generated="true" />
+      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/buildConfig/test/postIcs/debug" isTestSource="true" generated="true" />
+      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/rs/test/postIcs/debug" isTestSource="true" generated="true" />
+      <sourceFolder url="file://$MODULE_DIR$/build/generated/res/rs/test/postIcs/debug" type="java-test-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/src/postIcs/res" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/src/postIcs/resources" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/src/postIcs/aidl" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/postIcs/assets" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/postIcs/java" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/postIcs/jni" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/postIcs/rs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/androidTestPostIcs/res" type="java-test-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/src/androidTestPostIcs/resources" type="java-test-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/src/androidTestPostIcs/aidl" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/androidTestPostIcs/assets" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/androidTestPostIcs/java" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/androidTestPostIcs/jni" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/androidTestPostIcs/rs" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/build-types/debug/res" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/build-types/debug/resources" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/build-types/debug/aidl" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/build-types/debug/assets" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/build-types/debug/java" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/build-types/debug/jni" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/build-types/debug/rs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/res" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/src" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/assets" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/main/jni" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/res" type="java-test-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/resources" type="java-test-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/aidl" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/assets" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/java" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/jni" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/rs" isTestSource="true" />
+      <excludeFolder url="file://$MODULE_DIR$/build/intermediates" />
+      <excludeFolder url="file://$MODULE_DIR$/build/outputs" />
+    </content>
+    <orderEntry type="jdk" jdkName="Android API 19 Platform" jdkType="Android SDK" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" exported="" name="support-annotations-20.0.0" level="project" />
+    <orderEntry type="module" module-name="library" exported="" />
+  </component>
+</module>
+

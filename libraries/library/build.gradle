@@ -1,0 +1,75 @@
+import com.android.builder.internal.ClassFieldImpl
+
+apply plugin: 'android-library'
+
+dependencies {
+    compile fileTree(dir: 'libs', include: '*.jar')
+    compile project(':libraries:StickyListHeaders:library')
+    compile project(':libraries:AndroidTimesSquare:library')
+    compile project(':libraries:MicrowaveTimePicker:lib')
+    compile project(':libraries:jumper')
+    compile 'com.google.android.gms:play-services:4.4.52'
+    compile project(':libraries:AndroidSlidingUpPanel:library')
+    compile project(':libraries:facebook:facebook')
+    compile project(':libraries:ActionBar-PullToRefresh:library')
+    compile project(':libraries:ActionBar-PullToRefresh:extras:actionbarcompat')
+    compile project(':libraries:android-support-v4-preferencefragment')
+}
+
+android {
+//    compileSdkVersion Integer.parseInt(project.ANDROID_BUILD_SDK_VERSION)
+    buildToolsVersion project.ANDROID_BUILD_TOOLS_VERSION
+    defaultConfig {
+        minSdkVersion 9
+        targetSdkVersion Integer.parseInt(project.ANDROID_BUILD_SDK_VERSION)
+        compileSdkVersion Integer.parseInt(project.ANDROID_BUILD_SDK_VERSION)
+    }
+    sourceSets {
+        main {
+            manifest.srcFile 'AndroidManifest.xml'
+            java.srcDirs = ['src']
+            resources.srcDirs = ['src']
+            aidl.srcDirs = ['src']
+            renderscript.srcDirs = ['src']
+            res.srcDirs = ['res']
+            assets.srcDirs = ['assets']
+        }
+
+        // Move the tests to tests/java, tests/res, etc...
+        instrumentTest.setRoot('tests')
+
+        // Move the build types to build-types/<type>
+        // For instance, build-types/debug/java, build-types/debug/AndroidManifest.xml, ...
+        // This moves them out of them default location under src/<type>/... which would
+        // conflict with src/ being used by the main source set.
+        // Adding new build types or product flavors should be accompanied
+        // by a similar customization.
+        debug.setRoot('build-types/debug')
+        release.setRoot('build-types/release')
+    }
+    dexOptions {
+        incremental true
+    }
+    productFlavors {
+    }
+    buildTypes {
+    }
+}
+
+//android.libraryVariants.all { variant ->
+//	variant.processManifest.doFirst {
+//
+//		if(variant.getMergedFlavor().getTargetSdkVersion()==13) {
+//			FileTree tree = fileTree("${buildDir}.absolutePath") {
+//				include '**/AndroidManifest.xml'
+//			}
+//
+//			tree.each { File file ->
+//				println file
+//				String content = manifestFile.getText('UTF-8')
+//				content = content.replaceAll(/targetSdkVersion="19"/, 'targetSdkVersion=\"13\"')
+//				manifestFile.write(content, 'UTF-8')
+//			}
+//		}
+//	}
+//}

@@ -8,5 +8,5 @@
     <string name="poller">us.wmwm.happyschedule.lirails.service.LirrPoller</string>
     <string name="amazon_app_key">bec2b6df359341c3a70afeedc50f3363</string>
     <string name="admob_app_key">a14d07cbc165069</string>
-
+	<string name="promotional_account">li_rails</string>
 </resources>

@@ -1,0 +1,10 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="us.wmwm.njrail"
+    android:versionCode="2014052300"
+    android:versionName="2014-05-23" >
+
+    <uses-sdk
+        maxSdkVersion="13"
+        />
+
+</manifest>

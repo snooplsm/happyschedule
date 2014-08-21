@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://robobunny.com" >
+
+    <PreferenceCategory android:title="Styling" >
+        <us.wmwm.happyschedule.preference.SeekBarPreference
+            android:defaultValue="15"
+            android:key="textSize"
+            android:max="24"
+            android:summary="Set the global text size"
+            android:title="Text size"
+            app:min="15"
+            app:unitsLeft=""
+            app:unitsRight="pts" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/settings_category_departure_vision" >
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="@string/settings_departure_vision_key_on"
+            android:summary="@string/settings_summary_departure_vision"
+            android:title="@string/settings_title_departure_vision" >
+        </CheckBoxPreference>
+
+        <ListPreference
+            android:defaultValue="@string/settings_departure_vision_entry_value_period_10"
+            android:dependency="@string/settings_departure_vision_key_on"
+            android:entries="@array/settings_departure_vision_entries"
+            android:entryValues="@array/settings_departure_vision_entry_values"
+            android:key="@string/settings_departure_vision_key_period"
+            android:summary="@string/settings_summary_departure_vision_period"
+            android:title="@string/settings_title_departure_vision_period" >
+        </ListPreference>
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/settings_category_notifications" >
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="@string/settings_key_push_on"
+            android:summary="@string/settings_summary_notifications"
+            android:title="@string/settings_title_notifications_enable" >
+        </CheckBoxPreference>
+        
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="@string/settings_key_push_editorial_on"
+            android:summary="@string/settings_summary_notifications_editorial"
+            android:title="@string/settings_title_notifications_editorial_enable" >
+        </CheckBoxPreference>
+
+        <Preference
+            android:dependency="@string/settings_key_push_on"
+            android:key="@string/settings_key_rail_lines"
+            android:summary="@string/settings_summary_rail_lines"
+            android:title="Rail Lines" />
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="@string/settings_key_push_vibrate"
+            android:summary="@string/settings_description_push_vibrate"
+            android:title="@string/settings_title_push_vibrate" >
+        </CheckBoxPreference>
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="@string/settings_key_push_audio"
+            android:summary="@string/settings_description_sound"
+            android:title="@string/settings_title_push_sound" >
+        </CheckBoxPreference>
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:key="@string/settings_key_debug"
+        android:title="@string/settings_category_debug" >
+        <Preference
+            android:key="@string/settings_key_debug_push"
+            android:title="Push Id" />
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="@string/settings_key_debug_names"
+            android:summary="@string/settings_description_debug_names"
+            android:title="@string/settings_title_debug_names" >
+        </CheckBoxPreference>
+
+        <Preference
+            android:key="@string/settings_key_debug_version"
+            android:title="Version" />
+        <Preference
+            android:key="@string/settings_key_debug_package"
+            android:title="Package" />
+    </PreferenceCategory>
+
+</PreferenceScreen><!-- From: file:/Users/gravener/AndroidStudioProjects/happyschedule/libraries/library/res/xml/settings.xml --><!-- From: file:/Users/gravener/AndroidStudioProjects/happyschedule/NJRail/build/intermediates/exploded-aar/happyschedule.libraries/library/unspecified/res/xml/settings.xml -->

@@ -1,0 +1,12 @@
+<resources>
+
+    <string name="app_name">Septa Rails</string>
+    <string name="flurry_app_key">D4PWWBJJ2BCTSRSKGWYW</string>
+    <string name="config_url">lhttp://ryangravener.com/srails/config.json</string>
+    <string name="register_push_url">http://ryangravener.com/srails/register.php</string>
+    <string name="register_service_url">http://ryangravener.com/srails/register_service.php</string>
+    <string name="poller"></string>
+    <string name="amazon_app_key"></string>
+    <string name="admob_app_key">a14e87d66a7446b</string>
+
+</resources>

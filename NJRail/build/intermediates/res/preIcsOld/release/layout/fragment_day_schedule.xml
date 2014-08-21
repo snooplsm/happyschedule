@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <ExpandableListView
+        android:id="@+id/list2"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:childIndicator="@null"
+        android:divider="@null"
+        android:dividerHeight="0dp"
+        android:drawSelectorOnTop="true"        
+        android:groupIndicator="@null"
+        android:fitsSystemWindows="true"
+        android:clipToPadding="false" >
+    </ExpandableListView>
+
+    <RelativeLayout
+        android:id="@+id/fragment_alarm_picker"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+    </RelativeLayout>
+
+    <ProgressBar
+        android:id="@+id/progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:indeterminateDrawable="@drawable/progress_large_holo" />
+
+</RelativeLayout><!-- From: file:/Users/gravener/AndroidStudioProjects/happyschedule/libraries/library/res/layout/fragment_day_schedule.xml --><!-- From: file:/Users/gravener/AndroidStudioProjects/happyschedule/NJRail/build/intermediates/exploded-aar/happyschedule.libraries/library/unspecified/res/layout/fragment_day_schedule.xml -->

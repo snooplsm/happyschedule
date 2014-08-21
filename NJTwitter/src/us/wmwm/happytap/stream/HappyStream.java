@@ -425,10 +425,10 @@ public class HappyStream {
 								notRegistered.add(regs.getString(i));
 								nb.append(regs.getString(i)).append(",");
 							}
-						}
-						System.out.println("Sent " + successfuls.size());
-						System.out.println("Need to delete " + notRegistered.size());						
+						}											
 					}
+					System.out.println("Sent " + successfuls.size());
+					System.out.println("Need to delete " + notRegistered.size());
 					deletePushIds(HappyStream.db, notRegistered);
 					if (!replace.isEmpty()) {
 						System.out.println("Need to replace " + replace.size());

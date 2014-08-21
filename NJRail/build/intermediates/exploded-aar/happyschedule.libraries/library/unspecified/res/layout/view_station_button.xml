@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="@android:drawable/list_selector_background"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <TextView
+        android:layout_marginLeft="@dimen/view_station_button_marginLeft"
+        android:layout_marginRight="@dimen/view_station_button_marginRight"
+        android:id="@+id/text_id"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical"
+        android:textSize="@dimen/view_station_button_textSize"
+        android:text="Departure" />
+
+</RelativeLayout><!-- From: file:/Users/gravener/AndroidStudioProjects/happyschedule/libraries/library/res/layout/view_station_button.xml -->

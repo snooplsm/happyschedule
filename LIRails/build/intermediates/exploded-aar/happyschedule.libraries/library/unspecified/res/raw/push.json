@@ -1,0 +1,38 @@
+[
+   {
+      "name":"Newark Light Rail",
+      "screenname":"NJTRANSIT_NLR"
+   },
+   {
+      "name":"Hudson-Bergen Light Rail",
+      "screenname":"NJTRANSIT_HBLR"
+   },
+   {
+      "name":"Atlantic City Rail Line",
+      "screenname":"NJTRANSIT_ACRL"
+   },
+   {
+      "name":"Raritan Valley Line",
+      "screenname":"NJTRANSIT_RVL"
+   },
+   {
+      "name":"Pascack Valley Line",
+      "screename":"NJTRANSIT_PVL"
+   },
+   {
+      "name":"North Jersey Coast Line",
+      "screenname":"NJTRANSIT_NJCL"
+   },
+   {
+      "name":"Northeast Corridor",
+      "screenname":"NJTRANSIT_NEC"
+   },
+   {
+      "name":"Main-Bergen County Line",
+      "screenname":"NJTRANSIT_MBPJ"
+   },
+   {
+      "name":"Montclair-Boonton Line",
+      "screenname":"NJTRANSIT_MOBO"
+   }
+]

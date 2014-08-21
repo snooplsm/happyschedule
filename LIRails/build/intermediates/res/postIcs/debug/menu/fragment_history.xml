@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item android:icon="@drawable/ic_menu_moreoverflow_normal_holo_dark"
+        app:showAsAction="always">
+        <menu>
+            <item
+                android:id="@+id/menu_delete_all"
+                app:showAsAction="never"
+                android:title="Delete All History"/>
+        </menu>
+    </item>
+
+</menu><!-- From: file:/Users/gravener/AndroidStudioProjects/happyschedule/libraries/library/res/menu/fragment_history.xml --><!-- From: file:/Users/gravener/AndroidStudioProjects/happyschedule/LIRails/build/intermediates/exploded-aar/happyschedule.libraries/library/unspecified/res/menu/fragment_history.xml -->

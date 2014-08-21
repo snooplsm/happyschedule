@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ExpandableListView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?android:attr/windowBackground"
+    android:groupIndicator="@null"
+    android:childIndicator="@null"
+    android:divider="@null" >
+
+</ExpandableListView><!-- From: file:/Users/gravener/AndroidStudioProjects/happyschedule/libraries/library/res/layout/fragment_rail_lines.xml --><!-- From: file:/Users/gravener/AndroidStudioProjects/happyschedule/NJRail/build/intermediates/exploded-aar/happyschedule.libraries/library/unspecified/res/layout/fragment_rail_lines.xml -->

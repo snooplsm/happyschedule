@@ -7,7 +7,7 @@ import sqlite3
 import os
 import shutil
 import math
-
+import zipfile
 
 def dict_factory(cursor, row):
     d = {}
@@ -19,7 +19,15 @@ def findDopple(dopples,a):
 	if a in dopples:
 		return dopples[a]
 	return a
-	
+
+
+
+def zip(src, dst):
+	zf = zipfile.ZipFile(dst, "w",zipfile.ZIP_DEFLATED)
+	zf.write(src,"database_db");
+	zf.close()
+
+
 def makePretty(strt):
 	lastChar = " "
 	sb = list(strt)
@@ -276,7 +284,7 @@ def buildGraph(agencies) :
 	alternate_ids = {}
 	for override,folder,prepend in agencies:
 #		print folder,prepend
-		conn = sqlite3.connect("target/" + sys.argv[1] + "/database_db")
+		conn = sqlite3.connect(sys.argv[2])
 		c = conn.cursor()
 		namesReader = csv.reader(open(override+"/names.csv"))
 		for row in namesReader:
@@ -319,14 +327,38 @@ def buildGraph(agencies) :
 				maxLon = stopLon			
 			stop = {"id":stopId,"name":stopName,"lon":stopLon,"lat":stopLat}
 			stations[stopId] = stop
+		print "comparing all stations"
+		base = {"lat":0.0,"lon":0.0}
+		distanceToStations = {}
 		for stationA in stations:
-			for stationB in stations:
-				if stationA!=stationB and distance(stations[stationA],stations[stationB])==0:
-					aId = stationA
-					bId = stationB					
-					doppleGanger[aId] = bId	
-					print stations[stationA]["name"], stations[stationB]["name"]
+			dist = str(distance(stations[stationA],base))
+			arr = None
+			if dist in distanceToStations:
+				arr = distanceToStations[dist]
+			if arr==None:
+				arr = []
+				distanceToStations[dist] = arr
+			arr.append(stations[stationA])	
+		for dist in distanceToStations:
+			arr = distanceToStations[dist]
+			if len(arr)>1:
+				# print arr
+				for stationA in distanceToStations[dist]:
+					for stationB in distanceToStations[dist]:
+						if stationA["id"]!=stationB["id"] and distance(stationA,stationB)==0:
+							aId = stationA["id"]
+							bId = stationB["id"]					
+							doppleGanger[aId] = bId	
+							print stationA["name"], stationB["name"]
+		# for stationA in stations:
+		# 	for stationB in stations:
+		# 		if stationA!=stationB and distance(stations[stationA],stations[stationB])==0:
+		# 			aId = stationA
+		# 			bId = stationB					
+		# 			doppleGanger[aId] = bId	
+		# 			print stations[stationA]["name"], stations[stationB]["name"]
 		dopples = {}
+		print "finished comparing all stations"
 		print len(doppleGanger)
 		while len(doppleGanger)>0:
 			for k in doppleGanger:
@@ -370,6 +402,7 @@ def buildGraph(agencies) :
 #		print headers
 		c = conn.cursor()
 		dateDict = {}
+		print "reading services"
 		for row in serviceReader:
 			if(len(row)!=3):
 				continue
@@ -434,10 +467,8 @@ def buildGraph(agencies) :
 					print todelete
 					todelete.reverse()
 					print todelete
-#					raw_input("wha?")
 					for k in range(0, len(todelete)):
 						print len(newServices)
-						# raw_input("deleting "+str(todelete[k]))
 						del newServices[todelete[k]]
 			dateServices.extend(newServices)
 		for service in dateServices:
@@ -445,9 +476,9 @@ def buildGraph(agencies) :
 			c.execute("INSERT INTO service(service_id,date) values(?,?)",(service["id"],service["date"]))
 		conn.commit()
 #		print dateServices
-#		raw_input("ok")
 		tripReader = csv.reader(open(folder+"/trips.txt","rb"))
 		headers = {}
+		print "reading trips"
 		for row in tripReader:
 			for i in range(len(row)):
 				headers[row[i].lower().split(" ")[0]] = i
@@ -485,6 +516,7 @@ def buildGraph(agencies) :
 			trips[tripId] = trip
 		stopReader = csv.reader(open(folder+"/stop_times.txt","rb"))
 		headers = {}
+		print "reading stops"
 		for row in stopReader:
 			for i in range(len(row)):
 				headers[row[i].lower().split(" ")[0]] = i
@@ -494,7 +526,6 @@ def buildGraph(agencies) :
 		sequencePos = headers["stop_sequence"]
 		departPos = headers["departure_time"]
 		arrivePos = headers["arrival_time"]
-#		print "stop times"
 		for row in stopReader:
 			stop = {}
 			stopId = findDopple(dopples,prepend+row[stopPos])
@@ -519,13 +550,15 @@ def buildGraph(agencies) :
 			else:
 				stops = tripToStops[tripId]
 			stops.insert(int(sequence),stop)
-	print stations
+	# print stations
 	sys.path.append(os.path.abspath('.')+"/overrides/"+sys.argv[1])
 	try :
 		import peak
 	except:
 		sys.path.append(os.path.abspath('.')+"/failover/")
 		import peak
+	print "trip to stops"
+	
 	for tripId in tripToStops:
 		stops = tripToStops[tripId]
 		trip = trips[tripId]
@@ -547,6 +580,7 @@ def buildGraph(agencies) :
 				ahour = int(arrive[0])
 				amin = int(arrive[1])
 				asec = int(arrive[2])
+
 				if dhour>=24:
 					day = dhour / 24 + 1
 				#arrive = datetime(1970,1,1,remainder,minute,second)
@@ -561,20 +595,20 @@ def buildGraph(agencies) :
 					alltimes[source['id']][target['id']] = []
 				ktime = tk.mktime(arriveTime.timetuple())-tk.mktime(departTime.timetuple());
 				# print ktime
-				alltimes[source['id']][target['id']].append(ktime)
 				if ktime < 0:
 					print "arrive["+target["id"]+"]",target['arrive'],"-","depart["+source['id']+"]",source['depart']
 					for k in stops:
 						print k
+				else:
+					alltimes[source['id']][target['id']].append(ktime)
 				source['name'] = stations[source['id']]['name']
 				target['name'] = stations[target['id']]['name']
 				source['label'] = stations[source['id']]['name']
 				target['label'] = stations[target['id']]['name']
 				
-				G.add_node(source['id'],source)
-				G.add_node(target['id'],target)
+				G.add_node(source['id'])
+				G.add_node(target['id'])
 #				if(source["id"][0]=="n" and target["id"][0]=="m"):
-#					k = raw_input("say what?")
 				
 				if G.has_edge(source['id'],target['id'])==False:
 					# if source['id']=="n103" and target['id']=="n32906":
@@ -604,54 +638,29 @@ def buildGraph(agencies) :
 				H.add_node(routeId,routes[routeId])	
 			else:
 				lhour = target['depart'].split(":")[0]
+			shouldContinue = False
+			if source==None:
+				shouldContinue = True
+				depart = target['depart'].split(":")
+				arrive = target['arrive'].split(":")
+				dhour = int(depart[0])
+				dmin = int(depart[1])
+				dsec = int(depart[2])
+				ahour = int(arrive[0])
+				amin = int(arrive[1])
+				asec = int(arrive[2])
+
+				if dhour>=24:
+					day = dhour / 24 + 1
+				#arrive = datetime(1970,1,1,remainder,minute,second)
+				departTime = datetime(1970,1,day,dhour%24,dmin,dsec)
+				if ahour>=24:
+					day = ahour / 24 + 1
+				arriveTime = datetime(1970,1,day,ahour%24,amin,asec)
 			source = target
-			stops[position]["departTime"] = departTime
-			stops[position]["arriveTime"] = arriveTime
-			#				G.add_edge(source,target,{"direction":trips[tripId]['direction'],"route":trips[tripId]['route_id']})
-	# for routeId in routeInfo:
-	# 	raw_input("u mad bro?")
-	# 	mins = {}
-	# 	maxs = {}
-	# 	good = []
-	# 	allnodes = set()
-	# 	trips = routeToTrips[routeId]
-	# 	actualroute = []
-	# 	longest = []
-	# 	for trip in trips:
-	# 		stops = tripToStops[trip["id"]]
-	# 		if len(stops) > len(longest):
-	# 			longest = stops
-	# 		for stop in stops:
-	# 			stopId = stop["id"]
-	# 			allnodes.add(stopId)
-	# 	if len(longest)==len(allnodes):
-	# 		for node in longest:
-	# 			actualroute.append(node["id"])
-	# 	else:
-	# 		takencareof = []
-	# 		for node in longest:				
-	# 			for node in longest:
-	# 				takencareof.append(node["id"])
-	# 		print "intersection",set(takencareof) & allnodes
-	# 		print "longest", len(takencareof), "all",len(allnodes)
-	# 	print "allnodes",allnodes		
-	# 	print "actualroute",actualroute
-		
-			
-#	print "trips"
-#	networkx.readwrite.gml.write_gml(G,"before_stations.gml")
-	# for routeId in routeToTrips:
-	# 	for trip in routeToTrips[routeId]:			
-	# 		stops = tripToStops[trip["id"]]
-						
-	# print "strongly connected stations: ",networkx.algorithms.components.strongly_connected.number_strongly_connected_components(G)
-	# print "strongly connected routes: ",networkx.algorithms.components.strongly_connected.number_strongly_connected_components(H)
-#	draw(G,"stations_before.dot")
-#	draw(H,"route_before.dot")
-#	print "transfers"
 	for override,folder,prepend in agencies:
 		transferFile = folder+"/transfers.txt"
-		if os.path.exists(transferFile) :
+		if os.path.exists(transferFile):
 			#print "transfers.txt exists"
 			transferReader = csv.reader(open(folder+"/transfers.txt","rb"))
 			headers = {}
@@ -673,10 +682,9 @@ def buildGraph(agencies) :
 				minTransferTime = 0
 				if minTransferTimePos>-1:
 					minTransferTime = row[minTransferTimePos]
-				if G.has_edge(fromStopId,toStopId)==False and fromStopId!=toStopId:
+				if G.has_edge(fromStopId,toStopId)==False:
 #					if fromStopId=="n103" and toStopId=="n32906":
 #						print source,target,"\ntripid",tripId
-#						input = raw_input("this should not be possible")					
 					G.add_edge(fromStopId,toStopId)
 					if "routes" not in G[fromStopId][toStopId]:
 						G[fromStopId][toStopId]["routes"] = {};
@@ -731,17 +739,13 @@ def buildGraph(agencies) :
 						c.execute("INSERT INTO transfer_edge(source,target,duration) values(?,?,?)",(fromId,toId,int(round(dist/1.389))))
 			conn.commit()
 			metersPerSecond = 1.389
-	print "ok"
 	for a in alltimes:
-		print "alright"
 		for b in alltimes[a]:
-			print "here"
 			miny = sys.maxint
 			maxy = 0
 			total = 0.0
 			for time in alltimes[a][b]:
 				if time < 0:
-					# raw_input("da fuqqq? " + str(time) + "a: " + a + " b:" + b)
 					time = -1*time
 				total = total + time
 				if miny>time:
@@ -758,9 +762,8 @@ def buildGraph(agencies) :
 				maxtimes[a] = {}
 			maxtimes[a][b] = maxy
 			#print mintimes[key], avgtimes[key]
-			if mintimes[a][b] < 0:
-				raw_input("da fuq?")
-			G[a][b]['weight'] = mintimes[a][b]
+			if G.has_edge(a,b):
+				G[a][b]['weight'] = mintimes[a][b]
 #			G[a][b] = avgtimes[key]
 #			G[a][b] = maxtimes[key]
 	for tripId in tripToStops:
@@ -794,9 +797,10 @@ def buildGraph(agencies) :
 	# print "strongly connected routes: ",networkx.algorithms.components.strongly_connected.number_strongly_connected_components(H)
 #	draw(G,"stations_after.dot")
 #	draw(H,"routes_after.dot")
-#	raw_input("k?")			
 #	print "all pairs shortest paths routes"
-	paths = networkx.algorithms.shortest_paths.weighted.all_pairs_dijkstra_path(H)
+	print "calculating all pairs dijkstra"
+	paths = networkx.algorithms.shortest_paths.unweighted.all_pairs_shortest_path(H)
+	print "finished all pairs dijkstra"
 	routePaths = paths
 	for source in paths:
 		for target in paths[source]:
@@ -820,7 +824,7 @@ def buildGraph(agencies) :
 		firstStation = tripToStops[tripId][0]
 		lastStation = firstStation
 		ids.add(lastStation["id"])		
-		fareType = peak.isPeak(tripId,tripToStops[tripId],dateDict[trip["service_id"]]["dateTime"])
+		fareType = peak.isPeak(tripId,tripToStops[tripId],dateDict[trip["service_id"]]["dateTime"])		
 		for id in range(len(tripToStops[tripId])):       
 			stop = tripToStops[tripId][id]
 			ids.add(stop["id"])			
@@ -872,10 +876,8 @@ def buildGraph(agencies) :
 			tripId = tripCount[id][ids2]["trip"]
 			if count <= 4:
 				print stations[id]["name"],stations[ids2]["name"],count,tripId
-				
 	patharray = [networkx.algorithms.shortest_paths.weighted.all_pairs_dijkstra_path(G),networkx.algorithms.shortest_paths.unweighted.all_pairs_shortest_path(G)]
 		
-
 	for level in range(0,1):
 		paths = patharray[level]
 		for stationA in stations:
@@ -988,13 +990,11 @@ def buildGraph(agencies) :
 		after = datetime.now().microsecond
 		print after-before
 		for row2 in row2rows:
-			print "finding max level for:"+depart+","+arrive+":",row2			
 			pos = int(row2[0])+1					
 		count = 0
 		for i in range(0,len(row)-1):			
 			transfer = row[i]
 			next = row[i+1]
-			print "source:",depart,"target:",arrive,"a:",transfer,"b:",next,"level:",pos,"sequence:",i
 			tuples = (depart,arrive,transfer,next,pos,i)
 			# //print tuples
 			c.execute("INSERT INTO schedule_path(source,target,a,b,level,sequence) values(?,?,?,?,?,?)",tuples)
@@ -1038,8 +1038,20 @@ def buildGraph(agencies) :
 	conn.commit()
 	return (prepend,G,H,stations,walks,stopRoutes,tripToStops)
 shutil.rmtree("target",True)
-os.makedirs("target/"+sys.argv[1])
-conn = sqlite3.connect("target/"+sys.argv[1]+"/database_db")
+
+dbFile = sys.argv[2]
+try:
+	os.remove(dbFile)
+except OSError:
+	pass
+try:
+	os.remove(dbFile + ".zip")
+except OSError:
+	pass	
+
+# os.makedirs("target/"+sys.argv[1])
+print dbFile
+conn = sqlite3.connect(dbFile)
 c = conn.cursor()
 c.execute("""CREATE TABLE nested_trip (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -1169,6 +1181,9 @@ for agency,G,H,stations,walks,stopRoutes,tripToStops in results:
 					if D.has_edge(agency,agencyp)==False:
 						D.add_edge(agency,agencyp)						
 					c.execute("INSERT INTO agency_transfer_edge(agency_source,agency_target,source,target,duration) values(?,?,?,?,?)",(agency,agencyp,station["id"],stationp["id"],int(round(dist*1.389))))
-		conn.commit()				
+		conn.commit()
+conn.close()			
+zip(dbFile,dbFile+".zip")
+os.remove(dbFile)	
 # paths = networkx.algorithms.shortest_paths.unweighted.all_pairs_shortest_path(D)
 #print paths

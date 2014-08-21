@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="6dp" >
+
+    <TextView
+        android:id="@+id/alarm"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/dismiss"
+        android:gravity="center_vertical"
+        android:layout_alignRight="@id/dismiss"
+        android:layout_alignTop="@+id/dismiss"
+        android:text="alarm @ 10:44 pm" />
+
+    <ImageView
+        android:id="@id/dismiss"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:src="@drawable/ic_action_cancel"
+        android:tint="@color/black" />
+
+</RelativeLayout><!-- From: file:/Users/gravener/AndroidStudioProjects/happyschedule/libraries/library/res/layout/view_alarm.xml --><!-- From: file:/Users/gravener/AndroidStudioProjects/happyschedule/LIRails/build/intermediates/exploded-aar/happyschedule.libraries/library/unspecified/res/layout/view_alarm.xml -->

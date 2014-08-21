@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?android:attr/windowBackground" >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/fragment_departurevision_ad" >
+
+        <TextView
+            android:id="@+id/no_internet"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/error_background"
+            android:padding="@dimen/activity_horizontal_margin"
+            android:text="You do not have an internet connection."
+            android:textColor="@color/error_text"
+            android:visibility="gone" />
+
+        <uk.co.senab.actionbarpulltorefresh.extras.actionbarcompat.PullToRefreshLayout
+            android:layout_below="@id/no_internet"
+            android:id="@+id/pull_to_refresh"           
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+
+            <com.emilsjolander.components.stickylistheaders.StickyListHeadersListView
+                android:id="@+id/list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                
+                android:divider="@null"
+                android:dividerHeight="0dp" />
+        </uk.co.senab.actionbarpulltorefresh.extras.actionbarcompat.PullToRefreshLayout>
+
+        <LinearLayout            
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical" >
+
+            <TextView
+                android:id="@+id/departure"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="Select Departure Station"
+                android:textSize="33sp" />
+
+            <TextView
+                android:id="@+id/arrival"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="Select Arrival Station"
+                android:textSize="33sp" />
+        </LinearLayout>
+
+        <us.wmwm.happyschedule.views.EmptyView
+            android:id="@+id/empty"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone" />
+    </RelativeLayout>
+
+    <FrameLayout
+        android:id="@id/fragment_departurevision_ad"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true" >
+    </FrameLayout>
+
+</RelativeLayout><!-- From: file:/Users/gravener/AndroidStudioProjects/happyschedule/libraries/library/res/layout/fragment_departurevision.xml --><!-- From: file:/Users/gravener/AndroidStudioProjects/happyschedule/LIRails/build/intermediates/exploded-aar/happyschedule.libraries/library/unspecified/res/layout/fragment_departurevision.xml -->

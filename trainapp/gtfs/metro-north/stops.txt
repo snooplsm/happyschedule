@@ -73,7 +73,7 @@ stop_id,stop_code,stop_name,stop_desc,stop_lat,stop_lon,zone_id,stop_url,locatio
 110,,Larchmont,,40.933394,-73.759792,,http://as0.mta.info/mnr/stations/station_detail.cfm?key=208,0,,1
 111,,Mamaroneck,,40.954061,-73.736125,,http://as0.mta.info/mnr/stations/station_detail.cfm?key=210,0,,0
 112,,Harrison,,40.969432,-73.712964,,http://as0.mta.info/mnr/stations/station_detail.cfm?key=212,0,,1
-114,,Rye,,40.986744,-73.679131,,http://as0.mta.info/mnr/stations/station_detail.cfm?key=214,0,,1
+114,,Rye,,40.986027,-73.680461,,http://as0.mta.info/mnr/stations/station_detail.cfm?key=214,0,,1
 115,,Port Chester,,41.000732,-73.6647,,http://as0.mta.info/mnr/stations/station_detail.cfm?key=216,0,,0
 116,,Greenwich,,41.021277,-73.624621,,http://as0.mta.info/mnr/stations/station_detail.cfm?key=218,0,,1
 118,,Cos Cob,,41.030171,-73.598306,,http://as0.mta.info/mnr/stations/station_detail.cfm?key=220,0,,0
@@ -110,7 +110,7 @@ stop_id,stop_code,stop_name,stop_desc,stop_lat,stop_lon,zone_id,stop_url,locatio
 171,,Naugatuck,,41.494204,-73.052655,,http://as0.mta.info/mnr/stations/station_detail.cfm?key=296,0,,0
 172,,Waterbury,,41.552728,-73.046126,,http://as0.mta.info/mnr/stations/station_detail.cfm?key=298,0,,1
 145,,Milford,,41.223231,-73.057647,,http://as0.mta.info/mnr/stations/station_detail.cfm?key=250,0,,0
-190,,West Haven,,41.27142,-72.963488,,http://as0.mta.info/mnr/stations/station_detail.cfm?key=251,0,,0
+190,,West Haven,,41.27142,-72.963488,,http://as0.mta.info/mnr/stations/station_detail.cfm?key=251,0,,1
 149,,New Haven,,41.296501,-72.92829,,http://as0.mta.info/mnr/stations/station_detail.cfm?key=252,0,,1
 151,,NH-State St.,,41.304979,-72.921747,,http://as0.mta.info/mnr/stations/station_detail.cfm?key=253,0,,1
 502,,Kappock St/Knolls Crescent,,40.879135,-73.916842,,http://as0.mta.info/mnr/stations/station_detail.cfm?key=,0,,0

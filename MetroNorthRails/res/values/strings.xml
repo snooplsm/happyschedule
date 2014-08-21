@@ -2,7 +2,7 @@
 
     <string name="app_name">Metro North Rails</string>
     <string name="flurry_app_key">Y64TVGK7QPNB32BQMZ8M</string>
-    <string name="config_url">lhttp://ryangravener.com/mnrails/config.json</string>
+    <string name="config_url">http://ryangravener.com/mnrails/config.json</string>
     <string name="register_push_url">http://ryangravener.com/mnrails/register.php</string>
     <string name="register_service_url">http://ryangravener.com/mnrails/register_service.php</string>
     <string name="poller">us.wmwm.happyschedule.metronorthrails.service.MetroNorthPoller</string>
