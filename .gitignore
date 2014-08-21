@@ -18,3 +18,9 @@ libraries/ActionBar-PullToRefresh/bin
 libraries/ActionBar-PullToRefresh/gen
 libraries/SmoothProgressBar/bin
 libraries/SmoothProgressBar/gen
+stop_times.txt
+shapes.txt
+trips.txt
+stops.txt
+routes.txt
+trainapp/*.zip
