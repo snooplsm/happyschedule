@@ -148,7 +148,7 @@ public class FragmentLoad extends HappyFragment {
                             in.close();;
                         }
                     } else {
-                        in = ctx.getResources().openRawResource(R.raw.database_db);
+                        in = ctx.getResources().openRawResource(ctx.getResources().getIdentifier("database_db","raw",ctx.getPackageName()));
                         zin = new ZipInputStream(in);
                         int read;
                         ZipEntry ent = zin.getNextEntry();

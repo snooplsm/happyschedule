@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content" >
-
-</FrameLayout><!-- From: file:/Users/gravener/AndroidStudioProjects/happyschedule/libraries/library/res/layout/fragment_amazon_ad.xml --><!-- From: file:/Users/gravener/AndroidStudioProjects/happyschedule/LIRails/build/intermediates/exploded-aar/happyschedule.libraries/library/unspecified/res/layout/fragment_amazon_ad.xml -->

@@ -84,7 +84,7 @@ public class Api extends BaseApi {
     public int registerService(String data, String pushId) throws Exception {
         HttpURLConnection conn = null;
         try {
-            conn = post(Collections.singletonMap("services",data),null,ctx.getString(R.string.register_service_url)+"?push_id="+pushId);
+            conn = post(map("services",data),map(),ctx.getString(R.string.register_service_url)+"?push_id="+pushId);
             int code = conn.getResponseCode();
             Streams.readFully(conn.getInputStream());
             return code;

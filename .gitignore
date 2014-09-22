@@ -1,12 +1,16 @@
-library/bin
-library/gen
+libraries/library/bin
+libraries/library/gen
+libraries/library/build
+build
 NJRail/bin
 NJRail/gen
+NJRail/build
 NJTransit/bin
 NJTransit/gen
 google-play-services_lib/bin
 google-play-services_lib/gen
 LIRails/bin
+LIRails/build
 LIRails/gen
 NJTwitter/bin
 NJTwitter/push.db
@@ -14,6 +18,7 @@ NJTwitter/njtransit.json
 trainapp/target
 MetroNorthRails/bin
 MetroNorthRails/gen
+MetroNOrthRails/build
 libraries/ActionBar-PullToRefresh/bin
 libraries/ActionBar-PullToRefresh/gen
 libraries/SmoothProgressBar/bin

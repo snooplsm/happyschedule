@@ -20,6 +20,7 @@ import android.view.animation.Animation.AnimationListener;
 import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
 
+import com.amazon.device.ads.Ad;
 import com.amazon.device.ads.AdError;
 import com.amazon.device.ads.AdError.ErrorCode;
 import com.amazon.device.ads.AdLayout;
@@ -150,68 +151,39 @@ public class FragmentAmazonAd extends HappyFragment implements AdListener {
 		}
 	}
 
-	@Override
-	public void onAdCollapsed(AdLayout arg0) {
-		// TODO Auto-generated method stub
+    @Override
+    public void onAdLoaded(Ad ad, AdProperties adProperties) {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                Activity a = getActivity();
+                if (a == null) {
+                    return;
+                }
 
-	}
+                // If there is an ad currently being displayed, swap the ad that just
+                // loaded
+                // with ad currently being displayed, else display the ad that just
+                // loaded.
+                if (currentAdView != null) {
+                    SwapCurrentAd();
+                } else {
+                    // This is the first time we're loading an ad, so set the
+                    // current ad view to the ad we just loaded and set the next to null
+                    // so that we can load a new ad in the background.
+                    currentAdView = nextAdView;
+                    nextAdView = null;
+                    ShowCurrentAd();
+                }
+                failureCount = 0;
+                if(happyAdListener!=null) {
+                    happyAdListener.onAd();
+                }
+                Log.d(getClass().getSimpleName(), "onAdLoaded ");
+            }
+        });
+    }
 
-	@Override
-	public void onAdExpanded(AdLayout arg0) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void onAdFailedToLoad(AdLayout arg0, final AdError arg) {
-		// TODO Auto-generated method stub
-		Log.d(getClass().getSimpleName(),
-				"onAdFailedToLoad " + arg.getMessage());
-		failureCount++;
-		handler.post(new Runnable() {
-			@Override
-			public void run() {
-				if(happyAdListener!=null) {
-					happyAdListener.onAdFailed(failureCount, arg.getCode()==ErrorCode.NO_FILL);
-				}
-			}
-		});
-		
-	}
-
-	@Override
-	public void onAdLoaded(AdLayout ad, AdProperties arg1) {
-		handler.post(new Runnable() {
-			@Override
-			public void run() {
-				Activity a = getActivity();
-				if (a == null) {
-					return;
-				}
-
-				// If there is an ad currently being displayed, swap the ad that just
-				// loaded
-				// with ad currently being displayed, else display the ad that just
-				// loaded.
-				if (currentAdView != null) {
-					SwapCurrentAd();
-				} else {
-					// This is the first time we're loading an ad, so set the
-					// current ad view to the ad we just loaded and set the next to null
-					// so that we can load a new ad in the background.
-					currentAdView = nextAdView;
-					nextAdView = null;
-					ShowCurrentAd();
-				}
-				failureCount = 0;
-				if(happyAdListener!=null) {
-					happyAdListener.onAd();
-				}
-				Log.d(getClass().getSimpleName(), "onAdLoaded ");
-			}
-		});
-		
-	}
 
 	private void SwapCurrentAd() {
 		Log.d(TAG,"SWAP CURRENT AD");
@@ -260,4 +232,35 @@ public class FragmentAmazonAd extends HappyFragment implements AdListener {
 				a, R.anim.slide_up);
 		currentAdView.startAnimation(slideUp);
 	}
+
+    @Override
+    public void onAdDismissed(Ad ad) {
+
+    }
+
+    @Override
+    public void onAdCollapsed(Ad ad) {
+
+    }
+
+    @Override
+    public void onAdExpanded(Ad ad) {
+
+    }
+
+    @Override
+    public void onAdFailedToLoad(Ad ad, final AdError adError) {
+        // TODO Auto-generated method stub
+        Log.d(getClass().getSimpleName(),
+                "onAdFailedToLoad " + adError.getMessage());
+        failureCount++;
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                if(happyAdListener!=null) {
+                    happyAdListener.onAdFailed(failureCount, adError.getCode()==ErrorCode.NO_FILL);
+                }
+            }
+        });
+    }
 }
