@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<transition xmlns:android="http://schemas.android.com/apk/res/android" >
-
-    <item android:drawable="@color/get_schedule_11"/>
-    <item android:drawable="@color/get_schedule_1"/>
-    
-</transition><!-- From: file:/Users/gravener/AndroidStudioProjects/happyschedule/libraries/library/res/drawable/anim_get_schedule.xml --><!-- From: file:/Users/gravener/AndroidStudioProjects/happyschedule/NJRail/build/intermediates/exploded-aar/happyschedule.libraries/library/unspecified/res/drawable/anim_get_schedule.xml -->

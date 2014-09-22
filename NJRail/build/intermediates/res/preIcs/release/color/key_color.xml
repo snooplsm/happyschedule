@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<selector xmlns:android="http://schemas.android.com/apk/res/android">
-  <item android:state_enabled="true"
-   android:color="@color/white" />
-  <item android:state_enabled="false"
-   android:color="@color/grey" />
-</selector><!-- From: file:/Users/gravener/AndroidStudioProjects/happyschedule/libraries/MicrowaveTimePicker/lib/res/color/key_color.xml --><!-- From: file:/Users/gravener/AndroidStudioProjects/happyschedule/NJRail/build/intermediates/exploded-aar/happyschedule.libraries.MicrowaveTimePicker/lib/unspecified/res/color/key_color.xml -->
