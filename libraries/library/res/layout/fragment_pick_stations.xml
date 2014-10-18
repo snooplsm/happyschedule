@@ -66,7 +66,15 @@
                                 android:src="@drawable/reverse" />
                         </RelativeLayout>
                     </LinearLayout>
+
                 </RelativeLayout>
+
+                <ImageView
+                    android:id="@+id/bookmarked"
+                    android:layout_marginTop="-10dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp" />
             </RelativeLayout>
         </LinearLayout>
 

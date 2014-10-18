@@ -1,0 +1,203 @@
+K 25
+svn:wc:ra_dav:version-url
+V 166
+/source/repos/mobile-native/!svn/ver/37885/branches/Android/WWE/android_wwe_projectbranch_v3.0.2/Libraries/ViewPagerIndicator/sample/src/com/viewpagerindicator/sample
+END
+SampleLinesStyledLayout.java
+K 25
+svn:wc:ra_dav:version-url
+V 195
+/source/repos/mobile-native/!svn/ver/37885/branches/Android/WWE/android_wwe_projectbranch_v3.0.2/Libraries/ViewPagerIndicator/sample/src/com/viewpagerindicator/sample/SampleLinesStyledLayout.java
+END
+ListSamples.java
+K 25
+svn:wc:ra_dav:version-url
+V 183
+/source/repos/mobile-native/!svn/ver/37885/branches/Android/WWE/android_wwe_projectbranch_v3.0.2/Libraries/ViewPagerIndicator/sample/src/com/viewpagerindicator/sample/ListSamples.java
+END
+TestFragment.java
+K 25
+svn:wc:ra_dav:version-url
+V 184
+/source/repos/mobile-native/!svn/ver/37885/branches/Android/WWE/android_wwe_projectbranch_v3.0.2/Libraries/ViewPagerIndicator/sample/src/com/viewpagerindicator/sample/TestFragment.java
+END
+TestFragmentAdapter.java
+K 25
+svn:wc:ra_dav:version-url
+V 191
+/source/repos/mobile-native/!svn/ver/37885/branches/Android/WWE/android_wwe_projectbranch_v3.0.2/Libraries/ViewPagerIndicator/sample/src/com/viewpagerindicator/sample/TestFragmentAdapter.java
+END
+SampleTitlesWithListener.java
+K 25
+svn:wc:ra_dav:version-url
+V 196
+/source/repos/mobile-native/!svn/ver/37885/branches/Android/WWE/android_wwe_projectbranch_v3.0.2/Libraries/ViewPagerIndicator/sample/src/com/viewpagerindicator/sample/SampleTitlesWithListener.java
+END
+SampleCirclesSnap.java
+K 25
+svn:wc:ra_dav:version-url
+V 189
+/source/repos/mobile-native/!svn/ver/37885/branches/Android/WWE/android_wwe_projectbranch_v3.0.2/Libraries/ViewPagerIndicator/sample/src/com/viewpagerindicator/sample/SampleCirclesSnap.java
+END
+SampleTitlesStyledTheme.java
+K 25
+svn:wc:ra_dav:version-url
+V 195
+/source/repos/mobile-native/!svn/ver/37885/branches/Android/WWE/android_wwe_projectbranch_v3.0.2/Libraries/ViewPagerIndicator/sample/src/com/viewpagerindicator/sample/SampleTitlesStyledTheme.java
+END
+SampleUnderlinesDefault.java
+K 25
+svn:wc:ra_dav:version-url
+V 195
+/source/repos/mobile-native/!svn/ver/37885/branches/Android/WWE/android_wwe_projectbranch_v3.0.2/Libraries/ViewPagerIndicator/sample/src/com/viewpagerindicator/sample/SampleUnderlinesDefault.java
+END
+SampleTitlesStyledMethods.java
+K 25
+svn:wc:ra_dav:version-url
+V 197
+/source/repos/mobile-native/!svn/ver/37885/branches/Android/WWE/android_wwe_projectbranch_v3.0.2/Libraries/ViewPagerIndicator/sample/src/com/viewpagerindicator/sample/SampleTitlesStyledMethods.java
+END
+SampleLinesDefault.java
+K 25
+svn:wc:ra_dav:version-url
+V 190
+/source/repos/mobile-native/!svn/ver/37885/branches/Android/WWE/android_wwe_projectbranch_v3.0.2/Libraries/ViewPagerIndicator/sample/src/com/viewpagerindicator/sample/SampleLinesDefault.java
+END
+SampleTitlesCenterClickListener.java
+K 25
+svn:wc:ra_dav:version-url
+V 203
+/source/repos/mobile-native/!svn/ver/37885/branches/Android/WWE/android_wwe_projectbranch_v3.0.2/Libraries/ViewPagerIndicator/sample/src/com/viewpagerindicator/sample/SampleTitlesCenterClickListener.java
+END
+SampleTabsWithIcons.java
+K 25
+svn:wc:ra_dav:version-url
+V 191
+/source/repos/mobile-native/!svn/ver/37885/branches/Android/WWE/android_wwe_projectbranch_v3.0.2/Libraries/ViewPagerIndicator/sample/src/com/viewpagerindicator/sample/SampleTabsWithIcons.java
+END
+SampleUnderlinesNoFade.java
+K 25
+svn:wc:ra_dav:version-url
+V 194
+/source/repos/mobile-native/!svn/ver/37885/branches/Android/WWE/android_wwe_projectbranch_v3.0.2/Libraries/ViewPagerIndicator/sample/src/com/viewpagerindicator/sample/SampleUnderlinesNoFade.java
+END
+SampleCirclesWithListener.java
+K 25
+svn:wc:ra_dav:version-url
+V 197
+/source/repos/mobile-native/!svn/ver/37885/branches/Android/WWE/android_wwe_projectbranch_v3.0.2/Libraries/ViewPagerIndicator/sample/src/com/viewpagerindicator/sample/SampleCirclesWithListener.java
+END
+SampleTitlesStyledLayout.java
+K 25
+svn:wc:ra_dav:version-url
+V 196
+/source/repos/mobile-native/!svn/ver/37885/branches/Android/WWE/android_wwe_projectbranch_v3.0.2/Libraries/ViewPagerIndicator/sample/src/com/viewpagerindicator/sample/SampleTitlesStyledLayout.java
+END
+SampleTitlesBottom.java
+K 25
+svn:wc:ra_dav:version-url
+V 190
+/source/repos/mobile-native/!svn/ver/37885/branches/Android/WWE/android_wwe_projectbranch_v3.0.2/Libraries/ViewPagerIndicator/sample/src/com/viewpagerindicator/sample/SampleTitlesBottom.java
+END
+SampleCirclesStyledTheme.java
+K 25
+svn:wc:ra_dav:version-url
+V 196
+/source/repos/mobile-native/!svn/ver/37885/branches/Android/WWE/android_wwe_projectbranch_v3.0.2/Libraries/ViewPagerIndicator/sample/src/com/viewpagerindicator/sample/SampleCirclesStyledTheme.java
+END
+SampleCirclesStyledMethods.java
+K 25
+svn:wc:ra_dav:version-url
+V 198
+/source/repos/mobile-native/!svn/ver/37885/branches/Android/WWE/android_wwe_projectbranch_v3.0.2/Libraries/ViewPagerIndicator/sample/src/com/viewpagerindicator/sample/SampleCirclesStyledMethods.java
+END
+SampleTabsDefault.java
+K 25
+svn:wc:ra_dav:version-url
+V 189
+/source/repos/mobile-native/!svn/ver/37885/branches/Android/WWE/android_wwe_projectbranch_v3.0.2/Libraries/ViewPagerIndicator/sample/src/com/viewpagerindicator/sample/SampleTabsDefault.java
+END
+SampleCirclesStyledLayout.java
+K 25
+svn:wc:ra_dav:version-url
+V 197
+/source/repos/mobile-native/!svn/ver/37885/branches/Android/WWE/android_wwe_projectbranch_v3.0.2/Libraries/ViewPagerIndicator/sample/src/com/viewpagerindicator/sample/SampleCirclesStyledLayout.java
+END
+SampleTitlesDefault.java
+K 25
+svn:wc:ra_dav:version-url
+V 191
+/source/repos/mobile-native/!svn/ver/37885/branches/Android/WWE/android_wwe_projectbranch_v3.0.2/Libraries/ViewPagerIndicator/sample/src/com/viewpagerindicator/sample/SampleTitlesDefault.java
+END
+SampleTitlesInitialPage.java
+K 25
+svn:wc:ra_dav:version-url
+V 195
+/source/repos/mobile-native/!svn/ver/37885/branches/Android/WWE/android_wwe_projectbranch_v3.0.2/Libraries/ViewPagerIndicator/sample/src/com/viewpagerindicator/sample/SampleTitlesInitialPage.java
+END
+SampleTabsStyled.java
+K 25
+svn:wc:ra_dav:version-url
+V 188
+/source/repos/mobile-native/!svn/ver/37885/branches/Android/WWE/android_wwe_projectbranch_v3.0.2/Libraries/ViewPagerIndicator/sample/src/com/viewpagerindicator/sample/SampleTabsStyled.java
+END
+SampleUnderlinesStyledTheme.java
+K 25
+svn:wc:ra_dav:version-url
+V 199
+/source/repos/mobile-native/!svn/ver/37885/branches/Android/WWE/android_wwe_projectbranch_v3.0.2/Libraries/ViewPagerIndicator/sample/src/com/viewpagerindicator/sample/SampleUnderlinesStyledTheme.java
+END
+SampleIconsDefault.java
+K 25
+svn:wc:ra_dav:version-url
+V 190
+/source/repos/mobile-native/!svn/ver/37885/branches/Android/WWE/android_wwe_projectbranch_v3.0.2/Libraries/ViewPagerIndicator/sample/src/com/viewpagerindicator/sample/SampleIconsDefault.java
+END
+SampleUnderlinesStyledMethods.java
+K 25
+svn:wc:ra_dav:version-url
+V 201
+/source/repos/mobile-native/!svn/ver/37885/branches/Android/WWE/android_wwe_projectbranch_v3.0.2/Libraries/ViewPagerIndicator/sample/src/com/viewpagerindicator/sample/SampleUnderlinesStyledMethods.java
+END
+SampleLinesStyledTheme.java
+K 25
+svn:wc:ra_dav:version-url
+V 194
+/source/repos/mobile-native/!svn/ver/37885/branches/Android/WWE/android_wwe_projectbranch_v3.0.2/Libraries/ViewPagerIndicator/sample/src/com/viewpagerindicator/sample/SampleLinesStyledTheme.java
+END
+SampleLinesStyledMethods.java
+K 25
+svn:wc:ra_dav:version-url
+V 196
+/source/repos/mobile-native/!svn/ver/37885/branches/Android/WWE/android_wwe_projectbranch_v3.0.2/Libraries/ViewPagerIndicator/sample/src/com/viewpagerindicator/sample/SampleLinesStyledMethods.java
+END
+BaseSampleActivity.java
+K 25
+svn:wc:ra_dav:version-url
+V 190
+/source/repos/mobile-native/!svn/ver/37885/branches/Android/WWE/android_wwe_projectbranch_v3.0.2/Libraries/ViewPagerIndicator/sample/src/com/viewpagerindicator/sample/BaseSampleActivity.java
+END
+SampleCirclesDefault.java
+K 25
+svn:wc:ra_dav:version-url
+V 192
+/source/repos/mobile-native/!svn/ver/37885/branches/Android/WWE/android_wwe_projectbranch_v3.0.2/Libraries/ViewPagerIndicator/sample/src/com/viewpagerindicator/sample/SampleCirclesDefault.java
+END
+SampleTitlesTriangle.java
+K 25
+svn:wc:ra_dav:version-url
+V 192
+/source/repos/mobile-native/!svn/ver/37885/branches/Android/WWE/android_wwe_projectbranch_v3.0.2/Libraries/ViewPagerIndicator/sample/src/com/viewpagerindicator/sample/SampleTitlesTriangle.java
+END
+SampleUnderlinesStyledLayout.java
+K 25
+svn:wc:ra_dav:version-url
+V 200
+/source/repos/mobile-native/!svn/ver/37885/branches/Android/WWE/android_wwe_projectbranch_v3.0.2/Libraries/ViewPagerIndicator/sample/src/com/viewpagerindicator/sample/SampleUnderlinesStyledLayout.java
+END
+SampleCirclesInitialPage.java
+K 25
+svn:wc:ra_dav:version-url
+V 196
+/source/repos/mobile-native/!svn/ver/37885/branches/Android/WWE/android_wwe_projectbranch_v3.0.2/Libraries/ViewPagerIndicator/sample/src/com/viewpagerindicator/sample/SampleCirclesInitialPage.java
+END

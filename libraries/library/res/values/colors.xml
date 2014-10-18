@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     
-    <color name="windowBackground">#d6d6d6</color>
+    <color name="windowBackground">#FFFFFF</color>
     <color name="error_background">#99F16364</color>
     <color name="error_text">#eee</color>
     <color name="list_white">#F6F6F6</color>

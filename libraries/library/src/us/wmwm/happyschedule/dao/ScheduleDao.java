@@ -174,6 +174,32 @@ public class ScheduleDao {
 			p.add(data[sequence][1]);
 		}
 		cur.close();
+        cur = WDb.get().db.rawQuery("select level from schedule_path where source=? and target=? order by level desc", new String[]{departStationId,arriveStationId});
+        int levels2 = 0;
+        if(cur.moveToNext()) {
+            levels2 = cur.getInt(0)+1;
+        }
+        cur.close();
+        cur = WDb.get().db.rawQuery("select a,b,level,sequence from schedule_path where source=? and target=? order by level asc, sequence desc",new String[]{departStationId,arriveStationId});
+        while (cur.moveToNext()) {
+            int level = (levels-1)+cur.getInt(2);
+            int sequence = cur.getInt(3);
+            String[][] data;
+            if(pairs.size()==level+1) {
+                data = pairs.get(level);
+            } else {
+                data = new String[sequence+1][2];
+                pairs.add(data);
+            }
+
+            data[sequence][0] = cur.getString(0);
+            data[sequence][1] = cur.getString(1);
+            // System.out.println(pairs[i][0] + " - " + pairs[i][1]);
+            p.add(data[sequence][0]);
+            p.add(data[sequence][1]);
+        }
+        cur.close();
+        levels = levels + levels2;
 		cur = Db.get().db.rawQuery(String.format(
 				"select stop_id, name from stop where stop_id in (%s)",
 				join(p, ",")), null);
@@ -240,9 +266,6 @@ public class ScheduleDao {
 					String arrive = qur.getString(1);
 					String serviceId = qur.getString(2);
 					String tripId = qur.getString(3);
-					if(tripId.equals("1372")) {
-						System.out.println(tripId);
-					}
 					String blockId = qur.getString(4);
 					String routeId = qur.getString(5);
 					String stopId = qur.getString(6);					

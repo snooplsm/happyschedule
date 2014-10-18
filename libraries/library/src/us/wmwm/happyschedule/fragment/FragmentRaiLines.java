@@ -30,7 +30,7 @@ import android.widget.ExpandableListView;
 
 import com.flurry.android.FlurryAgent;
 
-public class FragmentRaiLines extends HappyFragment {
+public class FragmentRaiLines extends HappyFragment implements ISecondary {
 
 	ExpandableListView list;
 	
@@ -224,4 +224,12 @@ public class FragmentRaiLines extends HappyFragment {
 //		}
 		
 	}
+
+    @Override
+    public void setSecondary() {
+        Intent i = new Intent(HappyApplication.get(), HappyScheduleService.class);
+        Uri u = Uri.parse("http://wmwm.us?type=push");
+        i.setData(u);
+        HappyApplication.get().startService(i);
+    }
 }

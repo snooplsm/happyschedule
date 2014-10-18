@@ -3,15 +3,27 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?android:attr/windowBackground"
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical" >
 
-    <com.emilsjolander.components.stickylistheaders.StickyListHeadersListView
+    <se.emilsjolander.stickylistheaders.StickyListHeadersListView
         android:id="@+id/list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/fragment_history_ad"
         android:divider="@drawable/fragment_history"
         android:dividerHeight="1px" />
+
+    <com.melnykov.fab.FloatingActionButton
+        android:id="@+id/button_floating_action_discard"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:layout_above="@id/fragment_history_ad"
+        android:src="@drawable/ic_action_discard"
+        fab:fab_colorNormal="@color/get_schedule_11"
+        fab:fab_colorPressed="@color/get_schedule_1"
+        />
 
     <RelativeLayout
         android:id="@id/fragment_history_ad"
@@ -20,8 +32,11 @@
         android:layout_alignParentBottom="true" >
     </RelativeLayout>
 
+
+
     <us.wmwm.happyschedule.views.EmptyView
         android:id="@+id/empty"
+        android:tag="You have no history"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="gone" />

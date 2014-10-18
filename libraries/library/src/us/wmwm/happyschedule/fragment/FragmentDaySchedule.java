@@ -46,6 +46,8 @@ import us.wmwm.happyschedule.service.FareType;
 import us.wmwm.happyschedule.service.Poller;
 import us.wmwm.happyschedule.util.Share;
 import us.wmwm.happyschedule.util.Streams;
+import us.wmwm.happyschedule.views.BackListener;
+import us.wmwm.happyschedule.views.GraphBuilderView;
 import us.wmwm.happyschedule.views.ScheduleControlsView;
 import us.wmwm.happyschedule.views.ScheduleControlsView.ScheduleControlListener;
 import us.wmwm.happyschedule.views.ScheduleView;
@@ -58,6 +60,12 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Picture;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -65,12 +73,14 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.ShareCompat;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -84,11 +94,15 @@ import android.widget.ExpandableListView;
 import android.widget.RelativeLayout;
 
 import com.flurry.android.FlurryAgent;
+import com.larvalabs.svgandroid.SVG;
+import com.larvalabs.svgandroid.SVGBuilder;
+import com.melnykov.fab.FloatingActionButton;
+import com.melnykov.fab.FloatingActionLayout;
 import com.readystatesoftware.systembartint.SystemBarTintManager;
 import com.readystatesoftware.systembartint.SystemBarTintManager.SystemBarConfig;
 
 public class FragmentDaySchedule extends Fragment implements IPrimary,
-		ISecondary {
+		ISecondary, BackListener {
 
 	public interface OnDateChange {
 		void onDateChange(Calendar cal);
@@ -871,6 +885,12 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 
 	RelativeLayout root;
 
+    FloatingActionButton fabReverse;
+    FloatingActionButton fabDate;
+    FloatingActionButton fabBookmark;
+    FloatingActionButton fabGraph;
+    FloatingActionLayout fal;
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -878,10 +898,61 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 				R.layout.fragment_day_schedule, container, false);
 		list = (ExpandableListView) root.findViewById(R.id.list2);
 		progressBar = root.findViewById(R.id.progress);
+        fabReverse = (FloatingActionButton) root.findViewById(R.id.button_floating_action_reverse);
+        fabDate = (FloatingActionButton) root.findViewById(R.id.button_floating_action_change_date);
+        fabBookmark = (FloatingActionButton) root.findViewById(R.id.button_floating_action_bookmark);
+        fabGraph = (FloatingActionButton) root.findViewById(R.id.button_floating_action_graph);
+//        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.HONEYCOMB) {
+//            fabDate.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+//        }
+        SVGBuilder b = new SVGBuilder().readFromResource(getResources(),R.raw.schedule).setColorFilter(new PorterDuffColorFilter(Color.argb(210, 255, 255, 255), PorterDuff.Mode.SRC));
+        int twentySix = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,24,getResources().getDisplayMetrics());
+        //b.setLimits(twentySix,twentySix);
+        Picture p = b.build().getPicture();
+        Bitmap bb = Bitmap.createBitmap(p.getWidth(),p.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas c = new Canvas(bb);
+        c.drawPicture(p);
+        fabDate.setImageBitmap(bb);
+        b = new SVGBuilder().readFromResource(getResources(),R.raw.bookmark).setColorFilter(new PorterDuffColorFilter(Color.argb(210, 255, 255, 255), PorterDuff.Mode.SRC));
+        p = b.build().getPicture();
+        bb = Bitmap.createBitmap(p.getWidth(),p.getHeight(), Bitmap.Config.ARGB_8888);
+        c = new Canvas(bb);
+        c.drawPicture(p);
+        fabBookmark.setImageBitmap(bb);
+
+        //fabDate.setImageBitmap(bb);
+        b = new SVGBuilder().readFromResource(getResources(),R.raw.graph).setColorFilter(new PorterDuffColorFilter(Color.argb(210, 255, 255, 255), PorterDuff.Mode.SRC));
+        p = b.build().getPicture();
+        bb = Bitmap.createBitmap(p.getWidth(),p.getHeight(), Bitmap.Config.ARGB_8888);
+        c = new Canvas(bb);
+        c.drawPicture(p);
+        fabGraph.setImageBitmap(bb);
+        fabGraph.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT,LayoutParams.MATCH_PARENT);
+                root.addView(graphBuilder = new GraphBuilderView(getActivity(),null).init(from,to),lp);
+            }
+        });
+        fal = (FloatingActionLayout) root.findViewById(R.id.fal);
+        fabBookmark.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FavoriteHelper.add(new DepartureVision(from.getId(),to.getId()));
+            }
+        });
 		return root;
 	}
 
-	@Override
+    GraphBuilderView graphBuilder;
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        fal.attachToListView(list);
+    }
+
+    @Override
 	public void onDestroy() {
 		super.onDestroy();
 		Log.d(TAG, "onDestroy");
@@ -1097,4 +1168,14 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 				TimeUnit.MILLISECONDS);
 	}
 
+    @Override
+    public boolean onBack() {
+        System.out.println("onback");
+        if(graphBuilder!=null) {
+            root.removeView(graphBuilder);
+            graphBuilder = null;
+            return true;
+        }
+        return false;
+    }
 }

@@ -1,7 +1,10 @@
 package us.wmwm.happyschedule.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import twitter4j.Status;
+import twitter4j.json.DataObjectFactory;
 import us.wmwm.happyschedule.application.HappyApplication;
 import us.wmwm.happyschedule.model.Station;
 import android.content.ContentValues;
@@ -61,9 +64,38 @@ public class WDb {
 						null);
 	}
 
-	private static class OpenHelper extends SQLiteOpenHelper {
+    public void save(Status tweet, String tweetJson) {
+        ContentValues cv = new ContentValues();
+        cv.put("screenName",tweet.getUser().getScreenName());
+        cv.put("created", tweet.getCreatedAt().getTime());
+        cv.put("original",tweetJson);
+        db.insert("status",null,cv);
+    }
+
+    public List<Status> getStatuses() {
+        Cursor c = db.rawQuery("select original from status order by created desc limit 30",null);
+        List<Status> statuses = new ArrayList<Status>(30);
+        try {
+            while (c.moveToNext()) {
+                String orig = c.getString(0);
+                try {
+                    Status status = DataObjectFactory.createStatus(orig);
+                    statuses.add(status);
+                } catch (Exception e) {
+                    // can't do shit here
+                }
+            }
+        } finally {
+            if(c!=null) {
+                c.close();
+            }
+        }
+        return statuses;
+    }
+
+    private static class OpenHelper extends SQLiteOpenHelper {
 		public OpenHelper(String name) {
-			super(HappyApplication.get(), name, null, 2);
+			super(HappyApplication.get(), name, null, 5);
 		}
 
 		@Override
@@ -72,14 +104,42 @@ public class WDb {
 			db.execSQL("create table if not exists preference(key varchar(255) unique, value text)");
 			db.execSQL("create table if not exists notification(block_id varchar(100) unique, created integer)");
 			db.execSQL("create table if not exists push_notification(created_at integer, created_str varchar(100), id integer, text text, source varchar(100), user_id integer, user_name varchar(100), user_screen_name varchar(100), json text)");
+            db.execSQL("CREATE TABLE if not exists schedule_path (source VARCHAR(20) NOT NULL,target VARCHAR(20) NOT NULL,sequence INTEGER,level INTEGER,a VARCHAR(20) NOT NULL,b VARCHAR(20) NOT NULL)");
+            db.execSQL("create table if not exists status(screenName text, created integer, original text)");
 		}
 
 		@Override
 		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 			db.execSQL("create table if not exists notification(block_id varchar(100) unique, created integer)");
+            db.execSQL("CREATE TABLE if not exists schedule_path (source VARCHAR(20) NOT NULL,target VARCHAR(20) NOT NULL,sequence INTEGER,level INTEGER,a VARCHAR(20) NOT NULL,b VARCHAR(20) NOT NULL)");
 			db.execSQL("create table if not exists push_notification(created_at integer, created_str varchar(100), id integer, text text, source varchar(100), user_id integer, user_name varchar(100), user_screen_name varchar(100), json text)");
+            db.execSQL("create table if not exists status(screenName text, created integer, original text)");
 		}
 	}
+
+    public void addGraph(List<Station> stations) {
+        Station first = stations.get(0);
+        Station last = stations.get(stations.size()-1);
+        Cursor c = db.rawQuery("select max(level) from schedule_path where source=? and target=?", new String[]{first.getId(),last.getId()});
+        int level = 0;
+        if(c.moveToNext()) {
+            level = c.getInt(0)+1;
+        }
+        c.close();
+        int sequence = 0;
+        for(int i = 1; i < stations.size();i++) {
+            Station a = stations.get(i-1);
+            Station b = stations.get(i);
+            ContentValues cv = new ContentValues();
+            cv.put("a",a.getId());
+            cv.put("b",b.getId());
+            cv.put("source",first.getId());
+            cv.put("target",last.getId());
+            cv.put("sequence",sequence++);
+            cv.put("level",level);
+            db.insert("schedule_path",null,cv);
+        }
+    }
 	
 	public boolean hasNotification(String block) {
 		Cursor c = db.rawQuery("select count(*) from notification where block_id=?", new String[]{block});

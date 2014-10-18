@@ -6,22 +6,25 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
 import us.wmwm.happyschedule.model.LineStyle;
 import us.wmwm.happyschedule.model.Station;
 import us.wmwm.happyschedule.model.StationToStation;
 import us.wmwm.happyschedule.model.TrainStatus;
 import us.wmwm.happyschedule.views.DepartureVisionHeader;
 import us.wmwm.happyschedule.views.DepartureVisionView;
+
+import android.graphics.Color;
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.RoundRectShape;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.BaseAdapter;
 
-import com.emilsjolander.components.stickylistheaders.StickyListHeadersAdapter;
-
 public class DepartureVisionAdapter extends BaseAdapter implements
-		StickyListHeadersAdapter {
+        StickyListHeadersAdapter {
 
 	List<TrainStatus> statuses;
 	Map<String, LineStyle> keyToColor = Collections.emptyMap();

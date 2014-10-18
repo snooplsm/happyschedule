@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.preference.PreferenceManager;
+import android.text.TextUtils;
 
 public class Db {
 
@@ -34,17 +35,25 @@ public class Db {
 		}
 		return nameQuery;
 	}
-	public Cursor getStops(boolean departureVisionOnly) {
+
+    public Cursor getStops(boolean departureVisionOnly) {
+        return getStops(departureVisionOnly,null);
+    }
+	public Cursor getStops(boolean departureVisionOnly, String key) {
+        String where = "";
+        if(!TextUtils.isEmpty(key)) {
+            where = "and name like '%" + key + "%'";
+        }
 		if(departureVisionOnly) {
 			return db
 					.rawQuery(
-							"select stop_id as _id, stop_id, name|| ' ('||departure_vision||')', departure_vision, alternate_id, lat, lon from stop where departure_vision is not null order by name asc",
+							"select stop_id as _id, stop_id, name|| ' ('||departure_vision||')', departure_vision, alternate_id, lat, lon from stop where departure_vision is not null and 1=1 " + where + " order by name asc",
 							null);
 		} else {
 		
 		return db
 				.rawQuery(
-						"select stop_id as _id, stop_id, " + getNameQuery() + ", departure_vision, alternate_id, lat, lon from stop order by name asc",
+						"select stop_id as _id, stop_id, " + getNameQuery() + ", departure_vision, alternate_id, lat, lon from stop where 1=1 " + where + " order by name asc",
 						null);
 		}
 	}

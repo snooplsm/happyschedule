@@ -1,5 +1,6 @@
 package us.wmwm.happyschedule.fragment;
 
+import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
 import us.wmwm.happyschedule.R;
 import us.wmwm.happyschedule.adapter.StationAdapter;
 import us.wmwm.happyschedule.dao.Db;
@@ -18,7 +19,6 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.Toast;
 
-import com.emilsjolander.components.stickylistheaders.StickyListHeadersListView;
 import com.happytap.jumper.JumpListener;
 import com.happytap.jumper.JumpView;
 

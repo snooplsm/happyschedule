@@ -33,6 +33,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.larvalabs.svgandroid.SVG;
+import com.larvalabs.svgandroid.SVGBuilder;
 import com.larvalabs.svgandroid.SVGParser;
 
 public class FragmentLoad extends HappyFragment {
@@ -89,8 +90,8 @@ public class FragmentLoad extends HappyFragment {
 			createDatabase();
 		}
 		
-		SVG svg = SVGParser.getSVGFromResource(getResources(), R.raw.logo);
-		logo.setImageDrawable(svg.createPictureDrawable());
+		SVG svg = new SVGBuilder().readFromResource(getResources(), R.raw.logo).build();
+		logo.setImageDrawable(svg.getDrawable());
         ((ActionBarActivity)getActivity()).getSupportActionBar().hide();
 	}
 	

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    xmlns:fab="http://schemas.android.com/apk/res-auto">
+
+    <se.emilsjolander.stickylistheaders.StickyListHeadersListView
+        android:id="@+id/list"
+        android:divider="@null"
+        android:dividerHeight="0dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+    <com.melnykov.fab.FloatingActionLayout
+        android:layout_alignBottom="@id/list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/fal">
+
+        <com.melnykov.fab.FloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_action_edit"
+            android:id="@+id/edit_alerts"
+            fab:fab_colorNormal="@color/get_schedule_11"
+            fab:fab_colorPressed="@color/get_schedule_1"
+            />
+
+        </com.melnykov.fab.FloatingActionLayout>
+
+
+</RelativeLayout>

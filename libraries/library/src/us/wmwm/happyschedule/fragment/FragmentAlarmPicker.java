@@ -256,6 +256,8 @@ public class FragmentAlarmPicker extends DialogFragment {
 
 	public static StringBuilder buildMessage(Calendar cal, Calendar comparison) {
 		long diff = cal.getTimeInMillis() - comparison.getTimeInMillis();
+        long days = diff / 86400000;
+        diff = diff % 86400000;
 		long hours = diff / 3600000;
 		diff = diff % 3600000;
 		long mins = diff / 60000;
@@ -263,6 +265,9 @@ public class FragmentAlarmPicker extends DialogFragment {
 		long seconds = diff / 1000;
 		StringBuilder b = new StringBuilder();
 		boolean neg = false;
+        if(days<0) {
+            neg = true;
+        }
 		if(hours<0) {
 			neg = true;
 		}
@@ -275,6 +280,9 @@ public class FragmentAlarmPicker extends DialogFragment {
 		if(neg) {
 			b.append("-");
 		}
+        if(days!=0) {
+            b.append(days).append("d");
+        }
 		if (hours != 0) {
 			b.append(hours).append("h");
 		}

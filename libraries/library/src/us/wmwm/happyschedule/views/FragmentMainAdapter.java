@@ -1,5 +1,7 @@
 package us.wmwm.happyschedule.views;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 
@@ -13,8 +15,11 @@ import us.wmwm.happyschedule.fragment.FragmentHistory;
 import us.wmwm.happyschedule.fragment.FragmentHistory.OnHistoryListener;
 import us.wmwm.happyschedule.fragment.FragmentPickStations;
 import us.wmwm.happyschedule.fragment.FragmentPickStations.OnGetSchedule;
+import us.wmwm.happyschedule.fragment.FragmentRaiLines;
+import us.wmwm.happyschedule.fragment.FragmentStatuses;
 import us.wmwm.happyschedule.fragment.IPrimary;
 import us.wmwm.happyschedule.fragment.ISecondary;
+import us.wmwm.happyschedule.fragment.SettingsFragment;
 import us.wmwm.happyschedule.model.DepartureVision;
 import us.wmwm.happyschedule.model.Station;
 import android.content.SharedPreferences;
@@ -24,7 +29,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.view.ViewGroup;
 
-public class FragmentMainAdapter extends FragmentStatePagerAdapter {
+public class FragmentMainAdapter extends FragmentStatePagerAdapter implements ImagePagerStrip.ImagePagerStripAdapter {
 
 	OnStationSelectedListener onStationSelectedListener;
 
@@ -74,10 +79,90 @@ public class FragmentMainAdapter extends FragmentStatePagerAdapter {
 	};
 
 	public FragmentMainAdapter(FragmentManager fm) {
-		super(fm);
+
+        super(fm);
+
+        options = new ArrayList<Option>();
+
+//        history = new FragmentHistory();
+//        history.setRetainInstance(false);
+//        history.setOnHistoryListener(onHistoryListener);
+//        bookmark = new Option("BOOKMARKS",R.raw.bookmark,history);
+//
+//        options.add(bookmark);
+
+        FragmentPickStations pickStations = new FragmentPickStations();
+        pickStations.setRetainInstance(false);
+        pickStations.setOnGetSchedule(onGetSchedule);
+        Option pick = new Option("SCHEDULE",R.raw.schedule,pickStations);
+        options.add(pick);
+
+        FragmentHistory history = new FragmentHistory();
+        history.setRetainInstance(false);
+        history.setOnHistoryListener(onHistoryListener);
+        Option bookmark = new Option("BOOKMARKS",R.raw.bookmark,history);
+        options.add(bookmark);
+
+		if(HappyApplication.get().getString(R.string.poller).length()==0) {
+
+		} else {
+			int depts = Math.max(1,DepartureVisionHelper.getDepartureVisions().size());
+            if(depts>0) {
+                DepartureVision station = getDepartureVision(0);
+                FragmentDepartureVision dv = FragmentDepartureVision.newInstance(
+                        station, 0, getDepartureVisionArrival(),null,false);
+                dv.setDepartureVisionListener(departureVisionListener);
+                dv.setRetainInstance(false);
+                //dv.setOnStationSelected(onStationSelected);
+
+                Option departureVision = new Option("DEPARTUREVISION",R.raw.television1,dv);
+                options.add(departureVision);
+            }
+		}
+
+        FragmentStatuses r = new FragmentStatuses();
+
+        Option railLines = new Option("Alerts",R.raw.alert,r);
+        options.add(railLines);
+
+        SettingsFragment f = new SettingsFragment();
+
+        Option settings = new Option("",R.raw.globe2,f);
+        options.add(settings);
+
+//        Arrays.asList(new Option[]{
+//                new Option("Bookmarks", R.raw.bookmark),
+//                new Option("Schedule", R.raw.schedule),
+//                new Option("Departurevision", R.raw.television1),
+//                new Option("Chat", R.raw.chat),
+//                new Option("Global", R.raw.globe2)
+//        });
+
 	}
 
-	Object last;
+    @Override
+    public void onBack() {
+        if(last!=null&&BackListener.class.isAssignableFrom(last.getClass())) {
+            ((BackListener)last).onBack();
+        }
+    }
+
+    Object last;
+
+    private class Option {
+
+        String title;
+        int rawResource;
+        Fragment fragment;
+
+        public Option(String title, int rawResource, Fragment fragment) {
+            this.title = title;
+            this.rawResource = rawResource;
+            this.fragment = fragment;
+        }
+    }
+
+    List<Option> options;
 
 	@Override
 	public void setPrimaryItem(ViewGroup container, int position, Object object) {
@@ -95,26 +180,27 @@ public class FragmentMainAdapter extends FragmentStatePagerAdapter {
 
 	@Override
 	public Fragment getItem(int pos) {
-		int count = getCount();
-		if (pos == 0) {
-			FragmentHistory history = new FragmentHistory();
-			history.setRetainInstance(false);
-			history.setOnHistoryListener(onHistoryListener);
-			return history;
-		}
-		if (pos == 1) {
-			FragmentPickStations pick = new FragmentPickStations();
-			pick.setRetainInstance(false);
-			pick.setOnGetSchedule(onGetSchedule);
-			return pick;
-		}
-		DepartureVision station = getDepartureVision(pos);
-		FragmentDepartureVision dv = FragmentDepartureVision.newInstance(
-				station, pos-2, getDepartureVisionArrival(),null,false);
-		dv.setDepartureVisionListener(departureVisionListener);
-		dv.setRetainInstance(false);
-		dv.setOnStationSelected(onStationSelected);
-		return dv;
+        return options.get(pos).fragment;
+//		int count = getCount();
+//		if (pos == 0) {
+//			FragmentHistory history = new FragmentHistory();
+//			history.setRetainInstance(false);
+//			history.setOnHistoryListener(onHistoryListener);
+//			return history;
+//		}
+//		if (pos == 1) {
+//			FragmentPickStations pick = new FragmentPickStations();
+//			pick.setRetainInstance(false);
+//			pick.setOnGetSchedule(onGetSchedule);
+//			return pick;
+//		}
+//		DepartureVision station = getDepartureVision(pos);
+//		FragmentDepartureVision dv = FragmentDepartureVision.newInstance(
+//				station, pos-2, getDepartureVisionArrival(),null,false);
+//		dv.setDepartureVisionListener(departureVisionListener);
+//		dv.setRetainInstance(false);
+//		dv.setOnStationSelected(onStationSelected);
+//		return dv;
 	}
 
 	public DepartureVision getDepartureVision(int pos) {
@@ -122,7 +208,7 @@ public class FragmentMainAdapter extends FragmentStatePagerAdapter {
 		if (v.size() == 0) {
 			return null;
 		}
-		return v.get(pos - 2);
+		return v.get(pos);
 	}
 	
 	public Station getDepartureVisionArrival() {
@@ -134,34 +220,41 @@ public class FragmentMainAdapter extends FragmentStatePagerAdapter {
 		return Db.get().getStop(id);
 	}
 
-	@Override
+    @Override
 	public int getCount() {
-		int count = 2;
-		if(HappyApplication.get().getString(R.string.poller).length()==0) {
-			
-		} else {
-			count = count+Math.max(1,DepartureVisionHelper.getDepartureVisions().size());
-		}
-		return count;
+        return options.size();
+//		int count = 2;
+//		if(HappyApplication.get().getString(R.string.poller).length()==0) {
+//
+//		} else {
+//			count = count+Math.max(1,DepartureVisionHelper.getDepartureVisions().size());
+//		}
+//		return count;
 	}
 
 	@Override
 	public CharSequence getPageTitle(int position) {
-		if (position == 0) {
-			return " History & Favorites ";
-		}
-		if (position == 1) {
-			return " Schedule ";
-		}
-		if (position > 1) {
-			DepartureVision dv = getDepartureVision(position);
-			if (dv == null) {
-				return " Departurevision ";
-			}
-			Station station = Db.get().getStop(dv.getFrom());
-			return " " + station.getName() + " ";
-		}
-		return " Schedule ";
+        return options.get(position).title;
+//		if (position == 0) {
+//			return " History & Favorites ";
+//		}
+//		if (position == 1) {
+//			return " Schedule ";
+//		}
+//		if (position > 1) {
+//			DepartureVision dv = getDepartureVision(position);
+//			if (dv == null) {
+//				return " Departurevision ";
+//			}
+//			Station station = Db.get().getStop(dv.getFrom());
+//			return " " + station.getName() + " ";
+//		}
+//		return " Schedule ";
 	}
+
+    @Override
+    public int getSVGResourceId(int position) {
+        return options.get(position).rawResource;
+    }
 
 }

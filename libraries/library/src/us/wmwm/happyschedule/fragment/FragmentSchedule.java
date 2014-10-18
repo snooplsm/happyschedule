@@ -19,6 +19,7 @@ import us.wmwm.happyschedule.model.Station;
 import us.wmwm.happyschedule.model.StationToStation;
 import us.wmwm.happyschedule.util.PremiumUserHelper;
 import us.wmwm.happyschedule.util.Streams;
+import us.wmwm.happyschedule.views.BackListener;
 import us.wmwm.happyschedule.views.ScheduleControlsView.ScheduleControlListener;
 import android.os.Bundle;
 import android.os.Handler;
@@ -306,7 +307,7 @@ public class FragmentSchedule extends Fragment {
 		super.onPause();
 	}
 
-	public static FragmentSchedule newInstance(Calendar day, Station from, Station to) {
+    public static FragmentSchedule newInstance(Calendar day, Station from, Station to) {
 		Bundle b = new Bundle();
 		b.putSerializable("from", from);
 		b.putSerializable("to", to);
@@ -315,5 +316,6 @@ public class FragmentSchedule extends Fragment {
 		s.setArguments(b);
 		return s;
 	}
+
 
 }

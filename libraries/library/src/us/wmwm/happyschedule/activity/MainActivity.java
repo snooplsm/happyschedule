@@ -15,12 +15,15 @@ import us.wmwm.happyschedule.fragment.FragmentLoad;
 import us.wmwm.happyschedule.fragment.FragmentLoad.OnLoadListener;
 import us.wmwm.happyschedule.fragment.FragmentMain;
 import us.wmwm.happyschedule.util.PremiumUserHelper;
+import us.wmwm.happyschedule.views.BackListener;
+
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.v4.app.Fragment;
 import android.view.Menu;
 
 import com.android.vending.billing.IInAppBillingService;
@@ -241,4 +244,23 @@ public class MainActivity extends HappyActivity {
 		return true;
 	}
 
+    @Override
+    public void onBackPressed() {
+        List<Fragment> fragments = getSupportFragmentManager().getFragments();
+        if(fragments!=null) {
+            for(Fragment fragment :fragments) {
+                if(fragment==null) {
+                    continue;
+                }
+                System.out.println(fragment.getClass().getSimpleName());
+                if(BackListener.class.isAssignableFrom(fragment.getClass())) {
+                    BackListener b = (BackListener)fragment;
+                    if(b.onBack()) {
+                        return;
+                    }
+                }
+            }
+        }
+        super.onBackPressed();
+    }
 }

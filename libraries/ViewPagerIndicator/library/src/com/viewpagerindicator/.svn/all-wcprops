@@ -1,0 +1,59 @@
+K 25
+svn:wc:ra_dav:version-url
+V 160
+/source/repos/mobile-native/!svn/ver/37885/branches/Android/WWE/android_wwe_projectbranch_v3.0.2/Libraries/ViewPagerIndicator/library/src/com/viewpagerindicator
+END
+UnderlinePageIndicator.java
+K 25
+svn:wc:ra_dav:version-url
+V 188
+/source/repos/mobile-native/!svn/ver/37885/branches/Android/WWE/android_wwe_projectbranch_v3.0.2/Libraries/ViewPagerIndicator/library/src/com/viewpagerindicator/UnderlinePageIndicator.java
+END
+TabPageIndicator.java
+K 25
+svn:wc:ra_dav:version-url
+V 182
+/source/repos/mobile-native/!svn/ver/37885/branches/Android/WWE/android_wwe_projectbranch_v3.0.2/Libraries/ViewPagerIndicator/library/src/com/viewpagerindicator/TabPageIndicator.java
+END
+LinePageIndicator.java
+K 25
+svn:wc:ra_dav:version-url
+V 183
+/source/repos/mobile-native/!svn/ver/37885/branches/Android/WWE/android_wwe_projectbranch_v3.0.2/Libraries/ViewPagerIndicator/library/src/com/viewpagerindicator/LinePageIndicator.java
+END
+IconPageIndicator.java
+K 25
+svn:wc:ra_dav:version-url
+V 183
+/source/repos/mobile-native/!svn/ver/37885/branches/Android/WWE/android_wwe_projectbranch_v3.0.2/Libraries/ViewPagerIndicator/library/src/com/viewpagerindicator/IconPageIndicator.java
+END
+IcsLinearLayout.java
+K 25
+svn:wc:ra_dav:version-url
+V 181
+/source/repos/mobile-native/!svn/ver/37885/branches/Android/WWE/android_wwe_projectbranch_v3.0.2/Libraries/ViewPagerIndicator/library/src/com/viewpagerindicator/IcsLinearLayout.java
+END
+IconPagerAdapter.java
+K 25
+svn:wc:ra_dav:version-url
+V 182
+/source/repos/mobile-native/!svn/ver/37885/branches/Android/WWE/android_wwe_projectbranch_v3.0.2/Libraries/ViewPagerIndicator/library/src/com/viewpagerindicator/IconPagerAdapter.java
+END
+PageIndicator.java
+K 25
+svn:wc:ra_dav:version-url
+V 179
+/source/repos/mobile-native/!svn/ver/37885/branches/Android/WWE/android_wwe_projectbranch_v3.0.2/Libraries/ViewPagerIndicator/library/src/com/viewpagerindicator/PageIndicator.java
+END
+CirclePageIndicator.java
+K 25
+svn:wc:ra_dav:version-url
+V 185
+/source/repos/mobile-native/!svn/ver/37885/branches/Android/WWE/android_wwe_projectbranch_v3.0.2/Libraries/ViewPagerIndicator/library/src/com/viewpagerindicator/CirclePageIndicator.java
+END
+TitlePageIndicator.java
+K 25
+svn:wc:ra_dav:version-url
+V 184
+/source/repos/mobile-native/!svn/ver/37885/branches/Android/WWE/android_wwe_projectbranch_v3.0.2/Libraries/ViewPagerIndicator/library/src/com/viewpagerindicator/TitlePageIndicator.java
+END

@@ -3,6 +3,7 @@ package us.wmwm.happyschedule.adapter;
 import java.util.ArrayList;
 import java.util.List;
 
+import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
 import us.wmwm.happyschedule.dao.Db;
 import us.wmwm.happyschedule.views.StationHeader;
 import us.wmwm.happyschedule.views.StationView;
@@ -13,11 +14,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 
-import com.emilsjolander.components.stickylistheaders.StickyListHeadersAdapter;
 
 public class StationAdapter extends CursorAdapter implements StickyListHeadersAdapter {
 	
 	List<String> letters = new ArrayList<String>();
+
+    private boolean departureVisionOnly;
 	
 	public StationAdapter(Context context, boolean departureVisionOnly) {
 		super(context, null, true);
@@ -30,8 +32,13 @@ public class StationAdapter extends CursorAdapter implements StickyListHeadersAd
 //				letters.add(String.valueOf(A));
 //			}
 //		}
+        this.departureVisionOnly = departureVisionOnly;
 		swapCursor(Db.get().getStops(departureVisionOnly));
 	}
+
+    public void filter(String key) {
+        swapCursor(Db.get().getStops(departureVisionOnly,key));
+    }
 
 	@Override
 	public Cursor getItem(int position) {

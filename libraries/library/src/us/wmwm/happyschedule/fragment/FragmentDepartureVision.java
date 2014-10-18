@@ -10,12 +10,9 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import uk.co.senab.actionbarpulltorefresh.extras.actionbarcompat.PullToRefreshLayout;
-import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
-import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
+import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
 import us.wmwm.happyschedule.R;
 import us.wmwm.happyschedule.ThreadHelper;
 import us.wmwm.happyschedule.activity.ActivityPickStation;
@@ -38,12 +35,12 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -57,8 +54,9 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.TextView;
 
-import com.emilsjolander.components.stickylistheaders.StickyListHeadersListView;
 import com.flurry.android.FlurryAgent;
+import com.melnykov.fab.FloatingActionButton;
+import com.melnykov.fab.FloatingActionLayout;
 
 public class FragmentDepartureVision extends HappyFragment implements IPrimary,
 		ISecondary {
@@ -66,7 +64,8 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary,
 	StickyListHeadersListView list;
 	TextView stationSelect;
 	TextView stationArriveSelect;
-	PullToRefreshLayout pullToRefresh;
+    TextView stationName;
+	SwipeRefreshLayout pullToRefresh;
 
 	Future<?> poll;
 
@@ -210,7 +209,7 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary,
 				}
 				handler.post(new Runnable() {
 					public void run() {
-						pullToRefresh.setRefreshComplete();
+						pullToRefresh.setRefreshing(false);
 						adapter.setData(s);
 						if (adapter.getCount() == 0) {
 							empty.setVisibility(View.VISIBLE);
@@ -225,7 +224,7 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary,
 					@Override
 					public void run() {
 						try {
-							pullToRefresh.setRefreshComplete();
+							pullToRefresh.setRefreshing(false);
 						} catch (Exception e) {
 							//this component is pretty buggy.
 						}
@@ -236,17 +235,23 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary,
 		}
 	};
 
+    FloatingActionLayout fal;
+    FloatingActionButton change;
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		View root = inflater.inflate(R.layout.fragment_departurevision,
 				container, false);
 		list = (StickyListHeadersListView) root.findViewById(R.id.list);
+        stationName = (TextView) root.findViewById(R.id.station_name);
 		stationSelect = (TextView) root.findViewById(R.id.departure);
 		stationArriveSelect = (TextView) root.findViewById(R.id.arrival);
 		erroText = root.findViewById(R.id.no_internet);
 		empty = root.findViewById(R.id.empty);
-		pullToRefresh = (PullToRefreshLayout)root.findViewById(R.id.pull_to_refresh);
+		pullToRefresh = (SwipeRefreshLayout)root.findViewById(R.id.pull_to_refresh);
+        fal = (FloatingActionLayout) root.findViewById(R.id.fal);
+        change = (FloatingActionButton) root.findViewById(R.id.button_floating_action_change);
 		return root;
 	}
 
@@ -352,7 +357,7 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary,
 				departureVision = new DepartureVision();
 			}
 			position = arguments.getInt("position");
-			station = Db.get().getStop(departureVision.getFrom());
+			setStation(Db.get().getStop(departureVision.getFrom()));
 			stationToStation = (StationToStation) arguments
 					.getSerializable("stationToStation");
 			stationArrive = Db.get().getStop(departureVision.getTo());
@@ -448,25 +453,34 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary,
 				}
 			});
 		}
-		ActionBarPullToRefresh.from(getActivity())
-        // Mark All Children as pullable
-        .allChildrenArePullable()
-        // Set the OnRefreshListener
-        .listener(onRefreshListener)
-        // Finally commit the setup to our PullToRefreshLayout
-        .setup(pullToRefresh);
-
+//		ActionBarPullToRefresh.from(getActivity())
+//        // Mark All Children as pullable
+//        .allChildrenArePullable()
+//        // Set the OnRefreshListener
+//        .listener(onRefreshListener)
+//        // Finally commit the setup to our PullToRefreshLayout
+//        .setup(pullToRefresh);
+        pullToRefresh.setOnRefreshListener(onRefreshListener);
+        change.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivityForResult(ActivityPickStation.from(getActivity(), true),
+                        100);
+            }
+        });
 	}
 	
-	OnRefreshListener onRefreshListener = new OnRefreshListener() {
-		@Override
-		public void onRefreshStarted(View view) {
-			if (refresh != null) {
-				refresh.cancel(true);
-			}
+	SwipeRefreshLayout.OnRefreshListener onRefreshListener = new SwipeRefreshLayout.OnRefreshListener() {
 
-			refresh = ThreadHelper.getScheduler().submit(r);
-		}
+
+        @Override
+        public void onRefresh() {
+            if (refresh != null) {
+                refresh.cancel(true);
+            }
+
+            refresh = ThreadHelper.getScheduler().submit(r);
+        }
 	};
 
 	private void loadInitial() {
@@ -559,7 +573,7 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary,
 		State state = null;
 		if (resultCode == Activity.RESULT_OK) {
 			if (requestCode == 100 || requestCode == 300) {
-				station = (Station) data.getSerializableExtra("station");
+                setStation((Station) data.getSerializableExtra("station"));
 			} else {
 				stationArrive = (Station) data.getSerializableExtra("station");
 			}
@@ -594,7 +608,7 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary,
 				poll = ThreadHelper.getScheduler().scheduleAtFixedRate(r, 100,
 						SettingsFragment.getPollMilliseconds(),
 						TimeUnit.MILLISECONDS);
-				List<TrainStatus> ks = Collections.emptyList();
+				List<TrainStatus> ks = new ArrayList<TrainStatus>();
 				adapter.setData(ks);
 			}
 			if (requestCode == 100 || requestCode == 200) {
@@ -613,6 +627,13 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary,
 	boolean logged = false;
 
 	int count;
+
+    private void setStation(Station station) {
+        this.station = station;
+        if(station!=null) {
+            this.stationName.setText(station.getName());
+        }
+    }
 
 	Runnable delayed = new Runnable() {
 		@Override

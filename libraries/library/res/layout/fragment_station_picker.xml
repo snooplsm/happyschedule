@@ -5,7 +5,7 @@
     android:background="?android:attr/windowBackground"
     android:orientation="vertical" >
 
-    <com.emilsjolander.components.stickylistheaders.StickyListHeadersListView
+    <se.emilsjolander.stickylistheaders.StickyListHeadersListView
         android:id="@+id/list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

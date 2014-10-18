@@ -4,6 +4,8 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
 
+import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
+import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
 import us.wmwm.happyschedule.R;
 import us.wmwm.happyschedule.ThreadHelper;
 import us.wmwm.happyschedule.dao.WDb;
@@ -32,9 +34,8 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 
-import com.emilsjolander.components.stickylistheaders.StickyListHeadersAdapter;
-import com.emilsjolander.components.stickylistheaders.StickyListHeadersListView;
 import com.flurry.android.FlurryAgent;
+import com.melnykov.fab.FloatingActionButton;
 
 public class FragmentHistory extends HappyFragment implements IPrimary {
 
@@ -45,6 +46,8 @@ public class FragmentHistory extends HappyFragment implements IPrimary {
 	View empty;
 
 	Handler handler = new Handler();
+
+    FloatingActionButton fab;
 
 	public interface OnHistoryListener {
 		void onHistory(Station from, Station to);
@@ -75,37 +78,42 @@ public class FragmentHistory extends HappyFragment implements IPrimary {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		FlurryAgent.logEvent(item.getTitle() + "MenuItemSelected");
 		if (item.getItemId() == R.id.menu_delete_all) {
-			AlertDialog.Builder b = new AlertDialog.Builder(getActivity());
-			b.setTitle("Delete All History");
-			b.setMessage("Are you sure?");
-			b.setPositiveButton("Discard", new OnClickListener() {
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					FlurryAgent.logEvent("AllHistoryDeleted");
-					ThreadHelper.getScheduler().submit(new Runnable() {
-						@Override
-						public void run() {
-							WDb.get().deleteAllHistory();
-							handler.post(new Runnable() {
-								@Override
-								public void run() {
-									adapter.swap();
-									empty.setVisibility(View.VISIBLE);
-								}
-							});
-						}
-					});
-					dialog.dismiss();
-				}
-			}).setNegativeButton("Cancel", new OnClickListener() {
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					dialog.dismiss();
-				}
-			}).create().show();
+			showDiscard();
 		}
 		return super.onOptionsItemSelected(item);
 	}
+
+    private void showDiscard() {
+        AlertDialog.Builder b = new AlertDialog.Builder(getActivity());
+        b.setTitle("Delete All History");
+        b.setMessage("Are you sure?");
+        b.setPositiveButton("Discard", new OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                FlurryAgent.logEvent("AllHistoryDeleted");
+                ThreadHelper.getScheduler().submit(new Runnable() {
+                    @Override
+                    public void run() {
+                        WDb.get().deleteAllHistory();
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                adapter.swap();
+                                fab.hide();
+                                empty.setVisibility(View.VISIBLE);
+                            }
+                        });
+                    }
+                });
+                dialog.dismiss();
+            }
+        }).setNegativeButton("Cancel", new OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        }).create().show();
+    }
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -113,6 +121,14 @@ public class FragmentHistory extends HappyFragment implements IPrimary {
 		View view = inflater.inflate(R.layout.fragment_history, container,
 				false);
 		list = (StickyListHeadersListView) view.findViewById(R.id.list);
+        fab = (FloatingActionButton) view.findViewById(R.id.button_floating_action_discard);
+        fab.attachToListView(list);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDiscard();
+            }
+        });
 		list.setAdapter(adapter = new HistoryAdapter(getActivity()));
 		list.setOnItemClickListener(new OnItemClickListener() {
 			@Override
@@ -228,16 +244,21 @@ public class FragmentHistory extends HappyFragment implements IPrimary {
 	public void onResume() {
 		super.onResume();
 		adapter.notifyDataSetChanged();
-		if (adapter.getCount() == 0) {
-			empty.setVisibility(View.VISIBLE);
-		} else {
-			empty.setVisibility(View.GONE);
-		}
-
+        sync();
 	}
 
+    private void sync() {
+        if (adapter.getCount() == 0) {
+            empty.setVisibility(View.VISIBLE);
+            fab.hide();
+        } else {
+            fab.show();
+            empty.setVisibility(View.GONE);
+        }
+    }
+
 	private static class HistoryAdapter extends CursorAdapter implements
-			StickyListHeadersAdapter {
+            StickyListHeadersAdapter {
 
 		SimpleDateFormat DATE;
 
@@ -259,11 +280,11 @@ public class FragmentHistory extends HappyFragment implements IPrimary {
 			DepartureVisionHeader h = new DepartureVisionHeader(
 					parent.getContext());
 			if (position < favorites.size()) {
-				h.setData("Favorites");
+				h.setData("BOOKMARKS");
 			} else {
 				Calendar cal = Calendar.getInstance();
 				cal.setTimeInMillis(getItem(position-favorites.size()).getLong(2));
-				h.setData(DATE.format(cal.getTime()));
+				h.setData(DATE.format(cal.getTime()).toUpperCase());
 			}
 			h.setLayoutParams(new ViewGroup.LayoutParams(
 					LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
@@ -370,7 +391,9 @@ public class FragmentHistory extends HappyFragment implements IPrimary {
 		}
 		if(adapter!=null) {
 			adapter.swap();
+            sync();
 		}
+
 	}
 
 }

@@ -10,15 +10,19 @@
         android:layout_height="wrap_content" >
     </FrameLayout>
 
-    <android.support.v4.view.ViewPager
+    <us.wmwm.happyschedule.views.ImagePagerStrip
         android:layout_below="@id/main_fragment_ad"
+        android:id="@+id/indicator"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+    </us.wmwm.happyschedule.views.ImagePagerStrip>
+
+    <android.support.v4.view.ViewPager
+        android:layout_below="@id/indicator"
         android:id="@+id/pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent" >
-
-        <android.support.v4.view.PagerTabStrip
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
     </android.support.v4.view.ViewPager>
 
     <RelativeLayout        

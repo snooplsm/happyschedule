@@ -1,6 +1,4 @@
-import com.android.builder.internal.ClassFieldImpl
-
-apply plugin: 'android-library'
+apply plugin: 'com.android.library'
 
 dependencies {
 
@@ -12,9 +10,9 @@ dependencies {
     compile 'com.google.android.gms:play-services:4.4.52'
     compile project(':libraries:AndroidSlidingUpPanel:library')
     compile project(':libraries:facebook:facebook')
-    compile project(':libraries:ActionBar-PullToRefresh:library')
-    compile project(':libraries:ActionBar-PullToRefresh:extras:actionbarcompat')
     compile project(':libraries:android-support-v4-preferencefragment')
+    compile project(':libraries:ViewPagerIndicator:library')
+    compile project(':libraries:FloatingActionButton:library')
 }
 
 android {

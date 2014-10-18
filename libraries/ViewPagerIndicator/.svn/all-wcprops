@@ -1,0 +1,35 @@
+K 25
+svn:wc:ra_dav:version-url
+V 125
+/source/repos/mobile-native/!svn/ver/37885/branches/Android/WWE/android_wwe_projectbranch_v3.0.2/Libraries/ViewPagerIndicator
+END
+.gitignore
+K 25
+svn:wc:ra_dav:version-url
+V 136
+/source/repos/mobile-native/!svn/ver/37885/branches/Android/WWE/android_wwe_projectbranch_v3.0.2/Libraries/ViewPagerIndicator/.gitignore
+END
+CHANGELOG.md
+K 25
+svn:wc:ra_dav:version-url
+V 138
+/source/repos/mobile-native/!svn/ver/37885/branches/Android/WWE/android_wwe_projectbranch_v3.0.2/Libraries/ViewPagerIndicator/CHANGELOG.md
+END
+pom.xml
+K 25
+svn:wc:ra_dav:version-url
+V 133
+/source/repos/mobile-native/!svn/ver/37885/branches/Android/WWE/android_wwe_projectbranch_v3.0.2/Libraries/ViewPagerIndicator/pom.xml
+END
+README.md
+K 25
+svn:wc:ra_dav:version-url
+V 135
+/source/repos/mobile-native/!svn/ver/37885/branches/Android/WWE/android_wwe_projectbranch_v3.0.2/Libraries/ViewPagerIndicator/README.md
+END
+checkstyle.xml
+K 25
+svn:wc:ra_dav:version-url
+V 140
+/source/repos/mobile-native/!svn/ver/37885/branches/Android/WWE/android_wwe_projectbranch_v3.0.2/Libraries/ViewPagerIndicator/checkstyle.xml
+END

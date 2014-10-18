@@ -15,19 +15,28 @@ import us.wmwm.happyschedule.adapter.FareAdapter;
 import us.wmwm.happyschedule.dao.Db;
 import us.wmwm.happyschedule.dao.ScheduleDao;
 import us.wmwm.happyschedule.dao.WDb;
+import us.wmwm.happyschedule.model.DepartureVision;
 import us.wmwm.happyschedule.model.Station;
 import us.wmwm.happyschedule.util.Share;
+import us.wmwm.happyschedule.views.BackListener;
 import us.wmwm.happyschedule.views.ClipDrawListener;
 import us.wmwm.happyschedule.views.HappyShadowBuilder;
 import us.wmwm.happyschedule.views.StationButton;
 import android.app.Activity;
 import android.content.ClipData;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Picture;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.DragEvent;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -44,19 +53,22 @@ import android.view.ViewGroup.MarginLayoutParams;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.flurry.android.FlurryAgent;
+import com.larvalabs.svgandroid.SVGBuilder;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout.PanelSlideListener;
 
-public class FragmentPickStations extends Fragment implements IPrimary, ISecondary {
+public class FragmentPickStations extends Fragment implements IPrimary, ISecondary, BackListener {
 
 	StationButton departureButton;
 	StationButton arrivalButton;
 	View getScheduleButton;
 	FragmentStationPicker picker;
 	View reverseButton;
+    ImageView bookmarkButton;
 	View reverseButtonContainer;
 	View reverseHolder;
 	TextView fare;
@@ -79,7 +91,7 @@ public class FragmentPickStations extends Fragment implements IPrimary, ISeconda
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setHasOptionsMenu(true);
+		//setHasOptionsMenu(true);
 	}
 
 	View root;
@@ -96,6 +108,7 @@ public class FragmentPickStations extends Fragment implements IPrimary, ISeconda
 		arrivalButton.setHint("Arrival Station");
 		getScheduleButton = root.findViewById(R.id.get_schedule);
 		reverseButton = root.findViewById(R.id.reverse);
+        bookmarkButton = (ImageView) root.findViewById(R.id.bookmarked);
 		reverseButtonContainer = root.findViewById(R.id.reverse_container);
 		reverseHolder = root.findViewById(R.id.reverse_holder);
 		fare = (TextView) root.findViewById(R.id.fare);
@@ -185,7 +198,7 @@ public class FragmentPickStations extends Fragment implements IPrimary, ISeconda
 		if (!canShowReverse) {
 			reverseButton.setVisibility(View.GONE);
 		} else {
-			reverseButton.setVisibility(View.VISIBLE);			
+			reverseButton.setVisibility(View.VISIBLE);
 		}
 		ThreadHelper.getScheduler().submit(new Runnable() {
 			@Override
@@ -198,6 +211,13 @@ public class FragmentPickStations extends Fragment implements IPrimary, ISeconda
 					FlurryAgent.logEvent("ReverseButtonPosition", Collections.singletonMap("percent", percentL));
 				}
 				final Float percentLeft = Float.parseFloat(percentL);
+                boolean hasFavorite;
+                try {
+                    hasFavorite = FavoriteHelper.hasFavorite(new DepartureVision(departureButton.getStation().getId(),arrivalButton.getStation().getId()));
+                } catch (Exception e) {
+                    hasFavorite = false;
+                }
+                final boolean bookmarked = hasFavorite;
 				handler.post(new Runnable() {
 					@Override
 					public void run() {
@@ -206,6 +226,11 @@ public class FragmentPickStations extends Fragment implements IPrimary, ISeconda
 						MarginLayoutParams lp = (MarginLayoutParams) reverseHolder.getLayoutParams();
 						lp.leftMargin = (int) (percentLeft * reverseButtonContainer.getWidth());
 						reverseHolder.setLayoutParams(lp);
+                        if(bookmarked) {
+                            bookmarkButton.setVisibility(View.VISIBLE);
+                        } else {
+                            bookmarkButton.setVisibility(View.GONE);
+                        }
 						//reverseButtonContainer.setLayoutParams(lp);	
 					}
 				});
@@ -214,6 +239,8 @@ public class FragmentPickStations extends Fragment implements IPrimary, ISeconda
 		});
 		getActivity().supportInvalidateOptionsMenu();
 	}
+
+    FragmentSchedule fragmentSchedule;
 
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
@@ -343,7 +370,10 @@ public class FragmentPickStations extends Fragment implements IPrimary, ISeconda
 				}
 				final Station depart = departureButton.getStation();
 				final Station arrive = arrivalButton.getStation();
-				onGetSchedule.onGetSchedule(Calendar.getInstance(), depart, arrive);
+				//onGetSchedule.onGetSchedule(Calendar.getInstance(), depart, arrive);
+                fragmentSchedule = FragmentSchedule.newInstance(Calendar.getInstance(), depart,arrive);
+                getChildFragmentManager().beginTransaction().replace(R.id.secondary_view,fragmentSchedule).commit();
+
 				ThreadHelper.getScheduler().submit(new Runnable() {
 					@Override
 					public void run() {
@@ -412,6 +442,22 @@ public class FragmentPickStations extends Fragment implements IPrimary, ISeconda
 			}
         	
         });
+
+
+        Fragment frag = getChildFragmentManager().findFragmentById(R.id.secondary_view);
+        if(frag!=null) {
+            if(frag instanceof FragmentSchedule) {
+                this.fragmentSchedule = (FragmentSchedule)frag;
+            }
+        }
+
+        SVGBuilder b = new SVGBuilder().readFromResource(getResources(),R.raw.bookmark_alt).setColorFilter(new PorterDuffColorFilter(getResources().getColor(R.color.get_schedule_11), PorterDuff.Mode.SRC_ATOP));
+        int twentySix = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24, getResources().getDisplayMetrics());
+        Picture p = b.build().getPicture();
+        Bitmap bb = Bitmap.createBitmap(p.getWidth(),p.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas c = new Canvas(bb);
+        c.drawPicture(p);
+        bookmarkButton.setImageBitmap(bb);
 	}
 
 	protected boolean canGetSchedule() {
@@ -442,6 +488,7 @@ public class FragmentPickStations extends Fragment implements IPrimary, ISeconda
 		Station tmp = departureButton.getStation();
 		departureButton.setStation(arrivalButton.getStation());
 		arrivalButton.setStation(tmp);
+        setupReverseButton();
 	}
 
 	@Override
@@ -461,7 +508,8 @@ public class FragmentPickStations extends Fragment implements IPrimary, ISeconda
 
 	@Override
 	public void setPrimaryItem() {
-        ((ActionBarActivity)getActivity()).getSupportActionBar().setSubtitle(null);
+        System.out.println("setPrimaryItem");
+        //((ActionBarActivity)getActivity()).getSupportActionBar().setSubtitle(null);
 		canEatBack = true;
 	}
 	
@@ -470,4 +518,19 @@ public class FragmentPickStations extends Fragment implements IPrimary, ISeconda
 		canEatBack = false;
 	}
 
+    @Override
+    public boolean onBack() {
+        FragmentBackListener back = new FragmentBackListener(this);
+        if(back.onBack()) {
+            return true;
+        }
+        System.out.println("fragment pick stations back");
+        if(fragmentSchedule!=null) {
+            getChildFragmentManager().beginTransaction().remove(fragmentSchedule).commit();
+            System.out.println("fragment pick stations back remove frag");
+            fragmentSchedule = null;
+            return true;
+        }
+        return false;
+    }
 }

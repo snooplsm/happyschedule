@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
@@ -15,6 +16,50 @@
         android:fitsSystemWindows="true"
         android:clipToPadding="false" >
     </ExpandableListView>
+
+    <com.melnykov.fab.FloatingActionLayout
+        android:id="@+id/fal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/list2"
+        android:orientation="horizontal">
+
+        <com.melnykov.fab.FloatingActionButton
+            android:id="@+id/button_floating_action_reverse"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:src="@drawable/ic_action_import_export"
+            fab:fab_colorNormal="@color/get_schedule_11"
+            fab:fab_colorPressed="@color/get_schedule_1"
+            />
+        <com.melnykov.fab.FloatingActionButton
+            android:id="@+id/button_floating_action_change_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="4dp"
+            fab:fab_colorNormal="@color/get_schedule_11"
+            fab:fab_colorPressed="@color/get_schedule_1"
+            />
+
+        <com.melnykov.fab.FloatingActionButton
+            android:id="@+id/button_floating_action_bookmark"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="4dp"
+            fab:fab_colorNormal="@color/get_schedule_11"
+            fab:fab_colorPressed="@color/get_schedule_1"
+            />
+
+        <com.melnykov.fab.FloatingActionButton
+            android:id="@+id/button_floating_action_graph"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="4dp"
+            fab:fab_colorNormal="@color/get_schedule_11"
+            fab:fab_colorPressed="@color/get_schedule_1"
+            />
+    </com.melnykov.fab.FloatingActionLayout>
 
     <RelativeLayout
         android:id="@+id/fragment_alarm_picker"

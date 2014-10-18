@@ -5,6 +5,7 @@ import twitter4j.json.DataObjectFactory;
 import us.wmwm.happyschedule.R;
 import us.wmwm.happyschedule.activity.MainActivity;
 import us.wmwm.happyschedule.activity.TweetActivity;
+import us.wmwm.happyschedule.dao.WDb;
 import us.wmwm.happyschedule.fragment.SettingsFragment;
 import android.app.IntentService;
 import android.app.Notification;
@@ -141,7 +142,10 @@ public class GcmIntentService extends IntentService {
 		String by = " -" + title;
 		try {
 			Status status = DataObjectFactory.createStatus(tweet);
-			boolean promotionalOn = PreferenceManager.getDefaultSharedPreferences(this)
+            WDb.get().save(status,tweet);
+            Intent inserted = new Intent("data_inserted");
+            sendBroadcast(inserted);
+            boolean promotionalOn = PreferenceManager.getDefaultSharedPreferences(this)
 					.getBoolean(getString(R.string.settings_key_push_editorial_on), true);
 			if(!promotionalOn && status.getUser().getScreenName().toLowerCase().equals(getString(R.string.promotional_account))) {
 				return;

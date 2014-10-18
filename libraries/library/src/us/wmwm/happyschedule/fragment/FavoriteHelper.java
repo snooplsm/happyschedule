@@ -95,4 +95,13 @@ public class FavoriteHelper {
 		}
 	}
 
+    public static boolean hasFavorite(DepartureVision departure) {
+        List<DepartureVision> favs = getFavoritesVisions();
+        for(DepartureVision dv : favs) {
+            if(dv.getFrom().equals(departure.getFrom()) && dv.getTo().equals(departure.getTo())) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

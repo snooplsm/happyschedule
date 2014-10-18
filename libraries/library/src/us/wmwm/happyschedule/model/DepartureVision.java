@@ -78,8 +78,6 @@ public class DepartureVision implements Serializable {
 				return false;
 		} else if (!to.equals(other.to))
 			return false;
-		if (updated != other.updated)
-			return false;
 		return true;
 	}
 
