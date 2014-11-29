@@ -1,7 +1,7 @@
 libraries/library/bin
 libraries/library/gen
 libraries/library/build
-build
+**/build
 NJTransit/bin
 NJTransit/gen
 NJTwitter/bin
@@ -17,9 +17,9 @@ shapes.txt
 trips.txt
 stops.txt
 routes.txt
-.DS_Store
-.idea
-.gradle
-.iml
+**/.DS_Store
+**/.idea
+**/.gradle
+**/.iml
 trainapp/*.zip
 trainapp/gtfs
