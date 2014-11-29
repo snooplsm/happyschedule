@@ -17,8 +17,13 @@
 
         <!-- <item name="android:windowBackground"></item> -->
         <item name="android:windowBackground">@color/windowBackground</item>
-
+        <item name="android:actionBarStyle">@style/RailsActionBar</item>
+        <item name="actionBarStyle">@style/RailsActionBar</item>
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
+    </style>
+
+    <style name="RailsActionBar" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="android:background">@color/white</item>
     </style>
 
     <style name="small_thin">
