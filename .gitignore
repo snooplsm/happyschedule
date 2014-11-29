@@ -21,5 +21,6 @@ routes.txt
 **/.idea
 **/.gradle
 **/.iml
+**/reports
 trainapp/*.zip
 trainapp/gtfs
