@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app1="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginLeft="6dp"
+    android:layout_marginRight="6dp"
+    android:background="@color/list_white"
+    android:paddingBottom="6dp" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="6dp"
+        android:layout_marginRight="6dp"
+        android:background="@drawable/bg_accent_flat_light"
+        android:orientation="vertical" >
+
+        <LinearLayout
+            android:id="@+id/alarms"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="60dp" >
+
+            <us.wmwm.happyschedule.views.ScheduleControlButton
+                android:id="@+id/add_alarm"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                app1:src="@drawable/ic_action_add_alarm" />
+
+            <us.wmwm.happyschedule.views.ScheduleControlButton
+                android:id="@+id/pin"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:visibility="gone"
+                app1:src="@drawable/pin" />
+
+            <us.wmwm.happyschedule.views.ScheduleControlButton
+                android:id="@+id/trips"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                app1:src="@drawable/ic_action_view_as_list" />
+
+            <us.wmwm.happyschedule.views.ScheduleControlButton
+                android:id="@+id/share"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                app1:src="@drawable/ic_action_share" />
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

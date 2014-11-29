@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?android:attr/windowBackground">
+
+    <RelativeLayout
+        android:id="@+id/fragment_schedule_ad_top"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"></RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/top_ad"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/fragment_schedule_ad_top"></RelativeLayout>
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/pager2"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/ad" />
+
+    <FrameLayout
+        android:id="@id/ad"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/ad_height"
+        android:layout_alignParentBottom="true"
+        android:visibility="gone"></FrameLayout>
+
+    <RelativeLayout
+        android:id="@+id/loading_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="Loading..." />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/fragment_date_picker"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"></RelativeLayout>
+
+</RelativeLayout>

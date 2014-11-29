@@ -1,74 +1,152 @@
-apply plugin: 'com.android.library'
+apply plugin: 'com.android.application'
 
 dependencies {
-
     compile fileTree(dir: 'libs', include: '*.jar')
-    compile project(':libraries:StickyListHeaders:library')
     compile project(':libraries:AndroidTimesSquare:library')
     compile project(':libraries:MicrowaveTimePicker:lib')
     compile project(':libraries:jumper')
-    compile 'com.google.android.gms:play-services:4.4.52'
+    compile 'com.google.android.gms:play-services:6.1.11'
     compile project(':libraries:AndroidSlidingUpPanel:library')
     compile project(':libraries:facebook:facebook')
+    compile 'com.android.support:gridlayout-v7:21.0.0'
     compile project(':libraries:android-support-v4-preferencefragment')
     compile project(':libraries:ViewPagerIndicator:library')
     compile project(':libraries:FloatingActionButton:library')
+    compile project(':libraries:happyschedule-views')
+    compile project(':libraries:StickyListHeaders:library')
 }
 
 android {
-//    compileSdkVersion Integer.parseInt(project.ANDROID_BUILD_SDK_VERSION)
     buildToolsVersion project.ANDROID_BUILD_TOOLS_VERSION
     defaultConfig {
         minSdkVersion 9
         targetSdkVersion Integer.parseInt(project.ANDROID_BUILD_SDK_VERSION)
         compileSdkVersion Integer.parseInt(project.ANDROID_BUILD_SDK_VERSION)
+        versionName computeVersionName()
+        buildConfigField "us.wmwm.happyschedule.service.Poller", "POLLER", "null"
+        buildConfigField "boolean","IS_AMAZON_ADS_ENABLED","false"
+        buildConfigField "boolean","IS_GOOGLE_ADS_ENABLED","false"
     }
-    sourceSets {
-        main {
-            manifest.srcFile 'AndroidManifest.xml'
-            java.srcDirs = ['src']
-            resources.srcDirs = ['src']
-            aidl.srcDirs = ['src']
-            renderscript.srcDirs = ['src']
-            res.srcDirs = ['res']
-            assets.srcDirs = ['assets']
+
+    lintOptions {
+        checkReleaseBuilds false
+        abortOnError false
+    }
+
+    flavorDimensions "brand", "version"
+
+    productFlavors {
+
+        metroNorth {
+            flavorDimension "brand"
+            applicationId "com.metro.north"
+            buildConfigField "us.wmwm.happyschedule.service.Poller", "POLLER", "new us.wmwm.happyschedule.metronorthrails.service.MetroNorthPoller()"
+            buildConfigField "boolean","IS_AMAZON_ADS_ENABLED","false"
+            buildConfigField "boolean","IS_GOOGLE_ADS_ENABLED","true"
+        }
+        lirr {
+            flavorDimension "brand"
+            applicationId "com.lirr"
+            buildConfigField "us.wmwm.happyschedule.service.Poller", "POLLER", "new us.wmwm.happyschedule.lirails.service.LirrPoller()"
+            buildConfigField "boolean","IS_AMAZON_ADS_ENABLED","false"
+            buildConfigField "boolean","IS_GOOGLE_ADS_ENABLED","true"
+        }
+        njrails {
+            flavorDimension "brand"
+            applicationId "us.wmwm.njrail"
+            buildConfigField "us.wmwm.happyschedule.service.Poller", "POLLER", "new us.wmwm.happyschedule.service.DeparturePoller()"
+            buildConfigField "boolean","IS_AMAZON_ADS_ENABLED","false"
+            buildConfigField "boolean","IS_GOOGLE_ADS_ENABLED","true"
+        }
+        preIcs {
+            flavorDimension "version"
+            versionCode computeVersionCode() - 2
+            minSdkVersion 9
+            targetSdkVersion 13
+            compileSdkVersion 13
         }
 
-        // Move the tests to tests/java, tests/res, etc...
-        instrumentTest.setRoot('tests')
+        postIcs {
+            flavorDimension "version"
+            versionCode computeVersionCode()
+            minSdkVersion 14
+            targetSdkVersion Integer.parseInt(project.ANDROID_BUILD_SDK_VERSION)
+            compileSdkVersion Integer.parseInt(project.ANDROID_BUILD_SDK_VERSION)
+        }
+    }
 
-        // Move the build types to build-types/<type>
-        // For instance, build-types/debug/java, build-types/debug/AndroidManifest.xml, ...
-        // This moves them out of them default location under src/<type>/... which would
-        // conflict with src/ being used by the main source set.
-        // Adding new build types or product flavors should be accompanied
-        // by a similar customization.
-        debug.setRoot('build-types/debug')
-        release.setRoot('build-types/release')
-    }
-    dexOptions {
-        incremental true
-    }
-    productFlavors {
+    signingConfigs {
+        release {
+            storeFile file(project.RAILS_KEYSTORE)
+            storePassword project.RAILS_KEYSTORE_PASSWORD
+            keyAlias project.RAILS_KEYSTORE_ALIAS
+            keyPassword project.RAILS_KEY_PASS
+        }
+
+
     }
     buildTypes {
+        release {
+            proguardFile getDefaultProguardFile('proguard-android-optimize.txt')
+            proguardFile "proguard-project.txt"
+            minifyEnabled true
+            signingConfig signingConfigs.release
+            zipAlignEnabled true
+        }
+
+
     }
 }
 
-//android.libraryVariants.all { variant ->
-//	variant.processManifest.doFirst {
-//
-//		if(variant.getMergedFlavor().getTargetSdkVersion()==13) {
-//			FileTree tree = fileTree("${buildDir}.absolutePath") {
-//				include '**/AndroidManifest.xml'
-//			}
-//
-//			tree.each { File file ->
-//				println file
-//				String content = manifestFile.getText('UTF-8')
-//				content = content.replaceAll(/targetSdkVersion="19"/, 'targetSdkVersion=\"13\"')
-//				manifestFile.write(content, 'UTF-8')
-//			}
-//		}
-//	}
+def computeVersionCode() {
+    def now = Calendar.getInstance()
+    def dateFormat = new java.text.SimpleDateFormat("yyyyMMddkk");
+    return 1 + Integer.parseInt(dateFormat.format(now.getTime()))
+}
+
+def computeVersionName() {
+    def now = Calendar.getInstance()
+    def dateFormat = new java.text.SimpleDateFormat("yyyy-MM-dd");
+    return dateFormat.format(now.getTime())
+}
+
+def splitDatabase(variant) {
+
+
+
+    println("${buildDir.absolutePath}/intermediates/res/${variant.dirName}/raw")
+    def baseZip = file("${buildDir.absolutePath}/intermediates/res/${variant.dirName}/raw")
+    println("${baseZip.absolutePath}/database_db.zip")
+    def zipFile = file("${baseZip.absolutePath}/database_db.zip")
+    println("${baseZip.absolutePath}/")
+    def outputDir = file("${baseZip.absolutePath}/")
+    copy {
+
+        from zipTree(zipFile.absolutePath)
+        into outputDir
+    }
+
+    delete {
+        delete zipFile.absolutePath
+    }
+
+            {
+                def proc = "split -a 3 -b 125k ${outputDir.absolutePath}/database_db ${outputDir.absolutePath}/database_db_".execute()
+                proc.waitFor()
+            }
+
+    delete {
+        delete "${outputDir.absolutePath}/database_db"
+    }
+}
+
+//android.applicationVariants.all { variant ->
+//    variant.mergeResources.doLast {
+//        if(variant.getMergedFlavor().getTargetSdkVersion().getApiLevel()>13) {
+//            println("not of pre version")
+//        } else {
+//            println("of version : " + variant.getMergedFlavor().getTargetSdkVersion().getApiLevel())
+//            splitDatabase(variant);
+//        }
+//    }
 //}
