@@ -57,7 +57,7 @@ public class HappyStream {
 		} catch (UnknownHostException e1) {
 			throw new RuntimeException(e1);
 		}
-		db = client.getDB("njrails");
+		db = client.getDB("rails");
 		ConfigurationBuilder cb = new ConfigurationBuilder();
 		cb.setGZIPEnabled(true);
 		cb.setJSONStoreEnabled(true);
@@ -87,62 +87,6 @@ public class HappyStream {
 			@Override
 			public void onStatus(Status status) {
 				synchronized (this) {
-					System.out.println(status.getUser().getName() + " : "
-							+ status.getText());
-					File file = new File("njtransit.json");
-					JSONArray a = null;
-					if (file.exists()) {
-						FileInputStream fin = null;
-						try {
-							fin = new FileInputStream(file);
-							String data = Streams.readFully(fin);
-							a = new JSONArray(data);
-						} catch (Exception e) {
-							e.printStackTrace();
-						} finally {
-							if (fin != null) {
-								try {
-									fin.close();
-								} catch (IOException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								}
-							}
-						}
-					} else {
-						a = new JSONArray();
-					}
-					if (a.length() > 3) {
-						JSONArray b = new JSONArray();
-						for (int i = 1; i < a.length(); i++) {
-							try {
-								b.put(i - 1, a.getJSONObject(i));
-							} catch (JSONException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-						}
-						a = b;
-					}
-					try {
-						a.put(new JSONObject(DataObjectFactory
-								.getRawJSON(status)));
-					} catch (JSONException e) {
-						e.printStackTrace();
-					}
-					FileOutputStream fos = null;
-					try {
-						fos = new FileOutputStream(file);
-						fos.write(a.toString().getBytes());
-					} catch (Exception e) {
-						e.printStackTrace();
-					} finally {
-						try {
-							fos.close();
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-					}
 					saveStatus(status);
 					try {
 						processStatus(status);
@@ -303,14 +247,10 @@ public class HappyStream {
 		InputStream in = null;
 		DBCursor users = null;
 		try {
-			if (status.getUser().getScreenName().equalsIgnoreCase(screenname)) {
-				users = findAllUsers(status);
-			} else {
-				Calendar cal = Calendar.getInstance();
-				int hour = cal.get(Calendar.HOUR_OF_DAY);
-				int day = cal.get(Calendar.DAY_OF_WEEK);
-				users = findUsersForService(status, day, hour);
-			}
+			Calendar cal = Calendar.getInstance();
+			int hour = cal.get(Calendar.HOUR_OF_DAY);
+			int day = cal.get(Calendar.DAY_OF_WEEK);
+			users = findUsersForService(status, day, hour);
 
 			JSONArray regs = new JSONArray();
 			JSONObject fields = new JSONObject();
