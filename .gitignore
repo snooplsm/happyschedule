@@ -20,5 +20,6 @@ routes.txt
 .DS_Store
 .idea
 .gradle
+.iml
 trainapp/*.zip
 trainapp/gtfs
