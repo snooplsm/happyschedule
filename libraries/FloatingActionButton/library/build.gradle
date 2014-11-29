@@ -21,6 +21,6 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:support-annotations:20.0.0'
+    compile 'com.android.support:support-annotations:21.0.0'
     compile project(':libraries:StickyListHeaders:library')
 }

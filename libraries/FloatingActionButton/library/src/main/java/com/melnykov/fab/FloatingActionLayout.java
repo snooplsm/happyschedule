@@ -8,6 +8,8 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.LinearLayout;
 
+import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
+
 /**
  * Created by gravener on 10/5/14.
  */
@@ -67,6 +69,14 @@ public class FloatingActionLayout extends LinearLayout implements ViewGroup.OnHi
         mListView.setOnScrollListener(mOnScrollListener);
     }
 
+    public void attachToListView(@NonNull StickyListHeadersListView listView) {
+        if (listView == null) {
+            throw new NullPointerException("AbsListView cannot be null.");
+        }
+        mListView = listView.getWrappedList();
+        listView.setOnScrollListener(mOnScrollListener);
+    }
+
     public FloatingActionLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
         setOrientation(LinearLayout.HORIZONTAL);
@@ -103,11 +113,17 @@ public class FloatingActionLayout extends LinearLayout implements ViewGroup.OnHi
         if(count>1) {
             if(overflow==null) {
                 overflow = new FloatingActionButton(getContext());
+                int res = getResources().getIdentifier("ic_action_overflow","drawable",getContext().getPackageName());
+                overflow.setImageResource(res);
                 FloatingActionButton next = ((FloatingActionButton)getChildAt(1));
                 overflow.setColorNormal(next.getColorNormal());
                 overflow.setColorPressed(next.getColorPressed());
                 overflow.setType(FloatingActionButton.TYPE_MINI);
-                addView(overflow,0);
+                ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) getChildAt(0).getLayoutParams();
+                LinearLayout.LayoutParams lp2 = new LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT);
+                lp2.bottomMargin = lp.bottomMargin;
+                lp2.topMargin = lp.topMargin;
+                addView(overflow,0,lp2);
                 overflow.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View v) {
