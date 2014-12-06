@@ -7,9 +7,8 @@ curl -b cookies.txt -o /dev/null -b cookies.txt -L -d "userName=snooplsm&passwor
 curl -b cookies.txt -c cookies.txt --dump-header headers.txt -L "https://www.njtransit.com/mt/mt_servlet.srv?hdnPageAction=MTDevResourceDownloadTo&Category=rail" -o njtransit.zip
 unzip -o njtransit.zip -d gtfs/njtransit/
 
-cd ..
-file="$PWD/libraries/library/res/raw/database_db"
-cd trainapp
+file="$PWD/../libraries/library/src/njrails/res/raw/database_db"
+echo $file
 python graph_builder.py njtransit "$file"
 
 
