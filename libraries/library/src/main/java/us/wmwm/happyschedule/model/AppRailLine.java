@@ -12,7 +12,7 @@ public class AppRailLine implements Comparable<AppRailLine>{
 	
 	private String name;
 	private String key;
-    private Set<String> routeIds;
+    private Set<String> routeIds = new HashSet<String>();
 	
 	public String getName() {
 		return name;

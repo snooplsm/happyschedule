@@ -1,9 +1,5 @@
 package us.wmwm.happytap.stream;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -29,11 +25,9 @@ import twitter4j.UserStreamListener;
 import twitter4j.auth.AccessToken;
 import twitter4j.conf.ConfigurationBuilder;
 import twitter4j.internal.org.json.JSONArray;
-import twitter4j.internal.org.json.JSONException;
 import twitter4j.internal.org.json.JSONObject;
 import twitter4j.json.DataObjectFactory;
 
-import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
@@ -48,8 +42,6 @@ public class HappyStream {
 
 	private static String apiKey;
 
-	private static String screenname;
-
 	public static void main(String[] args) {
 		MongoClient client;
 		try {
@@ -57,7 +49,7 @@ public class HappyStream {
 		} catch (UnknownHostException e1) {
 			throw new RuntimeException(e1);
 		}
-		db = client.getDB("rails");
+		db = client.getDB("njrails");
 		ConfigurationBuilder cb = new ConfigurationBuilder();
 		cb.setGZIPEnabled(true);
 		cb.setJSONStoreEnabled(true);
@@ -66,7 +58,6 @@ public class HappyStream {
 		twitterStream.setOAuthConsumer(args[0], args[1]);
 		twitterStream.setOAuthAccessToken(new AccessToken(args[2], args[3]));
 		apiKey = args[4];
-		screenname = args[6];
 		UserStreamListener l = new UserStreamListener() {
 
 			@Override

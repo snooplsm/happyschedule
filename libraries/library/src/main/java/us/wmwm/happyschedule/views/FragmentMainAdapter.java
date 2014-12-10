@@ -110,7 +110,7 @@ public class FragmentMainAdapter extends FragmentStatePagerAdapter implements Im
 
         SettingsFragment f = new SettingsFragment();
 
-        Option settings = new Option("",R.raw.globe2,f);
+        Option settings = new Option("SETTINGS",R.raw.globe2,f);
         options.add(settings);
 
 //        Arrays.asList(new Option[]{

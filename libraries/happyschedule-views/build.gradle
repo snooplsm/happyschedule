@@ -5,7 +5,7 @@ android {
     buildToolsVersion "21.0.0"
 
     defaultConfig {
-        applicationId "us.wmwm.happyschedule.views"
+        //applicationId "us.wmwm.happyschedule.views"
         minSdkVersion 8
         targetSdkVersion 21
         versionCode 1
@@ -13,7 +13,7 @@ android {
     }
     buildTypes {
         release {
-            runProguard false
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }

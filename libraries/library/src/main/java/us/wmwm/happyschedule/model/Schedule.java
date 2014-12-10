@@ -39,6 +39,7 @@ public class Schedule implements Serializable {
 	public Map<String, String> routeIdToName;
 	public Map<String[], Set<String>> inOrder;
 	public Map<String[], Set<String>> reverseOrder;
+    public Map<String,String> tripIdToRouteId;
 	public Date start;
 	public Date end;
 	public Date userStart;

@@ -167,7 +167,7 @@ public class ScheduleView {
         duration.setText(((sts.arriveTime.getTimeInMillis() - sts.departTime
                 .getTimeInMillis()) / 60000) + " minutes");
 
-        this.depart.setText(depart.getName() + " to " + arrive.getName());
+        this.depart.setText(depart.getShortName() + " to " + arrive.getShortName());
         if (sts instanceof StationInterval) {
             StationInterval sts2 = (StationInterval) sts;
             train.setVisibility(View.GONE);

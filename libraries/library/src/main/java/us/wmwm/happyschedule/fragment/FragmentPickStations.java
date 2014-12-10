@@ -22,6 +22,8 @@ import us.wmwm.happyschedule.views.BackListener;
 import us.wmwm.happyschedule.views.ClipDrawListener;
 import us.wmwm.happyschedule.views.HappyShadowBuilder;
 import us.wmwm.happyschedule.views.StationButton;
+import us.wmwm.happyschedule.views.StationView;
+
 import android.app.Activity;
 import android.content.ClipData;
 import android.content.Intent;
@@ -31,6 +33,7 @@ import android.graphics.Color;
 import android.graphics.Picture;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -56,6 +59,8 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.flurry.android.FlurryAgent;
@@ -77,6 +82,7 @@ public class FragmentPickStations extends Fragment implements IPrimary, ISeconda
 	View reverseHolder;
 	TextView fare;
 	GridView fares;
+    LinearLayout scrollingContent;
 
 	Handler handler = new Handler();
 
@@ -99,8 +105,7 @@ public class FragmentPickStations extends Fragment implements IPrimary, ISeconda
 	}
 
 	View root;
-	
-	SlidingUpPanelLayout upPanelLayout;
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -116,8 +121,8 @@ public class FragmentPickStations extends Fragment implements IPrimary, ISeconda
 		reverseButtonContainer = root.findViewById(R.id.reverse_container);
 		reverseHolder = root.findViewById(R.id.reverse_holder);
 		fare = (TextView) root.findViewById(R.id.fare);
-		upPanelLayout = (SlidingUpPanelLayout) root.findViewById(R.id.sliding_up_layout);
 		fares = (GridView) root.findViewById(R.id.fares);
+        scrollingContent = (LinearLayout) root.findViewById(R.id.scrolling_content);
 		return root;
 	}
 
@@ -249,24 +254,44 @@ public class FragmentPickStations extends Fragment implements IPrimary, ISeconda
     @Override
     public void onViewCreated(final View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        ViewGroup viewGroup = (ViewGroup)view;
         view.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
-                //view.getViewTreeObserver().removeGlobalOnLayoutListener(this);
-                ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams)getScheduleButton.getLayoutParams();
-                ViewGroup.MarginLayoutParams lpDepart = (ViewGroup.MarginLayoutParams)departureButton.getLayoutParams();
-                ViewGroup.MarginLayoutParams lpArrive = (ViewGroup.MarginLayoutParams)arrivalButton.getLayoutParams();
+                view.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+//                ViewGroup.MarginLayoutParams lpDepart = (ViewGroup.MarginLayoutParams)departureButton.getLayoutParams();
+//                ViewGroup.MarginLayoutParams lpArrive = (ViewGroup.MarginLayoutParams)arrivalButton.getLayoutParams();
                 int height = view.getMeasuredHeight();
                 int getSchedHeight = getScheduleButton.getMeasuredHeight();
-                int maxHeight = height-getSchedHeight;
-                lpDepart.height = maxHeight/2;
-                lpArrive.height = maxHeight/2;
-                departureButton.setLayoutParams(lpDepart);
-                arrivalButton.setLayoutParams(lpArrive);
-                //lp.topMargin = view.getMeasuredHeight();//-ad.getMeasuredHeight();
+//                int maxHeight = height-getSchedHeight;
+//                lpDepart.height = maxHeight/2;
+//                lpArrive.height = maxHeight/2;
+//                departureButton.setLayoutParams(lpDepart);
+//                arrivalButton.setLayoutParams(lpArrive);
+//                ViewGroup.MarginLayoutParams slp = (ViewGroup.MarginLayoutParams)scrollingContent.getLayoutParams();
+//                slp.topMargin = height-getSchedHeight;
+                //scrollingContent.setLayoutParams(slp);
+                View v = new View(getActivity());
+                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,height-getSchedHeight);
+                v.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                scrollingContent.addView(v,0,lp);
+//                lp.topMargin = view.getMeasuredHeight();//-ad.getMeasuredHeight();
                 //ad.setLayoutParams(lp);
             }
         });
+        disallowTouches(viewGroup);
+
+    }
+
+    private void disallowTouches(ViewGroup viewGroup) {
+        for(int i = 0; i < viewGroup.getChildCount(); i++) {
+            View v = viewGroup.getChildAt(i);
+            if(v instanceof ViewGroup) {
+                ViewGroup vg = (ViewGroup)v;
+                disallowTouches(vg);
+                vg.requestDisallowInterceptTouchEvent(false);
+            }
+        }
     }
 
     @Override
@@ -399,60 +424,6 @@ public class FragmentPickStations extends Fragment implements IPrimary, ISeconda
 		};
 
 		getScheduleButton.setOnClickListener(onClickGetSchedule);
-		
-        SlidingUpPanelLayout layout = upPanelLayout;
-        layout.setShadowDrawable(getResources().getDrawable(R.drawable.above_shadow));
-        layout.setAnchorPoint(0.75f);
-        layout.setEnableDragViewTouchEvents(true);
-        layout.setPanelSlideListener(new PanelSlideListener() {
-
-            @Override
-            public void onPanelSlide(View panel, float slideOffset) {
-                if (slideOffset < 0.2) {
-//                    if (getActionBar().isShowing()) {
-//                        getActionBar().hide();
-//                    }
-                } else {
-//                    if (!getActionBar().isShowing()) {
-//                        getActionBar().show();
-//                    }
-                }
-            }                        
-
-            @Override
-            public void onPanelExpanded(View panel) {
-            	FlurryAgent.logEvent("onPanelExpanded");
-            }
-
-            @Override
-            public void onPanelCollapsed(View panel) {
-            	FlurryAgent.logEvent("onPanelCollapsed");
-            }
-
-            @Override
-            public void onPanelAnchored(View panel) {
-            	FlurryAgent.logEvent("onPanelAnchored");
-            }
-        });
-        getView().setFocusableInTouchMode(true); // this line is important
-		getView().requestFocus();
-        getView().setOnKeyListener(new OnKeyListener() {
-
-			@Override
-			public boolean onKey(View arg0, int keyCode, KeyEvent arg2) {
-				if(!canEatBack) {
-					return false;
-				}
-				if(keyCode==KeyEvent.KEYCODE_BACK) {
-					if(upPanelLayout.isAnchored()||upPanelLayout.isExpanded()) {
-						upPanelLayout.collapsePane();
-						return true;
-					}
-				}
-				return false;
-			}
-        	
-        });
 
 
         Fragment frag = getChildFragmentManager().findFragmentById(R.id.secondary_view);

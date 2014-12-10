@@ -25,6 +25,7 @@ import us.wmwm.happyschedule.model.TripInfo;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.text.TextUtils;
 import android.util.Log;
 
 public class ScheduleDao {
@@ -203,12 +204,12 @@ public class ScheduleDao {
         cur.close();
         levels = levels + levels2;
 		cur = Db.get().db.rawQuery(String.format(
-				"select stop_id, name from stop where stop_id in (%s)",
+				"select stop_id, name, short_name from stop where stop_id in (%s)",
 				join(p, ",")), null);
 		Map<String, String> idToName = new HashMap<String, String>();
 		while (cur.moveToNext()) {
 			String id = cur.getString(0);
-			String name = cur.getString(1);
+			String name = !TextUtils.isEmpty(cur.getString(2))?cur.getString(2) : cur.getString(1);
 			idToName.put(id, name);
 		}
 		cur.close();
@@ -233,6 +234,7 @@ public class ScheduleDao {
 
 		Map<String, Service> services = new HashMap<String, Service>();
 		Set<String> tripIds = new HashSet<String>();
+        Map<String,String> tripIdToRouteId = new HashMap<String,String>();
 		Map<String, String> routeIds = new HashMap<String, String>();
 		String stationsFragment = "stop_id=" + join(p, " or stop_id=");
 		String query = "select a1.depart,a1.arrive,a1.service_id,a1.trip_id,a1.block_id,a1.route_id,a1.stop_id,a1.lft,a1.fare_type from nested_trip a1 where a1.stop_id=? or a1.stop_id=? and a1.service_id in (select service_id from service where date in(:foo))";
@@ -276,6 +278,7 @@ public class ScheduleDao {
 					tripIds.add(tripId);
 					interval.routeId = routeId;
 					interval.serviceId = serviceId;
+                    tripIdToRouteId.put(tripId,routeId);
 					interval.departure = depart;
 					interval.arrival = arrive;
 					interval.sourceId = stopId;
@@ -379,6 +382,7 @@ public class ScheduleDao {
 		s.departId = departStationId;
 		s.arriveId = arriveStationId;
 		s.transfers = pairs;
+        s.tripIdToRouteId = tripIdToRouteId;
 		s.services = services;
 		s.connections = pairToTimes;
 		s.transferEdges = transferEdges;

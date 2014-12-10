@@ -1,21 +1,5 @@
 apply plugin: 'com.android.application'
 
-dependencies {
-    compile fileTree(dir: 'libs', include: '*.jar')
-    compile project(':libraries:AndroidTimesSquare:library')
-    compile project(':libraries:MicrowaveTimePicker:lib')
-    compile project(':libraries:jumper')
-    compile 'com.google.android.gms:play-services:6.1.11'
-    compile project(':libraries:AndroidSlidingUpPanel:library')
-    compile project(':libraries:facebook:facebook')
-    compile 'com.android.support:gridlayout-v7:21.0.0'
-    compile project(':libraries:android-support-v4-preferencefragment')
-    compile project(':libraries:ViewPagerIndicator:library')
-    compile project(':libraries:FloatingActionButton:library')
-    compile project(':libraries:happyschedule-views')
-    compile project(':libraries:StickyListHeaders:library')
-}
-
 android {
     buildToolsVersion project.ANDROID_BUILD_TOOLS_VERSION
     defaultConfig {
@@ -73,6 +57,19 @@ android {
             targetSdkVersion Integer.parseInt(project.ANDROID_BUILD_SDK_VERSION)
             compileSdkVersion Integer.parseInt(project.ANDROID_BUILD_SDK_VERSION)
         }
+
+        tv {
+            flavorDimension "version"
+            versionCode computeVersionCode()
+            minSdkVersion 17
+            targetSdkVersion Integer.parseInt(project.ANDROID_BUILD_SDK_VERSION)
+            compileSdkVersion Integer.parseInt(project.ANDROID_BUILD_SDK_VERSION)
+        }
+
+    }
+
+    sourceSets {
+        tv.setRoot("src/tv")
     }
 
     signingConfigs {
@@ -138,6 +135,23 @@ def splitDatabase(variant) {
     delete {
         delete "${outputDir.absolutePath}/database_db"
     }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: '*.jar')
+    compile project(':libraries:AndroidTimesSquareLib:library')
+    compile project(':libraries:MicrowaveTimePickerLib:lib')
+    compile project(':libraries:JumperLib')
+    compile 'com.google.android.gms:play-services:6.1.11'
+    compile project(':libraries:AndroidSlidingPanel:library')
+    compile project(':libraries:facebook:facebook')
+    compile 'com.android.support:gridlayout-v7:21.0.0'
+    compile project(':libraries:android-support-v4-preferencefragmentlib')
+    compile project(':libraries:ViewPagerIndicator:library')
+    compile project(':libraries:FloatingActionButton:library')
+    compile project(':libraries:happyschedule-views')
+    compile project(':libraries:StickyListHeadersLib:library')
+    tvCompile 'com.android.support:leanback-v17:21.0.0'
 }
 
 //android.applicationVariants.all { variant ->

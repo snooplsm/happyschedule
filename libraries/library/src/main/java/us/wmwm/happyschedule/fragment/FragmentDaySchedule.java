@@ -87,6 +87,7 @@ import us.wmwm.happyschedule.model.StationToStation;
 import us.wmwm.happyschedule.model.TrainStatus;
 import us.wmwm.happyschedule.model.Type;
 import us.wmwm.happyschedule.service.FareType;
+import us.wmwm.happyschedule.util.ImageUtil;
 import us.wmwm.happyschedule.util.Share;
 import us.wmwm.happyschedule.views.BackListener;
 import us.wmwm.happyschedule.views.DepartureVisionHeader;
@@ -655,7 +656,7 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
                     public void run() {
                         if (isToday) {
                             try {
-                                api.registerForTripNotifications(AppConfig.get(), schedule);
+                                api.registerForTripNotifications(AppConfig.get(), k, schedule);
                             } catch (Exception e) {
                                 Log.e(TAG, "Unable to register for trip notifications", e);
                             }
@@ -1031,29 +1032,11 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
         fabBookmark = (FloatingActionButton) root.findViewById(R.id.button_floating_action_bookmark);
         fabGraph = (FloatingActionButton) root.findViewById(R.id.button_floating_action_graph);
         header = (DepartureVisionHeader) root.findViewById(R.id.dvheader);
-        SVGBuilder b = new SVGBuilder().readFromResource(getResources(), R.raw.schedule).setColorFilter(new PorterDuffColorFilter(Color.argb(210, 255, 255, 255), PorterDuff.Mode.SRC));
-        int twentySix = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24, getResources().getDisplayMetrics());
-        //b.setLimits(twentySix,twentySix);
-        Picture p = b.build().getPicture();
-        Bitmap bb = Bitmap.createBitmap(p.getWidth(), p.getHeight(), Bitmap.Config.ARGB_8888);
-        Canvas c = new Canvas(bb);
-        c.drawPicture(p);
-        fabDate.setImageBitmap(bb);
         int color = Color.argb(210, 255, 255, 255);
-        b = new SVGBuilder().readFromResource(getResources(), R.raw.bookmark).setColorFilter(new PorterDuffColorFilter(color, PorterDuff.Mode.SRC));
-        p = b.build().getPicture();
-        bb = Bitmap.createBitmap(p.getWidth(), p.getHeight(), Bitmap.Config.ARGB_8888);
-        c = new Canvas(bb);
-        c.drawPicture(p);
-        fabBookmark.setImageBitmap(bb);
 
-        //fabDate.setImageBitmap(bb);
-        b = new SVGBuilder().readFromResource(getResources(), R.raw.graph).setColorFilter(new PorterDuffColorFilter(Color.argb(210, 255, 255, 255), PorterDuff.Mode.SRC));
-        p = b.build().getPicture();
-        bb = Bitmap.createBitmap(p.getWidth(), p.getHeight(), Bitmap.Config.ARGB_8888);
-        c = new Canvas(bb);
-        c.drawPicture(p);
-        fabGraph.setImageBitmap(bb);
+        fabDate.setImageBitmap(ImageUtil.loadBitmapFromSvgWithColorOverride(getActivity(),R.raw.schedule,color));
+        fabBookmark.setImageBitmap(ImageUtil.loadBitmapFromSvgWithColorOverride(getActivity(),R.raw.bookmark,color));
+        fabGraph.setImageBitmap(ImageUtil.loadBitmapFromSvgWithColorOverride(getActivity(),R.raw.graph,color));
         fabGraph.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -1092,15 +1075,7 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
             bg = Color.WHITE;
             color = Color.argb(210, Color.red(cc), Color.green(cc), Color.blue(cc));
         }
-        Picture p;
-        Bitmap bb;
-        Canvas c;
-        SVGBuilder b = new SVGBuilder().readFromResource(getResources(), R.raw.bookmark).setColorFilter(new PorterDuffColorFilter(color, PorterDuff.Mode.SRC));
-        p = b.build().getPicture();
-        bb = Bitmap.createBitmap(p.getWidth(), p.getHeight(), Bitmap.Config.ARGB_8888);
-        c = new Canvas(bb);
-        c.drawPicture(p);
-        fabBookmark.setImageBitmap(bb);
+        fabBookmark.setImageBitmap(ImageUtil.loadBitmapFromSvgWithColorOverride(getActivity(),R.raw.bookmark,color));
         fabBookmark.setColorNormal(bg);
     }
 

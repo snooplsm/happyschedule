@@ -126,7 +126,7 @@
 	}, {
 		"name": "Pascack Valley Line",
 		"screename": "NJTRANSIT_PVL",
-		"route_id": ["13"]
+		"route_ids": ["13"]
 	}, {
 		"name": "North Jersey Coast Line",
 		"screenname": "NJTRANSIT_NJCL",

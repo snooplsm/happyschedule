@@ -221,6 +221,7 @@ public class FragmentSchedule extends Fragment implements BackListener {
         });
 
         if(b.getBoolean("showAds")) {
+            getView().findViewById(R.id.ad).setVisibility(View.VISIBLE);
             getChildFragmentManager().beginTransaction().replace(R.id.ad, new FragmentHappytapAd()).commit();
         }
 

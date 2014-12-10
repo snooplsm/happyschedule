@@ -107,6 +107,14 @@ public class FragmentHappytapAd extends AbstractAdFragment {
         newAdFuture = ThreadHelper.getScheduler().scheduleAtFixedRate(newAdRequest, 60000, 60000, TimeUnit.MILLISECONDS);
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        if(newAdFuture!=null) {
+            newAdFuture.cancel(true);
+        }
+    }
+
     private void showNextAd() {
         Log.d(TAG,"showing next ad");
         adViewContainer.removeView(currentAdView);

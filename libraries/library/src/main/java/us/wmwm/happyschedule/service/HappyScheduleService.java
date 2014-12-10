@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.TimeZone;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import org.json.JSONObject;
 
@@ -64,7 +65,7 @@ public class HappyScheduleService extends Service {
 		pi = PendingIntent.getService(this, 0, i, 0);
 		alarmManager.setRepeating(AlarmManager.RTC, System.currentTimeMillis()+10000, 86400000,pi);
 
-		updateGCMFuture = ThreadHelper.getScheduler().submit(updateGCM);
+		updateGCMFuture = ThreadHelper.getScheduler().schedule(updateGCM,10000, TimeUnit.MILLISECONDS);
 	}
 	
 	Runnable updateGCM = new Runnable() {

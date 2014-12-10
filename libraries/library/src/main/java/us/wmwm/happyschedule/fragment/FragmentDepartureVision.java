@@ -44,6 +44,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -251,8 +252,12 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary,
 		View root = inflater.inflate(R.layout.fragment_departurevision,
 				container, false);
 		list = (StickyListHeadersListView) root.findViewById(R.id.list);
-        stationName = (TextView) root.findViewById(R.id.station_name);
+        stationName = new TextView(getActivity());
+        int padding = (int) getResources().getDimension(R.dimen.activity_horizontal_margin);
+        stationName.setPadding(padding,padding,padding,padding);
+        stationName.setGravity(Gravity.CENTER_HORIZONTAL);
 		stationSelect = (TextView) root.findViewById(R.id.departure);
+        list.addHeaderView(stationName);
 		stationArriveSelect = (TextView) root.findViewById(R.id.arrival);
 		erroText = root.findViewById(R.id.no_internet);
 		empty = root.findViewById(R.id.empty);

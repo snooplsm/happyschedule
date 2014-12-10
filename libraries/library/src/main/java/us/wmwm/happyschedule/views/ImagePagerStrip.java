@@ -228,10 +228,11 @@ public class ImagePagerStrip extends RelativeLayout implements ViewPager.OnPageC
         indicator = new TextView(getContext());
 
         Resources res = getResources();
-        int indicheight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,11.5f,res.getDisplayMetrics());
+        int indicheight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,4f,res.getDisplayMetrics());
         indicator.setTextSize(TypedValue.COMPLEX_UNIT_DIP,9);
         indicator.setGravity(Gravity.CENTER);
         indicator.setTextColor(Color.WHITE);
+        indicator.setBackgroundColor(Color.WHITE);
         indicator.setHorizontallyScrolling(true);
         indicator.setSingleLine(true);
         indicator.setEllipsize(TextUtils.TruncateAt.MARQUEE);
@@ -246,12 +247,13 @@ public class ImagePagerStrip extends RelativeLayout implements ViewPager.OnPageC
         addView(row, lp);
         indicLP.addRule(RelativeLayout.ALIGN_BOTTOM,row.getId());
         int color = res.getColor(R.color.get_schedule_11);
-        indicator.setBackgroundColor(color);
+        //indicator.setBackgroundColor(Color.WHITE);
+        setBackgroundColor(color);
         addView(indicator,indicLP);
         for(int i =0; i < adapter.getCount(); i++) {
             ImageView image = new ImageView(getContext());
             SVGBuilder b = new SVGBuilder().readFromResource(res, adapter.getSVGResourceId(i));
-            b.setColorFilter(new PorterDuffColorFilter(color, PorterDuff.Mode.SRC_ATOP));
+            b.setColorFilter(new PorterDuffColorFilter(color, PorterDuff.Mode.SRC));
 
 
             if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.HONEYCOMB) {
@@ -259,15 +261,14 @@ public class ImagePagerStrip extends RelativeLayout implements ViewPager.OnPageC
             }
             //image.setColorFilter(Color.rgb(163, 163, 163), PorterDuff.Mode.DST_IN);
             StateListDrawable sld = new StateListDrawable();
-            Drawable d = b.build().getDrawable();
-            sld.addState(new int[]{android.R.attr.state_pressed}, d);
-            sld.addState(new int[]{android.R.attr.state_selected}, d);
+
             b = new SVGBuilder().readFromResource(res,adapter.getSVGResourceId(i));
-            b.setColorFilter(new PorterDuffColorFilter(Color.rgb(163, 163, 163), PorterDuff.Mode.SRC_ATOP));
+            b.setColorFilter(new PorterDuffColorFilter(Color.argb(255, 255, 255, 255), PorterDuff.Mode.SRC));
             sld.addState(StateSet.WILD_CARD, b.build().getDrawable());
 
             StateListDrawable bsld = new StateListDrawable();
-            bsld.addState(new int[] {android.R.attr.state_pressed}, new ColorDrawable(Color.argb(80,Color.red(color),Color.green(color),Color.blue(color))));
+            ColorDrawable cd;
+            bsld.addState(new int[] {android.R.attr.state_pressed}, cd=new ColorDrawable(Color.argb(80, 255, 255, 255)));
             bsld.addState(StateSet.WILD_CARD, new ColorDrawable(Color.TRANSPARENT));
             image.setBackgroundDrawable(bsld);
             image.setPadding(padding, padding, padding, padding);
@@ -290,11 +291,7 @@ public class ImagePagerStrip extends RelativeLayout implements ViewPager.OnPageC
             row.addView(image, lp2);
         }
 
-        View view = new View(getContext());
-        view.setBackgroundColor(Color.rgb(199,200,205));
-        RelativeLayout.LayoutParams lp2 = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,2);
-        lp2.addRule(RelativeLayout.BELOW,row.getId());
-        addView(view,lp2);
+
         if(adapter.getCount()>0) {
             indicator.setText(adapter.getPageTitle(0));
         }

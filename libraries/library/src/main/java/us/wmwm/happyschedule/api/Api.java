@@ -35,8 +35,11 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TimeZone;
 
 import us.wmwm.happyschedule.R;
@@ -46,6 +49,8 @@ import us.wmwm.happyschedule.model.AppConfig;
 import us.wmwm.happyschedule.model.AppRailLine;
 import us.wmwm.happyschedule.model.RailPushMatrix;
 import us.wmwm.happyschedule.model.Schedule;
+import us.wmwm.happyschedule.model.StationInterval;
+import us.wmwm.happyschedule.model.StationToStation;
 import us.wmwm.happyschedule.util.Streams;
 
 /**
@@ -76,7 +81,7 @@ public class Api extends BaseApi {
             }
             conn.disconnect();
 
-        } catch (IOException e) {
+        } catch (Exception e) {
             Log.d(TAG, "can't register", e);
         }
     }
@@ -180,7 +185,13 @@ public class Api extends BaseApi {
         }
     }
 
-    public int registerForTripNotifications(AppConfig appConfig, Schedule schedule) throws Exception {
+    public int registerForTripNotifications(AppConfig appConfig, List<StationToStation> stationToStations, Schedule schedule) throws Exception {
+        Log.d(TAG,"registering for trip notifications");
+        String pushId = SettingsFragment.getRegistrationId();
+        if(TextUtils.isEmpty(pushId)) {
+            Log.d(TAG,"no pushid trip notifications");
+            return 500;
+        }
         RailPushMatrix m = new RailPushMatrix();
 
         Map<String,AppRailLine> lines = new HashMap<String,AppRailLine>();
@@ -190,7 +201,18 @@ public class Api extends BaseApi {
             }
         }
         Calendar cal = Calendar.getInstance();
-        for(String routeId : schedule.routeIdToName.keySet()) {
+        Set<String> routeIds = new HashSet<String>();
+        for(StationToStation sts : stationToStations) {
+            routeIds.add(schedule.tripIdToRouteId.get(sts.tripId));
+            if(sts instanceof StationInterval) {
+                StationInterval si = (StationInterval)sts;
+                while(si.hasNext()) {
+                    StationInterval next = si.next();
+                    routeIds.add(schedule.tripIdToRouteId.get(next.tripId));
+                }
+            }
+        }
+        for(String routeId : routeIds) {
             AppRailLine line = lines.get(routeId);
             if(line!=null) {
                 m.update(line, cal.get(Calendar.DAY_OF_WEEK),cal.get(Calendar.HOUR_OF_DAY), true);
@@ -198,20 +220,23 @@ public class Api extends BaseApi {
                 m.update(line, cal.get(Calendar.DAY_OF_WEEK),cal.get(Calendar.HOUR_OF_DAY), true);
                 cal.add(Calendar.HOUR_OF_DAY,-1);
             }
-            line = new AppRailLine();
-            line.setKey(ctx.getResources().getString(R.string.promotional_account));
-            m.update(line, cal.get(Calendar.DAY_OF_WEEK),cal.get(Calendar.HOUR_OF_DAY), true);
-            cal.add(Calendar.HOUR_OF_DAY,1);
-            m.update(line, cal.get(Calendar.DAY_OF_WEEK),cal.get(Calendar.HOUR_OF_DAY), true);
-            cal.add(Calendar.HOUR_OF_DAY,-1);
+
         }
+        AppRailLine line = new AppRailLine();
+        line.setKey(ctx.getResources().getString(R.string.promotional_account));
+        m.update(line, cal.get(Calendar.DAY_OF_WEEK),cal.get(Calendar.HOUR_OF_DAY), true);
+        cal.add(Calendar.HOUR_OF_DAY,1);
+        m.update(line, cal.get(Calendar.DAY_OF_WEEK),cal.get(Calendar.HOUR_OF_DAY), true);
+        cal.add(Calendar.HOUR_OF_DAY,-1);
         HttpURLConnection conn = null;
         try {
-            conn = post(map("dynamic_services",m.toJSON().toString()),map(),ctx.getString(R.string.register_dynamic_service_url));
+            conn = post(map("dynamic_services",m.toJSON().toString()),map(),ctx.getString(R.string.register_dynamic_service_url)+"?push_id="+pushId);
             int status = conn.getResponseCode();
             Streams.readFully(conn.getInputStream());
+            Log.d(TAG,"registered for trip notifications " + m.toJSON().toString());
             return status;
         } catch (Exception e) {
+            Log.e(TAG,"error registering for trip notifications",e);
             throw new RuntimeException(e);
         } finally {
             if(conn!=null) {
