@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="us.wmwm.happyschedule"
-    android:versionCode="1"
-    android:versionName="1.0"
     xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-feature android:name="android.hardware.touchscreen"
+        android:required="false" />
 
     <application
         android:name="us.wmwm.happyschedule.application.HappyApplication"
@@ -12,75 +13,18 @@
         android:label="@string/app_name"
         tools:replace="android:theme"
         android:theme="@style/AppTheme">
-        <activity
-            android:name="us.wmwm.happyschedule.activity.ActivityPickStation"
-            android:label="@string/app_name"
-            android:screenOrientation="nosensor"
-            android:theme="@style/AppTheme"></activity>
-        <activity
-            android:name="us.wmwm.happyschedule.activity.MainActivity"
-            android:label="@string/app_name"
-            android:screenOrientation="nosensor">
+
+        <activity android:name=".activity.MainActivity"
+            tools:node="remove"/>
+
+        <activity android:name=".activity.ChatActivity"
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name="us.wmwm.happyschedule.activity.SettingsActivity"
-            android:configChanges="orientation|screenSize|keyboardHidden|keyboard|navigation"
-            android:label="@string/app_name"
-            android:screenOrientation="nosensor"></activity>
-        <activity
-            android:name="us.wmwm.happyschedule.activity.RailLinesActivity"
-            android:configChanges="orientation|screenSize|keyboardHidden|keyboard|navigation"
-            android:label="@string/app_name"
-            android:screenOrientation="nosensor"></activity>
-
-        <activity
-            android:name="com.facebook.LoginActivity"
-            android:configChanges="orientation|screenSize|keyboardHidden|keyboard|navigation" />
-
-        <activity
-            android:name="us.wmwm.happyschedule.activity.AlarmActivity"
-            android:configChanges="orientation|screenSize|keyboardHidden|keyboard|navigation"
-            android:excludeFromRecents="true"
-            android:label="@string/app_name"
-            android:screenOrientation="nosensor"
-            android:showOnLockScreen="true"></activity>
-        <activity
-            android:name="com.amazon.device.ads.AdActivity"
-            android:theme="@android:style/Theme.Translucent"
-            android:configChanges="keyboardHidden|orientation|screenSize" />
-        <activity android:name="com.google.android.gms.ads.AdActivity" android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize" />
-
-        <activity
-            android:name="us.wmwm.happyschedule.activity.TweetActivity"
-            android:configChanges="orientation|screenSize|keyboardHidden|keyboard|navigation"
-            android:label="@string/app_name"
-            android:parentActivityName="us.wmwm.happyschedule.activity.MainActivity"
-            android:screenOrientation="nosensor">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-            </intent-filter>
-        </activity>
-
-        <service android:name="us.wmwm.happyschedule.service.HappyScheduleService"></service>
-
-        <meta-data
-            android:name="com.facebook.sdk.ApplicationId"
-            android:value="@string/app_id" />
-
-        <meta-data
-            android:name="com.google.android.gms.version"
-            android:value="@integer/google_play_services_version" />
-    </application>
-
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.VIBRATE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="com.android.vending.BILLING" />
+    </application>  
 
 </manifest>

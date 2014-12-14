@@ -366,7 +366,7 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary,
 			departureVision = (DepartureVision) arguments
 					.getSerializable("departureVision");
 			if (departureVision == null) {
-				departureVision = new DepartureVision();
+				departureVision = new DepartureVision(BuildConfig.DEFAULT_DEPARTURE_VISION_ID,null);
 			}
 			position = arguments.getInt("position");
 			setStation(Db.get().getStop(departureVision.getFrom()));
@@ -375,7 +375,9 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary,
 			stationArrive = Db.get().getStop(departureVision.getTo());
 			canLoad = arguments.getBoolean("isOverlay");
 		} else {
-
+            departureVision = new DepartureVision(BuildConfig.DEFAULT_DEPARTURE_VISION_ID,null);
+            setStation(Db.get().getStop(departureVision.getFrom()));
+            canLoad = true;
 		}
 
 		if (stationToStation == null) {
@@ -480,7 +482,7 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary,
                         100);
             }
         });
-        fal.attachToListView(list);
+        //fal.attachToListView(list);
 	}
 
 	private void loadInitial() {

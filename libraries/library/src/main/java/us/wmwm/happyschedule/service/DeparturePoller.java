@@ -25,6 +25,8 @@ import org.jsoup.select.Elements;
 import us.wmwm.happyschedule.model.AppConfig;
 import us.wmwm.happyschedule.model.StationInterval;
 import us.wmwm.happyschedule.model.TrainStatus;
+
+import android.text.TextUtils;
 import android.util.Log;
 
 public class DeparturePoller implements Poller {
@@ -46,10 +48,43 @@ public class DeparturePoller implements Poller {
 		for (String v : t) {
 			ss.addAll(getLittleStatuses(config, v));
 		}
-		Collections.sort(ss, comparator);
+        Map<TrainStatus,Integer> naturalSort = new HashMap<TrainStatus,Integer>();
+        for(int i = 0; i < ss.size(); i++) {
+            TrainStatus s = ss.get(i);
+            naturalSort.put(s,i);
+        }
+		Collections.sort(ss, new TrainComparator(naturalSort));
 		return ss;
 	}
 
+    private static final String TAG = DeparturePoller.class.getSimpleName();
+
+    class TrainComparator implements Comparator<TrainStatus> {
+
+        Map<TrainStatus,Integer> naturalSort;
+
+        public TrainComparator(Map<TrainStatus, Integer> pp) {
+            this.naturalSort = pp;
+        }
+        @Override
+        public int compare(TrainStatus lhs, TrainStatus rhs) {
+            boolean lhsHasTrack = !TextUtils.isEmpty(lhs.getTrack());
+            boolean rhsHasTrack = !TextUtils.isEmpty(rhs.getTrack());
+            Integer sortA = naturalSort.get(lhs);
+            Integer sortB = naturalSort.get(rhs);
+            if(lhsHasTrack && rhsHasTrack) {
+                return sortA.compareTo(sortB);
+            } else {
+                if(lhsHasTrack) {
+                    return -1;
+                }
+                if(rhsHasTrack) {
+                    return 1;
+                }
+            }
+            return sortA.compareTo(sortB);
+        }
+    }
 	Comparator<TrainStatus> comparator = new Comparator<TrainStatus>() {
 
 		@Override
@@ -73,6 +108,8 @@ public class DeparturePoller implements Poller {
 				if (minutesDiff < -14400000) {
 					bb.add(Calendar.HOUR_OF_DAY, 12);
 				}
+                Log.d(TAG, arg0.getDest() + " at " + aa.getTime());
+                Log.d(TAG, arg1.getDest() + " at " + bb.getTime());
 				return aa.compareTo(bb);
 			} catch (ParseException e) {
 				return 0;

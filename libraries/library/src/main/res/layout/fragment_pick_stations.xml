@@ -106,28 +106,14 @@
                     android:visibility="visible" />
 
                 <ImageView
+                    android:id="@+id/arrow_up"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerHorizontal="true"
-                    android:src="@drawable/ic_up" />
+                    android:src="@drawable/rotate_arrow" />
 
-                <GridView
-                    android:id="@+id/fares"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_below="@id/get_schedule"
-                    android:divider="@null"
-                    android:gravity="center"
-                    android:numColumns="2"
-                    android:paddingLeft="6dp"
-                    android:paddingRight="6dp"
-                    android:paddingTop="6dp"></GridView>
             </RelativeLayout>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="This is some long never ending text that keeps on going on and on my friend.  Som epeople sju." />
         </LinearLayout>
 
     </us.wmwm.happyschedule.views.ScrollingView>

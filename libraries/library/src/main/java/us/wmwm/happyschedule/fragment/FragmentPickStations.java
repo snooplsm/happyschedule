@@ -21,6 +21,7 @@ import us.wmwm.happyschedule.util.Share;
 import us.wmwm.happyschedule.views.BackListener;
 import us.wmwm.happyschedule.views.ClipDrawListener;
 import us.wmwm.happyschedule.views.HappyShadowBuilder;
+import us.wmwm.happyschedule.views.ScrollingView;
 import us.wmwm.happyschedule.views.StationButton;
 import us.wmwm.happyschedule.views.StationView;
 
@@ -34,6 +35,7 @@ import android.graphics.Picture;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.RotateDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -50,14 +52,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.DragShadowBuilder;
 import android.view.View.OnClickListener;
-import android.view.View.OnKeyListener;
 import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.MarginLayoutParams;
 import android.view.ViewTreeObserver;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -65,8 +65,6 @@ import android.widget.TextView;
 
 import com.flurry.android.FlurryAgent;
 import com.larvalabs.svgandroid.SVGBuilder;
-import com.sothree.slidinguppanel.SlidingUpPanelLayout;
-import com.sothree.slidinguppanel.SlidingUpPanelLayout.PanelSlideListener;
 
 public class FragmentPickStations extends Fragment implements IPrimary, ISecondary, BackListener {
 
@@ -81,8 +79,8 @@ public class FragmentPickStations extends Fragment implements IPrimary, ISeconda
 	View reverseButtonContainer;
 	View reverseHolder;
 	TextView fare;
-	GridView fares;
     LinearLayout scrollingContent;
+    ScrollingView scrollView;
 
 	Handler handler = new Handler();
 
@@ -121,8 +119,8 @@ public class FragmentPickStations extends Fragment implements IPrimary, ISeconda
 		reverseButtonContainer = root.findViewById(R.id.reverse_container);
 		reverseHolder = root.findViewById(R.id.reverse_holder);
 		fare = (TextView) root.findViewById(R.id.fare);
-		fares = (GridView) root.findViewById(R.id.fares);
         scrollingContent = (LinearLayout) root.findViewById(R.id.scrolling_content);
+        scrollView = (ScrollingView) root.findViewById(R.id.scroll_container);
 		return root;
 	}
 
@@ -184,6 +182,15 @@ public class FragmentPickStations extends Fragment implements IPrimary, ISeconda
 					FlurryAgent.logEvent("FareNotFound",k);
 					return;
 				}
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        int start = scrollingContent.getChildAt(0) instanceof RelativeLayout ? 1 : 2;
+                        while(scrollingContent.getChildCount()>start) {
+                            scrollingContent.removeViewAt(scrollingContent.getChildCount()-1);
+                        }
+                    }
+                });
 				final String adult = DecimalFormat.getCurrencyInstance()
 						.format(fares.get("Adult"));
 				FlurryAgent.logEvent("FareFound",k);
@@ -192,9 +199,12 @@ public class FragmentPickStations extends Fragment implements IPrimary, ISeconda
 					public void run() {
 						fare.setText("Fare: " + adult);
 						fare.setVisibility(View.VISIBLE);
-						FareAdapter adapter = new FareAdapter();
-						adapter.setData(fares);
-						FragmentPickStations.this.fares.setAdapter(adapter);
+                        for(Map.Entry<String,Double> fare : fares.entrySet()) {
+                            TextView t = new TextView(getActivity());
+                            t.setText(fare.getKey() + " : " + DecimalFormat.getCurrencyInstance()
+                                    .format(fare.getValue()));
+                            scrollingContent.addView(t);
+                        }
 					}
 				});
 			}
@@ -275,10 +285,29 @@ public class FragmentPickStations extends Fragment implements IPrimary, ISeconda
                 LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,height-getSchedHeight);
                 v.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 scrollingContent.addView(v,0,lp);
-//                lp.topMargin = view.getMeasuredHeight();//-ad.getMeasuredHeight();
+                //lp.topMargin = view.getMeasuredHeight();//-ad.getMeasuredHeight();
                 //ad.setLayoutParams(lp);
             }
         });
+//        scrollView.getViewTreeObserver().addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
+//            @Override
+//            public void onScrollChanged() {
+//                Log.d(TAG, "scrollview height: " + scrollView.getHeight());
+//                Log.d(TAG, "scrollview measheight: " + scrollView.getMeasuredHeight());
+//                Log.d(TAG, "content height " + scrollView.getHeight());
+//                Log.d(TAG, "content mes height " + scrollView.getMeasuredHeight());
+//                Log.d(TAG, "y scroll: " + scrollView.getScrollY());
+//                int max = scrollingContent.getMeasuredHeight()-scrollingContent.getChildAt(0).getMeasuredHeight();
+//                int ySCroll = scrollView.getScrollY();
+//                float percent = ySCroll/(float)max;
+//                ImageView arrow = (ImageView) getView().findViewById(R.id.arrow_up);
+//                RotateDrawable d = null;
+//                d = (RotateDrawable)arrow.getDrawable();
+//                d.setLevel((int)(percent*1000));
+//
+//
+//            }
+//        });
         disallowTouches(viewGroup);
 
     }

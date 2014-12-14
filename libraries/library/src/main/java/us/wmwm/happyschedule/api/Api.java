@@ -15,6 +15,7 @@ import android.os.Environment;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.facebook.model.GraphUser;
 import com.flurry.android.FlurryAgent;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.squareup.okhttp.OkHttpClient;
@@ -100,7 +101,22 @@ public class Api extends BaseApi {
                 conn.disconnect();
             }
         }
+    }
 
+    public int registerFacebookUser(GraphUser u, String pushId) {
+        HttpURLConnection conn = null;
+        try {
+            conn = post(map("user",u.getInnerJSONObject().toString()),map(),ctx.getString(R.string.register_facebook_url)+"?push_id="+pushId+"&id="+u.getId());
+            int code = conn.getResponseCode();
+            Streams.readFully(conn.getInputStream());
+            return code;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }finally {
+            if(conn!=null) {
+                conn.disconnect();
+            }
+        }
     }
 
     static SimpleDateFormat RFC;

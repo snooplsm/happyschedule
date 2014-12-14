@@ -66,14 +66,6 @@ public class FragmentMain extends Fragment implements BackListener {
 
     BackListener currentFragment;
 
-    Session.StatusCallback statusCallback = new Session.StatusCallback() {
-        @Override
-        public void call(Session session, SessionState state,
-                         Exception exception) {
-
-        }
-    };
-
     OnBackStackChangedListener onBackStackListener = new OnBackStackChangedListener() {
         @Override
         public void onBackStackChanged() {
@@ -153,19 +145,6 @@ public class FragmentMain extends Fragment implements BackListener {
         strip = (ImagePagerStrip) view.findViewById(R.id.indicator);
         pager.setPageMargin((int) (getResources()
                 .getDimension(R.dimen.activity_horizontal_margin)));
-        Session session = Session.getActiveSession();
-        if (session == null) {
-            if (savedInstanceState != null) {
-                session = Session.restoreSession(getActivity(), null, statusCallback, savedInstanceState);
-            }
-            if (session == null) {
-                session = new Session(getActivity());
-            }
-            Session.setActiveSession(session);
-            if (session.getState().equals(SessionState.CREATED_TOKEN_LOADED)) {
-                session.openForRead(new Session.OpenRequest(this).setCallback(statusCallback));
-            }
-        }
         return view;
     }
 
@@ -489,13 +468,11 @@ public class FragmentMain extends Fragment implements BackListener {
     @Override
     public void onStart() {
         super.onStart();
-        Session.getActiveSession().addCallback(statusCallback);
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        Session.getActiveSession().removeCallback(statusCallback);
     }
 
     @Override
@@ -506,8 +483,6 @@ public class FragmentMain extends Fragment implements BackListener {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        Session session = Session.getActiveSession();
-        Session.saveSession(session, outState);
     }
 
     @Override

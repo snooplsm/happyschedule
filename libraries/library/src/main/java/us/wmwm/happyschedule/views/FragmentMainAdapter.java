@@ -8,6 +8,7 @@ import java.util.List;
 import us.wmwm.happyschedule.R;
 import us.wmwm.happyschedule.application.HappyApplication;
 import us.wmwm.happyschedule.dao.Db;
+import us.wmwm.happyschedule.fragment.ChatFragment;
 import us.wmwm.happyschedule.fragment.DepartureVisionHelper;
 import us.wmwm.happyschedule.fragment.FragmentDepartureVision;
 import us.wmwm.happyschedule.fragment.FragmentDepartureVision.DepartureVisionListener;
@@ -103,9 +104,9 @@ public class FragmentMainAdapter extends FragmentStatePagerAdapter implements Im
             }
 		}
 
-        FragmentStatuses r = new FragmentStatuses();
+        ChatFragment r = new ChatFragment();
 
-        Option railLines = new Option("Alerts",R.raw.alert,r);
+        Option railLines = new Option("Chat",R.raw.chat,r);
         options.add(railLines);
 
         SettingsFragment f = new SettingsFragment();

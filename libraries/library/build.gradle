@@ -10,6 +10,7 @@ android {
         buildConfigField "us.wmwm.happyschedule.service.Poller", "POLLER", "null"
         buildConfigField "boolean","IS_AMAZON_ADS_ENABLED","false"
         buildConfigField "boolean","IS_GOOGLE_ADS_ENABLED","false"
+        buildConfigField "String","DEFAULT_DEPARTURE_VISION_ID","\"\""
     }
 
     lintOptions {
@@ -41,6 +42,8 @@ android {
             buildConfigField "us.wmwm.happyschedule.service.Poller", "POLLER", "new us.wmwm.happyschedule.service.DeparturePoller()"
             buildConfigField "boolean","IS_AMAZON_ADS_ENABLED","false"
             buildConfigField "boolean","IS_GOOGLE_ADS_ENABLED","true"
+            buildConfigField "String","DEFAULT_DEPARTURE_VISION_ID","\"105\""
+
         }
         preIcs {
             flavorDimension "version"
@@ -74,6 +77,12 @@ android {
 
     signingConfigs {
         release {
+            storeFile file(project.RAILS_KEYSTORE)
+            storePassword project.RAILS_KEYSTORE_PASSWORD
+            keyAlias project.RAILS_KEYSTORE_ALIAS
+            keyPassword project.RAILS_KEY_PASS
+        }
+        debug {
             storeFile file(project.RAILS_KEYSTORE)
             storePassword project.RAILS_KEYSTORE_PASSWORD
             keyAlias project.RAILS_KEYSTORE_ALIAS
@@ -143,7 +152,6 @@ dependencies {
     compile project(':libraries:MicrowaveTimePickerLib:lib')
     compile project(':libraries:JumperLib')
     compile 'com.google.android.gms:play-services:6.1.11'
-    compile project(':libraries:AndroidSlidingPanel:library')
     compile project(':libraries:facebook:facebook')
     compile 'com.android.support:gridlayout-v7:21.0.0'
     compile project(':libraries:android-support-v4-preferencefragmentlib')

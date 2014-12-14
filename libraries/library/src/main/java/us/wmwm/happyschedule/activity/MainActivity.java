@@ -50,65 +50,65 @@ public class MainActivity extends HappyActivity {
 		@Override
 		public void call(final Session session, SessionState state,
 				Exception exception) {
-			if (state != null && state == SessionState.OPENED) {
-				showMain();
-				Calendar cal = Calendar.getInstance();
-				cal.setTimeInMillis(PremiumUserHelper.getFacebookUserSaved());
-				Calendar oneMonthPrior = Calendar.getInstance();
-				oneMonthPrior.add(Calendar.MONTH, -1);
-				if (cal.before(oneMonthPrior)) {
-					loadFacebookUser = ThreadHelper.getScheduler().submit(
-							new Runnable() {
-								@Override
-								public void run() {
-
-									Request meRequest = Request.newMeRequest(
-											session,
-											new Request.GraphUserCallback() {
-
-												@Override
-												public void onCompleted(
-														final GraphUser user,
-														Response response) {
-													if (user != null) {
-														PremiumUserHelper
-																.setFacebookUser(
-																		user,
-																		session);
-													}
-												}
-											});
-									Request friendsRequest = Request
-											.newMyFriendsRequest(
-													session,
-													new Request.GraphUserListCallback() {
-
-														@Override
-														public void onCompleted(
-																List<GraphUser> users,
-																Response response) {
-															if (users != null) {
-																PremiumUserHelper
-																		.setFacebookUserFriends(
-																				users,
-																				session);
-															}
-														}
-													});
-									Bundle b = new Bundle();
-									b.putString("fields", "id,name,picture");
-									friendsRequest.setParameters(b);
-									Bundle email = new Bundle();
-									email.putString(
-											"fields",
-											"id,about,age_range,bio,birthday,context,cover,currency,education,email,favorite_athletes,favorite_teams,gender,hometown,is_verified,languages,last_name,link,location,middle_name,name,name_format,significant_other,verified,website,work,education");
-									meRequest.setParameters(email);
-									Request.executeBatchAndWait(meRequest,
-											friendsRequest);
-								}
-							});
-				}
-			}
+//			if (state != null && state == SessionState.OPENED) {
+//				showMain();
+//				Calendar cal = Calendar.getInstance();
+//				cal.setTimeInMillis(PremiumUserHelper.getFacebookUserSaved());
+//				Calendar oneMonthPrior = Calendar.getInstance();
+//				oneMonthPrior.add(Calendar.MONTH, -1);
+//				if (cal.before(oneMonthPrior)) {
+//					loadFacebookUser = ThreadHelper.getScheduler().submit(
+//							new Runnable() {
+//								@Override
+//								public void run() {
+//
+//									Request meRequest = Request.newMeRequest(
+//											session,
+//											new Request.GraphUserCallback() {
+//
+//												@Override
+//												public void onCompleted(
+//														final GraphUser user,
+//														Response response) {
+//													if (user != null) {
+//														PremiumUserHelper
+//																.setFacebookUser(
+//																		user,
+//																		session);
+//													}
+//												}
+//											});
+//									Request friendsRequest = Request
+//											.newMyFriendsRequest(
+//													session,
+//													new Request.GraphUserListCallback() {
+//
+//														@Override
+//														public void onCompleted(
+//																List<GraphUser> users,
+//																Response response) {
+//															if (users != null) {
+//																PremiumUserHelper
+//																		.setFacebookUserFriends(
+//																				users,
+//																				session);
+//															}
+//														}
+//													});
+//									Bundle b = new Bundle();
+//									b.putString("fields", "id,name,picture");
+//									friendsRequest.setParameters(b);
+//									Bundle email = new Bundle();
+//									email.putString(
+//											"fields",
+//											"id,about,age_range,bio,birthday,context,cover,currency,education,email,favorite_athletes,favorite_teams,gender,hometown,is_verified,languages,last_name,link,location,middle_name,name,name_format,significant_other,verified,website,work,education");
+//									meRequest.setParameters(email);
+//									Request.executeBatchAndWait(meRequest,
+//											friendsRequest);
+//								}
+//							});
+//				}
+//			}
 		}
 	};
 

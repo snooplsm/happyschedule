@@ -31,6 +31,10 @@
         <item name="android:fontFamily" tools:ignore="NewApi">sans-serif-thin</item>
     </style>
 
+    <style name="RailsBackground">
+        <item name="android:background">@drawable/abc_list_selector_holo_light</item>
+    </style>
+
     <!-- <style name="AlarmClockTheme" parent="Theme.AppCompat">
         <item name="android:windowBackground">@color/blackish</item>
         <item name="android:actionBarStyle">@style/SettingsTheme.ActionBar</item>

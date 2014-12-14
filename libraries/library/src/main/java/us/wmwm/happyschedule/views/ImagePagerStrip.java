@@ -228,7 +228,7 @@ public class ImagePagerStrip extends RelativeLayout implements ViewPager.OnPageC
         indicator = new TextView(getContext());
 
         Resources res = getResources();
-        int indicheight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,4f,res.getDisplayMetrics());
+        int indicheight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,5f,res.getDisplayMetrics());
         indicator.setTextSize(TypedValue.COMPLEX_UNIT_DIP,9);
         indicator.setGravity(Gravity.CENTER);
         indicator.setTextColor(Color.WHITE);
@@ -246,7 +246,7 @@ public class ImagePagerStrip extends RelativeLayout implements ViewPager.OnPageC
         row.setId(ImagePagerStrip.generateViewId());
         addView(row, lp);
         indicLP.addRule(RelativeLayout.ALIGN_BOTTOM,row.getId());
-        int color = res.getColor(R.color.get_schedule_11);
+        int color = res.getColor(R.color.get_schedule_1);
         //indicator.setBackgroundColor(Color.WHITE);
         setBackgroundColor(color);
         addView(indicator,indicLP);

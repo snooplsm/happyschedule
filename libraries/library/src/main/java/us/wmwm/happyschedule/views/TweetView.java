@@ -15,11 +15,16 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
+import org.jibble.pircbot.User;
+
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 import twitter4j.Status;
 import twitter4j.URLEntity;
 import us.wmwm.happyschedule.R;
+import us.wmwm.happyschedule.fragment.ChatFragment;
 import us.wmwm.happyschedule.fragment.FragmentAlarmPicker;
 
 /**
@@ -73,5 +78,7 @@ public class TweetView extends LinearLayout {
         Picasso.with(getContext())
                 .load(status.getUser().getBiggerProfileImageURL()).into(avatar);
     }
+
+
 
 }
