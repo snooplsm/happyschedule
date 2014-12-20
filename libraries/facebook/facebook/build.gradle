@@ -22,7 +22,7 @@ android {
             res.srcDirs = ['res']
         }
     }
-    
+
     productFlavors {
     }
     buildTypes {
