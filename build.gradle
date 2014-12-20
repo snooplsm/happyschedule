@@ -14,3 +14,10 @@ allprojects {
         mavenCentral()
     }
 }
+
+ext {
+    compileSdkVersion = 21
+    targetSdkVersion = 21
+    minSdkVersion = 14
+    buildToolsVersion = '21.1.1'
+}

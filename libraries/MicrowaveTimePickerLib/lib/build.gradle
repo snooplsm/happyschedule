@@ -5,8 +5,8 @@ dependencies {
 }
 
 android {
-    compileSdkVersion Integer.parseInt(project.ANDROID_BUILD_SDK_VERSION)
-    buildToolsVersion project.ANDROID_BUILD_TOOLS_VERSION
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
     sourceSets {
         main {
             manifest.srcFile 'AndroidManifest.xml'
@@ -32,11 +32,9 @@ android {
     }
     defaultConfig {
         minSdkVersion 8
-        targetSdkVersion Integer.parseInt(project.ANDROID_BUILD_SDK_VERSION)
+        targetSdkVersion rootProject.ext.targetSdkVersion
     }
-    dexOptions {
-        incremental true
-    }
+
     productFlavors {
     }
     buildTypes {

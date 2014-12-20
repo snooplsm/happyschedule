@@ -77,14 +77,22 @@ public class GcmIntentService extends IntentService {
 					if(currVersion<newVersion) {
 						showUpgradeNotification();
 					}
-				}
+				} else
+                if("chat_message".equals(extras.getString("type"))) {
+                    sendChatMessage(extras);
+                    throw new RuntimeException("chat");
+                }
 			}
 		}
 		// Release the wake lock provided by the WakefulBroadcastReceiver.
 		GcmBroadcastReceiver.completeWakefulIntent(intent);
 	}
 
-	private void showUpgradeNotification() {
+    private void sendChatMessage(Bundle extras) {
+
+    }
+
+    private void showUpgradeNotification() {
 		boolean on = PreferenceManager.getDefaultSharedPreferences(this)
 				.getBoolean(getString(R.string.settings_key_push_on), false);
 		if (!on) {

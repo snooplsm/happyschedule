@@ -1,11 +1,11 @@
 apply plugin: 'com.android.application'
 
 android {
-    buildToolsVersion project.ANDROID_BUILD_TOOLS_VERSION
+    buildToolsVersion rootProject.ext.buildToolsVersion
     defaultConfig {
-        minSdkVersion 9
-        targetSdkVersion Integer.parseInt(project.ANDROID_BUILD_SDK_VERSION)
-        compileSdkVersion Integer.parseInt(project.ANDROID_BUILD_SDK_VERSION)
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        compileSdkVersion rootProject.ext.compileSdkVersion
         versionName computeVersionName()
         buildConfigField "us.wmwm.happyschedule.service.Poller", "POLLER", "null"
         buildConfigField "boolean","IS_AMAZON_ADS_ENABLED","false"
@@ -57,16 +57,16 @@ android {
             flavorDimension "version"
             versionCode computeVersionCode()
             minSdkVersion 14
-            targetSdkVersion Integer.parseInt(project.ANDROID_BUILD_SDK_VERSION)
-            compileSdkVersion Integer.parseInt(project.ANDROID_BUILD_SDK_VERSION)
+            targetSdkVersion rootProject.ext.targetSdkVersion
+            compileSdkVersion rootProject.ext.targetSdkVersion
         }
 
         tv {
             flavorDimension "version"
             versionCode computeVersionCode()
             minSdkVersion 17
-            targetSdkVersion Integer.parseInt(project.ANDROID_BUILD_SDK_VERSION)
-            compileSdkVersion Integer.parseInt(project.ANDROID_BUILD_SDK_VERSION)
+            targetSdkVersion rootProject.ext.targetSdkVersion
+            compileSdkVersion rootProject.ext.targetSdkVersion
         }
 
     }
@@ -172,3 +172,4 @@ dependencies {
 //        }
 //    }
 //}
+

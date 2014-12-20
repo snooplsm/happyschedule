@@ -11,6 +11,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
+
 import twitter4j.DirectMessage;
 import twitter4j.StallWarning;
 import twitter4j.Status;
@@ -220,6 +224,24 @@ public class HappyStream {
 		// sample() method internally creates a thread which manipulates
 		// TwitterStream and calls these adequate listener methods continuously.
 		twitterStream.user();
+		
+		Server server = new Server(8080);
+		ServletContextHandler servletContextHandler = new ServletContextHandler();
+		servletContextHandler.setContextPath("/rails");
+		servletContextHandler.addServlet(new ServletHolder(new ChatServlet(client,apiKey)),"/chat/*");
+		server.setHandler(servletContextHandler);
+//		ContextHandler handler = new ContextHandler();
+//		handler.setContextPath("/njrails/chat");
+//		handler.setResourceBase(".");
+//		//handler.
+//		handler.setClassLoader(Thread.currentThread().getContextClassLoader());
+//		server.setHandler(handler);
+		try {
+			server.start();
+	        server.join();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public static void saveStatus(Status status) {
@@ -241,7 +263,7 @@ public class HappyStream {
 			Calendar cal = Calendar.getInstance();
 			int hour = cal.get(Calendar.HOUR_OF_DAY);
 			int day = cal.get(Calendar.DAY_OF_WEEK);
-			users = findUsersForService(status, day, hour);
+			users = findUsersForService(ServiceType.SERVICES, status, day, hour);
 
 			JSONArray regs = new JSONArray();
 			JSONObject fields = new JSONObject();
@@ -422,12 +444,24 @@ public class HappyStream {
 		WriteResult res = conn.getCollection("users").remove(
 				doc);
 	}
+	
+	public enum ServiceType {
+		
+		SERVICES("services"), DYNAMIC_SERVICES("dynamic_services");
+		
+		private String key;
+		
+		private ServiceType(String key) {
+			this.key = key;
+		}
+		
+	}
 
-	public static DBCursor findUsersForService(Status status, int day, int hour)
+	public static DBCursor findUsersForService(ServiceType type, Status status, int day, int hour)
 			throws Exception {
-		BasicDBObject query = new BasicDBObject("services.screenname", status
-				.getUser().getScreenName()).append("services.day", day).append(
-				"services.hour", hour);
+		BasicDBObject query = new BasicDBObject(type.key+".screenname", status
+				.getUser().getScreenName()).append(type.key+"services.day", day).append(
+						type.key+".hour", hour);
 		BasicDBObject fields = new BasicDBObject("push_id",1);
 		return db.getCollection("users").find(query,fields);
 	}

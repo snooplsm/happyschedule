@@ -38,6 +38,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -106,6 +107,9 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary,
     @Override
     public void setOnScrollingListener(AbsListView.OnScrollListener onScroll) {
         this.onScroll = onScroll;
+        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.LOLLIPOP) {
+
+        }
     }
 
     Runnable r = new Runnable() {

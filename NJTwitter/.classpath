@@ -7,5 +7,15 @@
 	<classpathentry kind="lib" path="libs/twitter4j-media-support-3.0.3.jar"/>
 	<classpathentry kind="lib" path="libs/twitter4j-stream-3.0.3.jar"/>
 	<classpathentry kind="lib" path="libs/mongo-java-driver-2.12.2.jar"/>
+	<classpathentry kind="lib" path="libs/jetty-server-9.2.6.v20141205.jar"/>
+	<classpathentry kind="lib" path="libs/jetty-webapp-9.2.6.v20141205.jar"/>
+	<classpathentry kind="lib" path="libs/jetty-http-9.2.6.v20141205.jar"/>
+	<classpathentry kind="lib" path="libs/jetty-servlet-9.2.6.v20141205.jar"/>
+	<classpathentry kind="lib" path="libs/jetty-servlets-9.2.6.v20141205.jar"/>
+	<classpathentry kind="lib" path="libs/jetty-util-9.2.6.v20141205.jar"/>
+	<classpathentry kind="lib" path="libs/servlet-api-3.1.jar"/>
+	<classpathentry kind="lib" path="libs/jetty-io-9.2.6.v20141205.jar"/>
+	<classpathentry kind="lib" path="libs/jetty-security-9.2.6.v20141205.jar"/>
+	<classpathentry kind="lib" path="libs/gson-2.3.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

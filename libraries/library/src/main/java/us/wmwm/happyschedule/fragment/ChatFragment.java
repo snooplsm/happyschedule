@@ -23,6 +23,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -51,6 +52,8 @@ import java.sql.Connection;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -58,6 +61,7 @@ import java.util.Map;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+import us.wmwm.happyschedule.BuildConfig;
 import us.wmwm.happyschedule.R;
 import us.wmwm.happyschedule.ThreadHelper;
 import us.wmwm.happyschedule.api.Api;
@@ -101,7 +105,9 @@ public class ChatFragment extends HappyFragment implements IPrimary {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Settings.addLoggingBehavior(LoggingBehavior.INCLUDE_ACCESS_TOKENS);
+        if(BuildConfig.DEBUG) {
+            Settings.addLoggingBehavior(LoggingBehavior.INCLUDE_ACCESS_TOKENS);
+        }
         api = new Api(getActivity());
         manager = NotificationManagerCompat.from(getActivity());
         manager.cancel(6000);
@@ -184,18 +190,43 @@ public class ChatFragment extends HappyFragment implements IPrimary {
         usersText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(slidingPane.isOpen()) {
-                    if(bot!=null) {
-                        userAdapter.setData(Arrays.asList(bot.getUsers(getChannel())));
-                    }
+                if (slidingPane.isOpen()) {
                     usersText.setSelected(false);
                     slidingPane.closePane();
-                    textContainer.setVisibility(View.VISIBLE);
+
                 } else {
-                    textContainer.setVisibility(View.GONE);
                     usersText.setSelected(true);
+                    if (bot != null) {
+                        userAdapter.setData(bot.getUsers());
+                    }
                     slidingPane.openPane();
                 }
+            }
+        });
+        slidingPane.setPanelSlideListener(new SlidingPaneLayout.PanelSlideListener() {
+            @Override
+            public void onPanelSlide(View panel, float slideOffset) {
+
+            }
+
+            @Override
+            public void onPanelOpened(View panel) {
+                textContainer.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onPanelClosed(View panel) {
+                textContainer.setVisibility(View.VISIBLE);
+            }
+        });
+        users.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                User user = userAdapter.getItem(position);
+                if(text.getText().toString().trim().length()==0) {
+                    text.setText("@"+user.getNick()+": ");
+                }
+                slidingPane.closePane();
             }
         });
         StateListDrawable d = new StateListDrawable();
@@ -243,6 +274,9 @@ public class ChatFragment extends HappyFragment implements IPrimary {
         enabled = true;
         if (bot == null && Session.getActiveSession().isOpened()) {
             bot = new RailBot();
+            if(BuildConfig.DEBUG) {
+                bot.setVerbose(true);
+            }
             bot.scheduleReconnect();
         }
     }
@@ -265,6 +299,22 @@ public class ChatFragment extends HappyFragment implements IPrimary {
 
         public RailBot() {
             setAutoNickChange(true);
+        }
+
+        public List<User> getUsers() {
+            String[] chans = getChannels();
+            if(chans==null || chans.length==0) {
+                return Collections.emptyList();
+            }
+            List<User> users = Arrays.asList(getUsers(chans[0]));
+            Collections.sort(users, new Comparator<User>() {
+                @Override
+                public int compare(User lhs, User rhs) {
+                    return lhs.getNick().compareToIgnoreCase(rhs.getNick());
+                }
+
+            });
+            return users;
         }
 
         @Override
@@ -323,7 +373,7 @@ public class ChatFragment extends HappyFragment implements IPrimary {
             m.timestamp = System.currentTimeMillis();
             m.message = "<" + m.nick + " disconnected>";
             adapter.addData(m);
-            userAdapter.setData(new ArrayList<User>(Arrays.asList(bot.getUsers(getChannel()))));
+            userAdapter.setData(bot.getUsers());
         }
 
 
@@ -348,7 +398,7 @@ public class ChatFragment extends HappyFragment implements IPrimary {
             } else {
                 m.message = "<" + m.nick + " joined>";
             }
-            userAdapter.setData(Arrays.asList(bot.getUsers(getChannel())));
+            userAdapter.setData(bot.getUsers());
             adapter.addData(m);
         }
 
@@ -564,8 +614,8 @@ public class ChatFragment extends HappyFragment implements IPrimary {
         }
 
         @Override
-        public Object getItem(int position) {
-            return null;
+        public User getItem(int position) {
+            return users.get(position);
         }
 
         List<User> users = new ArrayList<User>();
