@@ -6,11 +6,11 @@ dependencies {
 }
 
 android {
-    compileSdkVersion Integer.parseInt(project.ANDROID_BUILD_SDK_VERSION)
-    buildToolsVersion project.ANDROID_BUILD_TOOLS_VERSION
+    compileSdkVersion project.ext.compileSdkVersion
+    buildToolsVersion project.ext.buildToolsVersion
     defaultConfig {
         minSdkVersion 8
-        targetSdkVersion Integer.parseInt(project.ANDROID_BUILD_SDK_VERSION)
+        targetSdkVersion project.ext.targetSdkVersion
     }
     lintOptions {
         abortOnError false
