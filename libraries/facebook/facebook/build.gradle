@@ -6,11 +6,11 @@ dependencies {
 }
 
 android {
-    compileSdkVersion project.ext.compileSdkVersion
-    buildToolsVersion project.ext.buildToolsVersion
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
     defaultConfig {
         minSdkVersion 8
-        targetSdkVersion project.ext.targetSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
     }
     lintOptions {
         abortOnError false
@@ -22,9 +22,7 @@ android {
             res.srcDirs = ['res']
         }
     }
-    dexOptions {
-        incremental true
-    }
+    
     productFlavors {
     }
     buildTypes {
