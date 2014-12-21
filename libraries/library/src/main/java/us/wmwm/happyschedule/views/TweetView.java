@@ -8,23 +8,17 @@ import android.text.style.ClickableSpan;
 import android.text.util.Linkify;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.webkit.WebView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
-import org.jibble.pircbot.User;
-
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 
 import twitter4j.Status;
 import twitter4j.URLEntity;
 import us.wmwm.happyschedule.R;
-import us.wmwm.happyschedule.fragment.ChatFragment;
 import us.wmwm.happyschedule.fragment.FragmentAlarmPicker;
 
 /**
@@ -40,7 +34,7 @@ public class TweetView extends LinearLayout {
 
     public TweetView(Context ctx) {
         super(ctx);
-        LayoutInflater.from(ctx).inflate(R.layout.view_tweet,this);
+        LayoutInflater.from(ctx).inflate(R.layout.view_tweet, this);
         View view = this;
         avatar = (ImageView) view.findViewById(R.id.avatar);
         name = (TextView) view.findViewById(R.id.name);
@@ -70,7 +64,7 @@ public class TweetView extends LinearLayout {
             }
         }
         screenname.setText("");
-        this.text.setAutoLinkMask(Linkify.WEB_URLS|Linkify.PHONE_NUMBERS);
+        this.text.setAutoLinkMask(Linkify.WEB_URLS | Linkify.PHONE_NUMBERS);
         this.text.setText(text);
         Calendar created = Calendar.getInstance();
         created.setTime(status.getCreatedAt());
@@ -78,7 +72,6 @@ public class TweetView extends LinearLayout {
         Picasso.with(getContext())
                 .load(status.getUser().getBiggerProfileImageURL()).into(avatar);
     }
-
 
 
 }
