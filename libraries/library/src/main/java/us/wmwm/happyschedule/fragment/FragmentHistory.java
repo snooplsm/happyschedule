@@ -220,6 +220,9 @@ public class FragmentHistory extends HappyFragment implements IPrimary, BackList
 	public void onActivityCreated(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onActivityCreated(savedInstanceState);
+        if(WDb.get().getPreference("rails.monthly")!=null) {
+            getView().setPadding(0,0,0,0);
+        }
 
 	}
 

@@ -1,7 +1,10 @@
 package us.wmwm.happyschedule.dao;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import twitter4j.Status;
 import twitter4j.json.DataObjectFactory;
@@ -44,6 +47,16 @@ public class WDb {
 				SQLiteDatabase.CONFLICT_REPLACE);
 	}
 
+    public Map<String,String> getPreferences(String wildcard) {
+        Cursor c = db.rawQuery("select key,value from preference where key like ?", new String[] {wildcard.replaceAll("\\*","%")});
+        Map<String,String> prefs = new HashMap<String,String>();
+        while(c.moveToNext()) {
+            prefs.put(c.getString(0),c.getString(1));
+        }
+        c.close();
+        return prefs;
+    }
+
 	public String getPreference(String key) {
 		Cursor c = db.rawQuery("select value from preference where key = ?",
 				new String[] { key });
@@ -63,6 +76,21 @@ public class WDb {
 						"select depart_id,  arrive_id, time, time as _id from history group by depart_id,arrive_id, datetime(time,'unixepoch') order by time desc",
 						null);
 	}
+
+    public int getHistorySize() {
+        Cursor c = db.rawQuery("select count(*) from history",null);
+        try {
+            c.moveToNext();
+            return c.getInt(0);
+        } catch (Exception e) {
+
+        } finally {
+            c.close();
+        }
+        return 0;
+
+
+    }
 
     public void save(Status tweet, String tweetJson) {
         ContentValues cv = new ContentValues();

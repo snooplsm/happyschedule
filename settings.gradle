@@ -1,4 +1,4 @@
-include ':libraries:AndroidTimesSquareLib:library', ':library', ':happyschedule-views'
+include ':libraries:AndroidTimesSquareLib:library', ':library', ':happyschedule-views', ':NJTwitter'
 include ':libraries:MicrowaveTimePickerLib:lib'
 include ':libraries:AndroidSlidingPanel:library'
 include ':libraries:JumperLib'

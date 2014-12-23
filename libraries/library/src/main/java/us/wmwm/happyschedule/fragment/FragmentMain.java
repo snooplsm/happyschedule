@@ -123,15 +123,17 @@ public class FragmentMain extends Fragment implements BackListener {
     @Override
     public void onViewCreated(final View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        view.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                view.getViewTreeObserver().removeGlobalOnLayoutListener(this);
-                ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) ad.getLayoutParams();
-                lp.topMargin = view.getMeasuredHeight();//-ad.getMeasuredHeight();
-                ad.setLayoutParams(lp);
-            }
-        });
+        if(WDb.get().getPreference("rails.monthly")==null) {
+            view.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+                    view.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+                    ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) ad.getLayoutParams();
+                    lp.topMargin = view.getMeasuredHeight();//-ad.getMeasuredHeight();
+                    ad.setLayoutParams(lp);
+                }
+            });
+        }
     }
 
     @Override
@@ -139,8 +141,10 @@ public class FragmentMain extends Fragment implements BackListener {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_main, container, false);
         pager = (ViewPager) view.findViewById(R.id.pager);
-        ad = view.findViewById(R.id.ad);
-        ad.setVisibility(View.INVISIBLE);
+        if(WDb.get().getPreference("rails.monthly")==null) {
+            ad = view.findViewById(R.id.ad);
+            ad.setVisibility(View.INVISIBLE);
+        }
         //indic = (TabPageIndicator) view.findViewById(R.id.indicator);
         strip = (ImagePagerStrip) view.findViewById(R.id.indicator);
         pager.setPageMargin((int) (getResources()
@@ -197,6 +201,9 @@ public class FragmentMain extends Fragment implements BackListener {
     ViewPager.OnPageChangeListener onPageChangeListener = new ViewPager.OnPageChangeListener() {
         @Override
         public void onPageScrolled(int position, float v, int i2) {
+            if(ad==null) {
+                return;
+            }
             if (position == 0) {
                 int height = getView().getMeasuredHeight();
                 Log.d(TAG,"visibility direction " + (strip.getDirection()==ImagePagerStrip.RIGHT ? "left":"right"));
@@ -216,6 +223,9 @@ public class FragmentMain extends Fragment implements BackListener {
 
         @Override
         public void onPageSelected(int i) {
+            if(ad==null) {
+                return;
+            }
             if(i==0) {
                 handler.removeCallbacks(positionAd);
             }
@@ -223,6 +233,9 @@ public class FragmentMain extends Fragment implements BackListener {
 
         @Override
         public void onPageScrollStateChanged(int i) {
+            if(ad==null) {
+                return;
+            }
             if(i== ViewPager.SCROLL_STATE_SETTLING) {
                 handler.removeCallbacks(positionAd);
                 handler.removeCallbacks(hide);
@@ -283,15 +296,23 @@ public class FragmentMain extends Fragment implements BackListener {
         }
     };
 
+    SettingsFragment.OnPurchaseClickedListener onPurchaseClickedListener;
+
+    public void setOnPurchaseClickedListener(SettingsFragment.OnPurchaseClickedListener onPurchaseClickedListener) {
+        this.onPurchaseClickedListener = onPurchaseClickedListener;
+    }
+
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         ((ActionBarActivity) getActivity()).getSupportActionBar().hide();
         getFragmentManager().addOnBackStackChangedListener(onBackStackListener);
-        AbstractAdFragment ad = new FragmentHappytapAd();
 
-        getFragmentManager().beginTransaction().replace(R.id.ad, ad)
-                .commit();
+        if(WDb.get().getPreference("rails.monthly")==null) {
+            AbstractAdFragment ad = new FragmentHappytapAd();
+            getFragmentManager().beginTransaction().replace(R.id.ad, ad)
+                    .commit();
+        }
         handler.post(new Runnable() {
             @Override
             public void run() {
@@ -311,12 +332,14 @@ public class FragmentMain extends Fragment implements BackListener {
                         }
                     }
                 };
+                fma.setOnPurchaseClickedListener(onPurchaseClickedListener);
                 pager.setOffscreenPageLimit(fma.getCount());
                 pager.setAdapter(fma);
                 strip.setAdapter(fma);
                 fma.setOnScrollListener(onScrollListener);
                 strip.setOnPageChangeListener(onPageChangeListener);
                 strip.setViewPager(pager);
+
 
                 fma.setOnGetScheduleListener(onGetSchedule = new OnGetSchedule() {
 

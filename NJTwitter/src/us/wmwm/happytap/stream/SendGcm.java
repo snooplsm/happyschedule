@@ -23,7 +23,7 @@ public class SendGcm {
 		int count = (int) db.getCollection("chat_users").count();
 		for(int i = 0; i < count; i+=1000) {
 			DBCursor cursor = db.getCollection("chat_users").find().skip(i).limit(1000);
-			ThreadHelper.getScheduler().submit(new SendMessage(cursor,gson, apiKey,message));
+			ThreadHelper.getScheduler().submit(new SendMessage(db.getCollection("chat_users"),cursor,gson, apiKey,message));
 		}
 		return count;
 	}

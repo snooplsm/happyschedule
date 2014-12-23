@@ -2,20 +2,26 @@ package us.wmwm.happyschedule.fragment;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import us.wmwm.happyschedule.R;
 import us.wmwm.happyschedule.activity.RailLinesActivity;
 import us.wmwm.happyschedule.application.HappyApplication;
 import us.wmwm.happyschedule.dao.WDb;
+
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
@@ -27,12 +33,13 @@ import android.support.v4.preference.PreferenceFragment;
 import android.util.Log;
 import android.view.View;
 
+import com.android.vending.billing.IInAppBillingService;
 import com.flurry.android.FlurryAgent;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.squareup.seismic.ShakeDetector;
 
-public class SettingsFragment extends PreferenceFragment implements com.squareup.seismic.ShakeDetector.Listener {
+public class SettingsFragment extends PreferenceFragment implements com.squareup.seismic.ShakeDetector.Listener, IPrimary {
 
 	ListPreference refreshInterval;
 	Preference railLine;
@@ -41,6 +48,17 @@ public class SettingsFragment extends PreferenceFragment implements com.squareup
 	Preference pushId;
 	Preference version;
 	Preference packageName;
+    Preference subscription;
+
+    public static interface OnPurchaseClickedListener {
+        void onPurchaseClicked();
+    }
+
+    OnPurchaseClickedListener onPurchaseClickedListener;
+
+    public void setOnPurchaseClickedListener(OnPurchaseClickedListener onPurchaseClickedListener) {
+        this.onPurchaseClickedListener = onPurchaseClickedListener;
+    }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
@@ -64,7 +82,8 @@ public class SettingsFragment extends PreferenceFragment implements com.squareup
 		pushId = (Preference) findPreference(getString(R.string.settings_key_debug_push));
 		version = (Preference) findPreference(getString(R.string.settings_key_debug_version));
 		packageName = (Preference) findPreference(getString(R.string.settings_key_debug_package));
-		
+		subscription = (Preference) findPreference(getString(R.string.settings_key_purchase_subscription));
+
 		railLine.setIntent(new Intent(getActivity(), RailLinesActivity.class));
 		refreshInterval.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
 			
@@ -75,6 +94,14 @@ public class SettingsFragment extends PreferenceFragment implements com.squareup
 				return true;
 			}
 		});
+
+        subscription.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                onPurchaseClickedListener.onPurchaseClicked();
+                return false;
+            }
+        });
 		pushNotifications.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
 			@Override
 			public boolean onPreferenceChange(Preference preference,
@@ -121,6 +148,9 @@ public class SettingsFragment extends PreferenceFragment implements com.squareup
 		}
 		version.setSummary(getAppVersionName() + " / " + getAppVersion());
 		packageName.setSummary(getActivity().getPackageName());
+        if(WDb.get().getPreference("rails.monthly")!=null) {
+            getView().setPadding(0,0,0,0);
+        }
 	};
 	
 	BroadcastReceiver packageInstalledReceiver;
@@ -131,7 +161,8 @@ public class SettingsFragment extends PreferenceFragment implements com.squareup
 		if(packageInstalledReceiver!=null) {
 			getActivity().unregisterReceiver(packageInstalledReceiver);
 		}
-	}
+
+    }
 	
 	private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
 	
@@ -172,6 +203,15 @@ public class SettingsFragment extends PreferenceFragment implements com.squareup
 		String regId = WDb.get().getPreference("gcm_registration_id_"+getAppVersion());
 		return regId;
 	}
+
+    public static Map<String,String> getAllRegistrationIds() {
+        Map<String,String> prefs = WDb.get().getPreferences("gcm_registration_id_*");
+        return prefs;
+    }
+
+    public void deleteOldRegistrationIds() {
+
+    }
 	
 	public static int getAppVersion() {
 	    try {
@@ -202,7 +242,18 @@ public class SettingsFragment extends PreferenceFragment implements com.squareup
 		WDb.get().savePreference("gcm_registration_id_"+getAppVersion(), id);
 	}
 
-	@Override
+    @Override
+    public void setPrimaryItem() {
+        pushId.setSummary(getRegistrationId());
+        String pp = WDb.get().getPreference("rails.monthly");
+        if(pp!=null) {
+            subscription.setSummary("Monthly subscription active.");
+        } else {
+            subscription.setSummary("No monthly subscription found.  Click to activate.");
+        }
+    }
+
+    @Override
 	public void hearShake() {
 		getPreferenceScreen().addPreference(debugScreen);
 	}

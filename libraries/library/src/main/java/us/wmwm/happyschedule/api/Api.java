@@ -1,17 +1,6 @@
 package us.wmwm.happyschedule.api;
 
-import android.content.BroadcastReceiver;
-import android.content.ContentValues;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
-import android.net.Uri;
-import android.os.Environment;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -21,26 +10,22 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.gson.Gson;
 import com.squareup.okhttp.OkHttpClient;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -214,14 +199,14 @@ public class Api extends BaseApi {
 //            throw new ApiException(500);
 //        }
 //        Map<String, String> data = new HashMap<String, String>();
-//        JSONObject message = new JSONObject();
+//        JSONObject text = new JSONObject();
 //        try {
-//            message.put("type", "leave");
-//            message.put("name", user.getName());
+//            text.put("type", "leave");
+//            text.put("name", user.getName());
 //        } catch (JSONException e) {
 //            e.printStackTrace();
 //        }
-//        data.put("message", message.toString());
+//        data.put("text", text.toString());
 //        data.put("push_id",pushId);
 //        HttpURLConnection conn = null;
 //        try {
@@ -261,6 +246,15 @@ public class Api extends BaseApi {
         }
         data.put("message", message.toString());
         data.put("push_id",pushId);
+        Collection<String> all = SettingsFragment.getAllRegistrationIds().values();
+        JSONArray allIds = new JSONArray();
+        for(String s : all) {
+            if(s.equals(pushId)) {
+                continue;
+            }
+            allIds.put(s);
+        }
+        data.put("all_push_ids",allIds.toString());
         HttpURLConnection conn = null;
         try {
             conn = post(data,map(),ctx.getString(R.string.chat_url));
@@ -279,7 +273,7 @@ public class Api extends BaseApi {
             }
         }
 
-        //post(message)
+        //post(text)
     }
 
     public MessageResponse sendMessage(ChatFragment.Message m) {
@@ -292,7 +286,7 @@ public class Api extends BaseApi {
         JSONObject message = new JSONObject();
         try {
             message.put("type", "message");
-            message.put("message",m.message);
+            message.put("text",m.text);
         } catch (JSONException e) {
             e.printStackTrace();
         }

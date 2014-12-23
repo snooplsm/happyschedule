@@ -6,7 +6,7 @@
         res/values-v11/styles.xml on API 14+ devices.
     -->
     <style name="AppBaseTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <item name="android:colorPrimary">@color/get_schedule</item>
+        <item name="android:colorPrimary">@color/get_schedule_11</item>
         <item name="android:colorPrimaryDark">@color/get_schedule_11</item>
         <item name="android:colorAccent">@color/get_schedule_1</item>
         <item name="colorAccent">@color/get_schedule_1</item>

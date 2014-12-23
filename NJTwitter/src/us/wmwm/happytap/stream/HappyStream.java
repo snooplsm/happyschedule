@@ -62,133 +62,133 @@ public class HappyStream {
 		twitterStream.setOAuthConsumer(args[0], args[1]);
 		twitterStream.setOAuthAccessToken(new AccessToken(args[2], args[3]));
 		apiKey = args[4];
-		UserStreamListener l = new UserStreamListener() {
+        UserStreamListener userStreamListener = new UserStreamListener() {
 
-			@Override
-			public void onDeletionNotice(StatusDeletionNotice arg0) {
+            @Override
+            public void onDeletionNotice(StatusDeletionNotice arg0) {
 
-			}
+            }
 
-			@Override
-			public void onScrubGeo(long arg0, long arg1) {
+            @Override
+            public void onScrubGeo(long arg0, long arg1) {
 
-			}
+            }
 
-			@Override
-			public void onStallWarning(StallWarning arg0) {
+            @Override
+            public void onStallWarning(StallWarning arg0) {
 
-			}
+            }
 
-			@Override
-			public void onStatus(Status status) {
-				synchronized (this) {
-					saveStatus(status);
-					try {
-						processStatus(status);
-						System.out.println("DONE");
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-			}
+            @Override
+            public void onStatus(Status status) {
+                synchronized (this) {
+                    saveStatus(status);
+                    try {
+                        processStatus(status);
+                        System.out.println("DONE");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
 
-			@Override
-			public void onTrackLimitationNotice(int arg0) {
+            @Override
+            public void onTrackLimitationNotice(int arg0) {
 
-			}
+            }
 
-			@Override
-			public void onException(Exception arg0) {
+            @Override
+            public void onException(Exception arg0) {
 
-			}
+            }
 
-			@Override
-			public void onBlock(User arg0, User arg1) {
+            @Override
+            public void onBlock(User arg0, User arg1) {
 
-			}
+            }
 
-			@Override
-			public void onDeletionNotice(long arg0, long arg1) {
+            @Override
+            public void onDeletionNotice(long arg0, long arg1) {
 
-			}
+            }
 
-			@Override
-			public void onDirectMessage(DirectMessage arg0) {
+            @Override
+            public void onDirectMessage(DirectMessage arg0) {
 
-			}
+            }
 
-			@Override
-			public void onFavorite(User arg0, User arg1, Status arg2) {
+            @Override
+            public void onFavorite(User arg0, User arg1, Status arg2) {
 
-			}
+            }
 
-			@Override
-			public void onFollow(User arg0, User arg1) {
+            @Override
+            public void onFollow(User arg0, User arg1) {
 
-			}
+            }
 
-			@Override
-			public void onFriendList(long[] arg0) {
+            @Override
+            public void onFriendList(long[] arg0) {
 
-			}
+            }
 
-			@Override
-			public void onUnblock(User arg0, User arg1) {
+            @Override
+            public void onUnblock(User arg0, User arg1) {
 
-			}
+            }
 
-			@Override
-			public void onUnfavorite(User arg0, User arg1, Status arg2) {
+            @Override
+            public void onUnfavorite(User arg0, User arg1, Status arg2) {
 
-			}
+            }
 
-			@Override
-			public void onUserListCreation(User arg0, UserList arg1) {
+            @Override
+            public void onUserListCreation(User arg0, UserList arg1) {
 
-			}
+            }
 
-			@Override
-			public void onUserListDeletion(User arg0, UserList arg1) {
+            @Override
+            public void onUserListDeletion(User arg0, UserList arg1) {
 
-			}
+            }
 
-			@Override
-			public void onUserListMemberAddition(User arg0, User arg1,
-					UserList arg2) {
+            @Override
+            public void onUserListMemberAddition(User arg0, User arg1,
+                                                 UserList arg2) {
 
-			}
+            }
 
-			@Override
-			public void onUserListMemberDeletion(User arg0, User arg1,
-					UserList arg2) {
+            @Override
+            public void onUserListMemberDeletion(User arg0, User arg1,
+                                                 UserList arg2) {
 
-			}
+            }
 
-			@Override
-			public void onUserListSubscription(User arg0, User arg1,
-					UserList arg2) {
+            @Override
+            public void onUserListSubscription(User arg0, User arg1,
+                                               UserList arg2) {
 
-			}
+            }
 
-			@Override
-			public void onUserListUnsubscription(User arg0, User arg1,
-					UserList arg2) {
+            @Override
+            public void onUserListUnsubscription(User arg0, User arg1,
+                                                 UserList arg2) {
 
-			}
+            }
 
-			@Override
-			public void onUserListUpdate(User arg0, UserList arg1) {
+            @Override
+            public void onUserListUpdate(User arg0, UserList arg1) {
 
-			}
+            }
 
-			@Override
-			public void onUserProfileUpdate(User arg0) {
+            @Override
+            public void onUserProfileUpdate(User arg0) {
 
-			}
+            }
 
-		};
-		twitterStream.addListener(l);
-		StatusListener s = new StatusListener() {
+        };
+		twitterStream.addListener(userStreamListener);
+		StatusListener statusListener = new StatusListener() {
 
 			@Override
 			public void onException(Exception arg0) {
@@ -220,22 +220,16 @@ public class HappyStream {
 
 			}
 		};
-		twitterStream.addListener(s);
+		twitterStream.addListener(statusListener);
 		// sample() method internally creates a thread which manipulates
 		// TwitterStream and calls these adequate listener methods continuously.
 		twitterStream.user();
 		
 		Server server = new Server(8080);
 		ServletContextHandler servletContextHandler = new ServletContextHandler();
-		servletContextHandler.setContextPath("/rails");
+		servletContextHandler.setContextPath("/rails/v1.0/");
 		servletContextHandler.addServlet(new ServletHolder(new ChatServlet(client,apiKey)),"/chat/*");
 		server.setHandler(servletContextHandler);
-//		ContextHandler handler = new ContextHandler();
-//		handler.setContextPath("/njrails/chat");
-//		handler.setResourceBase(".");
-//		//handler.
-//		handler.setClassLoader(Thread.currentThread().getContextClassLoader());
-//		server.setHandler(handler);
 		try {
 			server.start();
 	        server.join();

@@ -7,6 +7,7 @@ import org.json.JSONObject;
 
 import us.wmwm.happyschedule.R;
 import us.wmwm.happyschedule.ThreadHelper;
+import us.wmwm.happyschedule.activity.MainActivity;
 import us.wmwm.happyschedule.dao.WDb;
 import us.wmwm.happyschedule.fragment.FragmentHappyAd.DiscardListener;
 import us.wmwm.happyschedule.fragment.FragmentPickStations.OnGetSchedule;
@@ -22,10 +23,17 @@ import us.wmwm.happyschedule.util.Streams;
 import us.wmwm.happyschedule.views.BackListener;
 import us.wmwm.happyschedule.views.ScheduleControlsView.ScheduleControlListener;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -144,7 +152,7 @@ public class FragmentSchedule extends Fragment implements BackListener {
         b.putSerializable("from", from);
         b.putSerializable("to", to);
         b.putSerializable("day", day);
-        b.putBoolean("showAds",showAds);
+        b.putBoolean("showAds",showAds && WDb.get().getPreference("rails.monthly")==null);
         FragmentSchedule s = new FragmentSchedule();
         s.setArguments(b);
         return s;
@@ -224,6 +232,27 @@ public class FragmentSchedule extends Fragment implements BackListener {
             getView().findViewById(R.id.ad).setVisibility(View.VISIBLE);
             getChildFragmentManager().beginTransaction().replace(R.id.ad, new FragmentHappytapAd()).commit();
         }
+
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                NotificationManagerCompat compat = NotificationManagerCompat.from(getActivity());
+                NotificationCompat.Builder b = new NotificationCompat.Builder(getActivity());
+                String title = "Support " + getString(R.string.app_name)+"?";
+                String text = "Subscribe to " + getString(R.string.app_name) + " to remove ads and support the developer.";
+                b.setStyle(new NotificationCompat.BigTextStyle().setBigContentTitle(title).bigText(text));
+                b.setContentTitle(title);
+                b.setContentText(text);
+                int notifyId = 1000;
+                PendingIntent subscribe = PendingIntent.getActivity(getActivity(), 0, new Intent(getActivity(), MainActivity.class).setData(Uri.parse("http://wmwm.us?launchPurchase="+ Boolean.TRUE)), 0);
+                PendingIntent dismiss = PendingIntent.getActivity(getActivity(), 0, new Intent(getActivity(), MainActivity.class).setData(Uri.parse("http://wmwm.us?dismiss="+ notifyId)), 0);
+                b.addAction(0,"Subscribe",subscribe);
+                b.addAction(0,"Never!",dismiss);
+                b.setContentIntent(subscribe);
+                b.setSmallIcon(R.drawable.ic_stat_512);
+                compat.notify(notifyId,b.build());
+            }
+        },1000);
 
     }
 

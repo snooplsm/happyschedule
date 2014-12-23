@@ -20,6 +20,7 @@ import us.wmwm.happyschedule.activity.ActivityPickStation;
 import us.wmwm.happyschedule.adapter.DepartureVisionAdapter;
 import us.wmwm.happyschedule.application.HappyApplication;
 import us.wmwm.happyschedule.dao.Db;
+import us.wmwm.happyschedule.dao.WDb;
 import us.wmwm.happyschedule.model.AppConfig;
 import us.wmwm.happyschedule.model.DepartureVision;
 import us.wmwm.happyschedule.model.LineStyle;
@@ -268,6 +269,9 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary,
 		pullToRefresh = (SwipeRefreshLayout)root.findViewById(R.id.pull_to_refresh);
         fal = (FloatingActionLayout) root.findViewById(R.id.fal);
         change = (FloatingActionButton) root.findViewById(R.id.button_floating_action_change);
+        if(WDb.get().getPreference("rails.monthly")!=null) {
+            root.setPadding(0,0,0,0);
+        }
 		return root;
 	}
 
@@ -435,30 +439,7 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary,
 		}
 
 		loadInitial();
-		// FragmentAmazonAd ad = new FragmentAmazonAd();
-		// ad.setHappyAdListener(new HappyAdListener() {
-		// @Override
-		// public void onAd() {
-		// }
-		//
-		// @Override
-		// public void onAdFailed(int count, boolean noFill) {
-		// handler.post(new Runnable() {
-		// @Override
-		// public void run() {
-		// try {
-		// FragmentGoogleAd gad = new FragmentGoogleAd();
-		// getFragmentManager().beginTransaction()
-		// .replace(R.id.fragment_ad, gad).commit();
-		// } catch (Exception e) {
-		//
-		// }
-		// }
-		// });
-		// }
-		// });
-		// getFragmentManager().beginTransaction().replace(R.id.fragment_ad, ad)
-		// .commit();
+
 		activityCreated = true;
 		if (!canLoad && departureVisionListener != null) {
 			list.setOnItemClickListener(new OnItemClickListener() {
@@ -471,13 +452,7 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary,
 				}
 			});
 		}
-//		ActionBarPullToRefresh.from(getActivity())
-//        // Mark All Children as pullable
-//        .allChildrenArePullable()
-//        // Set the OnRefreshListener
-//        .listener(onRefreshListener)
-//        // Finally commit the setup to our PullToRefreshLayout
-//        .setup(pullToRefresh);
+
         pullToRefresh.setOnRefreshListener(onRefreshListener);
         change.setOnClickListener(new OnClickListener() {
             @Override
@@ -486,7 +461,7 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary,
                         100);
             }
         });
-        //fal.attachToListView(list);
+
 	}
 
 	private void loadInitial() {

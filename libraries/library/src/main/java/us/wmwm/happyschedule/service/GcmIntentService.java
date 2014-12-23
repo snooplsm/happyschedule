@@ -6,6 +6,7 @@ import us.wmwm.happyschedule.R;
 import us.wmwm.happyschedule.activity.MainActivity;
 import us.wmwm.happyschedule.activity.TweetActivity;
 import us.wmwm.happyschedule.dao.WDb;
+import us.wmwm.happyschedule.fragment.ChatFragment;
 import us.wmwm.happyschedule.fragment.SettingsFragment;
 import android.app.IntentService;
 import android.app.Notification;
@@ -48,9 +49,9 @@ public class GcmIntentService extends IntentService {
 
 		if (!extras.isEmpty()) { // has effect of unparcelling Bundle
 			/*
-			 * Filter messages based on message type. Since it is likely that
-			 * GCM will be extended in the future with new message types, just
-			 * ignore any message types you're not interested in, or that you
+			 * Filter messages based on text type. Since it is likely that
+			 * GCM will be extended in the future with new text types, just
+			 * ignore any text types you're not interested in, or that you
 			 * don't recognize.
 			 */
 			if (GoogleCloudMessaging.MESSAGE_TYPE_SEND_ERROR
@@ -60,15 +61,15 @@ public class GcmIntentService extends IntentService {
 					.equals(messageType)) {
 				// sendNotification("Deleted messages on server: "
 				// + extras.toString());
-				// If it's a regular GCM message, do some work.
+				// If it's a regular GCM text, do some work.
 			} else if (GoogleCloudMessaging.MESSAGE_TYPE_MESSAGE
 					.equals(messageType)) {
 				// This loop represents the service doing some work.
 				Log.i(TAG, "Completed work @ " + SystemClock.elapsedRealtime());
-				// Post notification of received message.
+				// Post notification of received text.
 				if("alert".equals(extras.getString("type"))) {
 					sendNotification(extras.getString("tweet"),extras.getString("title"),
-							extras.getString("message"));
+							extras.getString("text"));
 					Log.i(TAG, "Received: " + extras.toString());
 				} else
 				if("upgrade_alert".equals(extras.getString("type"))) {
@@ -80,7 +81,7 @@ public class GcmIntentService extends IntentService {
 				} else
                 if("chat_message".equals(extras.getString("type"))) {
                     sendChatMessage(extras);
-                    throw new RuntimeException("chat");
+                    //throw new RuntimeException("chat");
                 }
 			}
 		}
@@ -89,6 +90,10 @@ public class GcmIntentService extends IntentService {
 	}
 
     private void sendChatMessage(Bundle extras) {
+        String message = extras.getString("message");
+        Log.d(TAG,"chat text: " + message);
+        Intent messageIntent = ChatFragment.getMessageReceivedIntent(message);
+        sendBroadcast(messageIntent);
 
     }
 
@@ -134,9 +139,9 @@ public class GcmIntentService extends IntentService {
 		mNotificationManager.notify("update_available".hashCode(), notif);
 	}
 
-	// Put the message into a notification and post it.
+	// Put the text into a notification and post it.
 	// This is just one simple example of what you might choose to do with
-	// a GCM message.
+	// a GCM text.
 	private void sendNotification(String tweet, String title, String msg) {
 		boolean on = PreferenceManager.getDefaultSharedPreferences(this)
 				.getBoolean(getString(R.string.settings_key_push_on), false);

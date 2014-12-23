@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import twitter4j.internal.org.json.JSONArray;
 import twitter4j.internal.org.json.JSONObject;
 
 import com.google.gson.Gson;
@@ -19,6 +20,7 @@ import com.mongodb.DB;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
+import com.mongodb.WriteResult;
 
 public class ChatServlet extends HttpServlet {
 	
@@ -55,8 +57,10 @@ public class ChatServlet extends HttpServlet {
 			if(message.type==null) {
 				error.missingFields.add("message.type");
 			}
-			if(message.name==null) {
-				error.missingFields.add("message.name");
+			if("join".equals(message.type)) {
+				if(message.name==null) {
+					error.missingFields.add("message.name");
+				}
 			}
 			if(!error.missingFields.isEmpty()) {
 				message = null;
@@ -71,7 +75,8 @@ public class ChatServlet extends HttpServlet {
 			sendError(resp, error);
 			return;
 		}		
-		DBObject user = db.getCollection("chat_users").findOne(new BasicDBObject("push_id", req.getParameter("push_id")));
+		BasicDBObject push = new BasicDBObject("push_id", req.getParameter("push_id"));
+		DBObject user = db.getCollection("chat_users").findOne(push);
 		if(user==null) {
 			user = new BasicDBObject();
 			user.put("push_id", push_id);
@@ -79,19 +84,60 @@ public class ChatServlet extends HttpServlet {
 		}		
 		if(message.facebook!=null) {
 			user.put("facebook", message.facebook);
+			user.put("name", message.facebook.get("first_name") + " " + message.facebook.get("last_name"));
 		}
-
 		user.put("updated", new Date());
-		db.getCollection("chat_users").save(user);		
+		db.getCollection("chat_users").save(user);
+		user = db.getCollection("chat_users").findOne(push);
+		message.id = user.get("_id").toString();
+		message.name = user.get("name").toString();
 		if("join".equals(message.type)) {
 			List<User> users = getLatestUsers();
+			String allPushIds = req.getParameter("all_push_ids");
+			if(allPushIds!=null) {
+				try {
+					JSONArray a = new JSONArray(allPushIds);
+					List<String> toDelete =new ArrayList<String>();
+					for(int i = 0; i < a.length(); i++) {
+						String pushId = a.getString(i);
+						if(pushId.equals(push_id)) {
+							continue;
+						}
+						toDelete.add(pushId);
+					}
+					if(!toDelete.isEmpty()) {
+						BasicDBObject doc = new BasicDBObject();
+						doc.put("push_id", new BasicDBObject("$in", toDelete));
+						WriteResult res = db.getCollection("chat_users").remove(
+								doc);
+					}
+				} catch (Exception e) {
+					throw new RuntimeException(e);
+				}
+			}
+
+            DBCursor messages = db.getCollection("chat_messages").find().sort(new BasicDBObject("timestamp",-1)).limit(20);
+            List<Message> previousMessages = new ArrayList<Message>();
+            while(messages.hasNext()) {
+                DBObject o = messages.next();
+                Message m = new Message();
+                m.id = (String) o.get("id");
+                m.name = (String) o.get("name");
+                m.text = (String) o.get("text");
+                m.timestamp = ((Date) o.get("timestamp")).getTime();
+                previousMessages.add(m);
+            }
+
 			Response response = new Response();
 			response.self = getUser(user);
 			response.data = users;
+            response.history = previousMessages;
 			response.code = 200;
 			resp.setStatus(200);
 			resp.getWriter().write(gson.toJson(response));
 		} if("message".equals(message.type)) {
+            BasicDBObject messageObject = new BasicDBObject("id",message.id).append("timestamp",new Date()).append("text",message.text).append("name", user.get("name"));
+            db.getCollection("chat_messages").save(messageObject);
 			int count = new SendGcm(db, apiKey, message, gson).send();
 			Response response = new Response();
 			response.data = count;

@@ -33,9 +33,6 @@ public abstract class AbstractAdFragment extends HappyFragment {
         if(savedInstanceState!=null) {
             failureCount = savedInstanceState.getInt("failureCount");
         }
-        if(!PremiumUserHelper.isPaidUser()) {
-            LoadAd();
-        }
     }
 
     abstract protected void LoadAd();

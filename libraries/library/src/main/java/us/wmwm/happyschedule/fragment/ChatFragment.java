@@ -1,7 +1,6 @@
 package us.wmwm.happyschedule.fragment;
 
 import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -11,6 +10,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.StateListDrawable;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
@@ -21,8 +21,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
-import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
@@ -37,35 +36,30 @@ import com.facebook.Response;
 import com.facebook.Session;
 import com.facebook.SessionState;
 import com.facebook.Settings;
-import com.facebook.UiLifecycleHelper;
 import com.facebook.model.GraphUser;
 import com.facebook.widget.LoginButton;
+import com.google.gson.Gson;
 
-import java.io.IOException;
-import java.sql.Connection;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 
 import us.wmwm.happyschedule.BuildConfig;
 import us.wmwm.happyschedule.R;
 import us.wmwm.happyschedule.ThreadHelper;
 import us.wmwm.happyschedule.api.Api;
 import us.wmwm.happyschedule.api.JoinResponse;
+import us.wmwm.happyschedule.api.MessageResponse;
 import us.wmwm.happyschedule.api.User;
+import us.wmwm.happyschedule.application.HappyApplication;
 import us.wmwm.happyschedule.dao.WDb;
 import us.wmwm.happyschedule.util.ImageUtil;
 import us.wmwm.happyschedule.views.DepartureVisionHeader;
 import us.wmwm.happyschedule.views.FacebookView;
-import us.wmwm.happyschedule.views.TweetView;
 
 /**
  * Created by gravener on 12/11/14.
@@ -76,7 +70,8 @@ public class ChatFragment extends HappyFragment implements IPrimary {
 
     boolean enabled = false;
 
-    boolean connected;
+    Calendar connected;
+
     Session.StatusCallback statusCallback = new Session.StatusCallback() {
 
         @Override
@@ -107,38 +102,80 @@ public class ChatFragment extends HappyFragment implements IPrimary {
     UserAdapter userAdapter;
     GraphUser user = null;
     EditText text;
-    boolean isDestroying;
-    Notification notification;
     BroadcastReceiver chatReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.d(TAG, "chatReceiver");
-            if (notification != null) {
-                manager.cancel(6000);
+            if (intent.getAction().endsWith("Disconnect")) {
+                Log.d(TAG, "chatReceiver");
+                WDb.get().savePreference("chatEnabled", Boolean.FALSE.toString());
+            } else {
+                if (me == null) {
+                    return;
+                }
+                Gson gson = new Gson();
+                Message message = gson.fromJson(intent.getStringExtra("message"), Message.class);
+                if (message.id.equals(me.id)) {
+                    //confirmed sent
+                    return;
+                }
+                message.type = Type.MESSAGE;
+                adapter.addData(message);
+
+                InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(
+                        Context.INPUT_METHOD_SERVICE);
+                if (imm.isActive(text)) {
+                    Log.d(TAG, "active keyboard");
+                    list.invalidate();
+                    list.setSelection(adapter.getCount() - 1);
+                }
             }
-            WDb.get().savePreference("chatEnabled", Boolean.FALSE.toString());
         }
     };
+    boolean isDestroying;
     Handler handler = new Handler();
 
+    public static String getDisconnectAction() {
+        return HappyApplication.get().getPackageName() + ".DisconnectChat";
+    }
+
+    private static String getMessageReceivedAction() {
+        return HappyApplication.get().getPackageName() + ".MessageReceived";
+    }
+
+    public static Intent getMessageReceivedIntent(String messageJson) {
+        Intent intent = new Intent(getMessageReceivedAction());
+        intent.putExtra("message", messageJson);
+        return intent;
+    }
+
     private boolean isConnected() {
-        return connected;
+        Calendar now = Calendar.getInstance();
+        now.add(Calendar.HOUR_OF_DAY, -1);
+        if (connected == null) {
+            return false;
+        }
+        if (connected.after(now)) {
+            return true;
+        }
+        return false;
     }
 
     private void scheduleReconnect() {
         if (reconnect != null) {
             reconnect.cancel(true);
         }
+        Log.d(TAG, "scheduleReconnect()");
         reconnect = ThreadHelper.getScheduler().submit(new Runnable() {
             @Override
             public void run() {
                 if (user == null) {
+                    Log.d(TAG, "getting facebook user");
                     Request.executeAndWait(Request.newMeRequest(Session.getActiveSession(), new Request.GraphUserCallback() {
 
                         @Override
                         public void onCompleted(GraphUser u, Response response) {
                             user = u;
-
+                            Log.d(TAG, "facebook user received " + u.getName());
                             ThreadHelper.getScheduler().submit(new Runnable() {
                                 @Override
                                 public void run() {
@@ -155,13 +192,16 @@ public class ChatFragment extends HappyFragment implements IPrimary {
                 }
                 if (user != null) {
                     try {
+                        Log.d(TAG, "joining chat ");
                         JoinResponse resp = api.joinChat(user);
+                        Log.d(TAG, "chat joined " + resp.toString());
+                        connected = Calendar.getInstance();
                         me = resp.self;
+                        adapter.addData(resp);
                         userAdapter.setData(resp.data);
                         System.out.println(resp);
                     } catch (Exception e) {
-                        e.printStackTrace();
-                        ;
+                        Log.e(TAG, "error joining chat", e);
                     }
                 }
             }
@@ -176,7 +216,6 @@ public class ChatFragment extends HappyFragment implements IPrimary {
         }
         api = new Api(getActivity());
         manager = NotificationManagerCompat.from(getActivity());
-        manager.cancel(6000);
         Session session = Session.getActiveSession();
         if (session == null) {
             if (savedInstanceState != null) {
@@ -191,7 +230,9 @@ public class ChatFragment extends HappyFragment implements IPrimary {
             }
         }
 
-        getActivity().registerReceiver(chatReceiver, new IntentFilter(getAction()));
+        IntentFilter filter = new IntentFilter(getDisconnectAction());
+        filter.addAction(getMessageReceivedAction());
+        getActivity().registerReceiver(chatReceiver, filter);
 
     }
 
@@ -214,6 +255,190 @@ public class ChatFragment extends HappyFragment implements IPrimary {
         progressText = (TextView) view.findViewById(R.id.progressText);
         return view;
     }
+
+//    class RailBot extends PircBot {
+//
+//        Future<?> reconnect;
+//
+//        int next = 0;
+//
+//        public RailBot() {
+//            setAutoNickChange(true);
+//        }
+//
+//        public List<User> getUsers() {
+//            String[] chans = getChannels();
+//            if(chans==null || chans.length==0) {
+//                return Collections.emptyList();
+//            }
+//            List<User> users = Arrays.asList(getUsers(chans[0]));
+//            Collections.sort(users, new Comparator<User>() {
+//                @Override
+//                public int compare(User lhs, User rhs) {
+//                    return lhs.getNick().compareToIgnoreCase(rhs.getNick());
+//                }
+//
+//            });
+//            return users;
+//        }
+//
+//        @Override
+//        protected void onDisconnect() {
+//            Log.d(TAG, "onDisconnect");
+//            super.onDisconnect();
+//            if(isDestroying) {
+//                return;
+//            }
+//            Message m = new Message();
+//            m.type = Type.DISCONNECTED;
+//            m.text = "<disconnected>";
+//            m.timestamp = System.currentTimeMillis();
+//            adapter.addData(m);
+//            scheduleReconnect();
+//        }
+//
+//        @Override
+//        protected void onConnect() {
+//            super.onConnect();
+//            next /= 4;
+//            Log.d(TAG, "onConnect, joining " + getChannel());
+//            handler.post(new Runnable() {
+//                @Override
+//                public void run() {
+//                    progress.setVisibility(View.VISIBLE);
+//                    progressText.setText("joining room");
+//                }
+//            });
+//            reconnect = ThreadHelper.getScheduler().submit(new Runnable() {
+//                @Override
+//                public void run() {
+//                    joinChannel(getChannel());
+//                }
+//            });
+//        }
+//
+//        @Override
+//        protected void onUserList(String s, User[] users) {
+//            super.onUserList(s, users);
+//            Message m = new Message();
+//            m.timestamp = System.currentTimeMillis();
+//            m.text = "<there are " + users.length + " in the chat>";
+//            m.type = Type.USER_COUNT;
+//            adapter.addData(m);
+//            userAdapter.setData(Arrays.asList(users));
+//        }
+//
+//        @Override
+//        protected void onPart(String s, String sender, String s3, String s4) {
+//            super.onPart(s, sender, s3, s4);
+//            Message m = new Message();
+//            m.type = Type.DISCONNECTED;
+//            m.timestamp = System.currentTimeMillis();
+//            adapter.addData(m);
+//            userAdapter.setData(bot.getUsers());
+//        }
+//
+//
+//        @Override
+//        protected void onJoin(String channel, String sender, String login, String hostname) {
+//            super.onJoin(channel, sender, login, hostname);
+//
+//            Message m = new Message();
+//            m.type = Type.CONNECTED;
+//            m.name = sender;
+//            m.text = "joined";
+//            m.timestamp = System.currentTimeMillis();
+//            if (sender.equals(bot.getNick())) {
+//                handler.post(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        progress.setVisibility(View.GONE);
+//                        progressText.setVisibility(View.GONE);
+//                    }
+//                });
+//                m.text = "<connected>";
+//            } else {
+//                m.text = "<" + m.name + " joined>";
+//            }
+//            userAdapter.setData(bot.getUsers());
+//            adapter.addData(m);
+//        }
+//
+//        @Override
+//        protected void onMessage(String channel, String sender, String login, String hostname, String text) {
+//            super.onMessage(channel, sender, login, hostname, text);
+//            Message m = new Message();
+//            m.type = Type.MESSAGE;
+//            m.name = sender;
+//            m.text = text;
+//            m.timestamp = System.currentTimeMillis();
+//            adapter.addData(m);
+//            Log.d(TAG, "text: " + text);
+//        }
+//
+//        private void scheduleReconnect() {
+//            if (reconnect != null) {
+//                reconnect.cancel(true);
+//            }
+//            if (isConnected()) {
+//                return;
+//            }
+//            reconnect = ThreadHelper.getScheduler().schedule(new Runnable() {
+//                @Override
+//                public void run() {
+//                    handler.post(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            progress.setVisibility(View.VISIBLE);
+//                            progressText.setText("connecting...");
+//                        }
+//                    });
+//                    try {
+//                        if (user == null) {
+//                            Request.executeAndWait(Request.newMeRequest(Session.getActiveSession(), new Request.GraphUserCallback() {
+//
+//                                @Override
+//                                public void onCompleted(GraphUser u, Response response) {
+//                                    user = u;
+//                                    setName(u.getFirstName() + u.getLastName().substring(0, 1));
+//                                    setRealName(u.getId());
+//                                    setFinger(u.getInnerJSONObject().toString());
+//                                    ThreadHelper.getScheduler().submit(new Runnable() {
+//                                        @Override
+//                                        public void run() {
+//                                            try {
+//                                                api.registerFacebookUser(user, SettingsFragment.getRegistrationId());
+//                                                Log.d(TAG,"saved facebook user on server");
+//                                            } catch (Exception e) {
+//                                                Log.e(TAG,"erorr saving user",e);
+//                                            }
+//                                        }
+//                                    });
+//                                }
+//                            }));
+//                        }
+//                        ConnectionSettings s = new ConnectionSettings("irc.freenode.net");
+//                        s.useSSL = true;
+//                        s.port = 6697;
+//                        Log.d(TAG, "connecting to " + s.server + ":" + s.port);
+//                        connect(s);
+//                        Log.d(TAG, "connected");
+//                    } catch (IOException e) {
+//                        Log.e(TAG, "error connecting", e);
+//                        scheduleReconnect();
+//                    } catch (NickAlreadyInUseException e) {
+//                        Log.e(TAG, "username already in use: " + getNick());
+//                        scheduleReconnect();
+//                    } catch (IrcException e) {
+//                        Log.e(TAG, "error connecting", e);
+//                        scheduleReconnect();
+//                    }
+//                }
+//            }, next, TimeUnit.MILLISECONDS);
+//            next *= 2;
+//            Log.d(TAG, "scheduleReconnect in " + next + " milliseconds");
+//        }
+//    }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -296,193 +521,6 @@ public class ChatFragment extends HappyFragment implements IPrimary {
 
     }
 
-//    class RailBot extends PircBot {
-//
-//        Future<?> reconnect;
-//
-//        int next = 0;
-//
-//        public RailBot() {
-//            setAutoNickChange(true);
-//        }
-//
-//        public List<User> getUsers() {
-//            String[] chans = getChannels();
-//            if(chans==null || chans.length==0) {
-//                return Collections.emptyList();
-//            }
-//            List<User> users = Arrays.asList(getUsers(chans[0]));
-//            Collections.sort(users, new Comparator<User>() {
-//                @Override
-//                public int compare(User lhs, User rhs) {
-//                    return lhs.getNick().compareToIgnoreCase(rhs.getNick());
-//                }
-//
-//            });
-//            return users;
-//        }
-//
-//        @Override
-//        protected void onDisconnect() {
-//            Log.d(TAG, "onDisconnect");
-//            super.onDisconnect();
-//            if(isDestroying) {
-//                return;
-//            }
-//            Message m = new Message();
-//            m.type = Type.DISCONNECTED;
-//            m.nick = null;
-//            m.message = "<disconnected>";
-//            m.timestamp = System.currentTimeMillis();
-//            adapter.addData(m);
-//            scheduleReconnect();
-//        }
-//
-//        @Override
-//        protected void onConnect() {
-//            super.onConnect();
-//            next /= 4;
-//            Log.d(TAG, "onConnect, joining " + getChannel());
-//            handler.post(new Runnable() {
-//                @Override
-//                public void run() {
-//                    progress.setVisibility(View.VISIBLE);
-//                    progressText.setText("joining room");
-//                }
-//            });
-//            reconnect = ThreadHelper.getScheduler().submit(new Runnable() {
-//                @Override
-//                public void run() {
-//                    joinChannel(getChannel());
-//                }
-//            });
-//        }
-//
-//        @Override
-//        protected void onUserList(String s, User[] users) {
-//            super.onUserList(s, users);
-//            Message m = new Message();
-//            m.timestamp = System.currentTimeMillis();
-//            m.message = "<there are " + users.length + " in the chat>";
-//            m.type = Type.USER_COUNT;
-//            adapter.addData(m);
-//            userAdapter.setData(Arrays.asList(users));
-//        }
-//
-//        @Override
-//        protected void onPart(String s, String sender, String s3, String s4) {
-//            super.onPart(s, sender, s3, s4);
-//            Message m = new Message();
-//            m.type = Type.DISCONNECTED;
-//            m.nick = sender;
-//            m.timestamp = System.currentTimeMillis();
-//            m.message = "<" + m.nick + " disconnected>";
-//            adapter.addData(m);
-//            userAdapter.setData(bot.getUsers());
-//        }
-//
-//
-//        @Override
-//        protected void onJoin(String channel, String sender, String login, String hostname) {
-//            super.onJoin(channel, sender, login, hostname);
-//
-//            Message m = new Message();
-//            m.type = Type.CONNECTED;
-//            m.nick = sender;
-//            m.message = "joined";
-//            m.timestamp = System.currentTimeMillis();
-//            if (sender.equals(bot.getNick())) {
-//                handler.post(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        progress.setVisibility(View.GONE);
-//                        progressText.setVisibility(View.GONE);
-//                    }
-//                });
-//                m.message = "<connected>";
-//            } else {
-//                m.message = "<" + m.nick + " joined>";
-//            }
-//            userAdapter.setData(bot.getUsers());
-//            adapter.addData(m);
-//        }
-//
-//        @Override
-//        protected void onMessage(String channel, String sender, String login, String hostname, String message) {
-//            super.onMessage(channel, sender, login, hostname, message);
-//            Message m = new Message();
-//            m.type = Type.MESSAGE;
-//            m.nick = sender;
-//            m.message = message;
-//            m.timestamp = System.currentTimeMillis();
-//            adapter.addData(m);
-//            Log.d(TAG, "message: " + message);
-//        }
-//
-//        private void scheduleReconnect() {
-//            if (reconnect != null) {
-//                reconnect.cancel(true);
-//            }
-//            if (isConnected()) {
-//                return;
-//            }
-//            reconnect = ThreadHelper.getScheduler().schedule(new Runnable() {
-//                @Override
-//                public void run() {
-//                    handler.post(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            progress.setVisibility(View.VISIBLE);
-//                            progressText.setText("connecting...");
-//                        }
-//                    });
-//                    try {
-//                        if (user == null) {
-//                            Request.executeAndWait(Request.newMeRequest(Session.getActiveSession(), new Request.GraphUserCallback() {
-//
-//                                @Override
-//                                public void onCompleted(GraphUser u, Response response) {
-//                                    user = u;
-//                                    setName(u.getFirstName() + u.getLastName().substring(0, 1));
-//                                    setRealName(u.getId());
-//                                    setFinger(u.getInnerJSONObject().toString());
-//                                    ThreadHelper.getScheduler().submit(new Runnable() {
-//                                        @Override
-//                                        public void run() {
-//                                            try {
-//                                                api.registerFacebookUser(user, SettingsFragment.getRegistrationId());
-//                                                Log.d(TAG,"saved facebook user on server");
-//                                            } catch (Exception e) {
-//                                                Log.e(TAG,"erorr saving user",e);
-//                                            }
-//                                        }
-//                                    });
-//                                }
-//                            }));
-//                        }
-//                        ConnectionSettings s = new ConnectionSettings("irc.freenode.net");
-//                        s.useSSL = true;
-//                        s.port = 6697;
-//                        Log.d(TAG, "connecting to " + s.server + ":" + s.port);
-//                        connect(s);
-//                        Log.d(TAG, "connected");
-//                    } catch (IOException e) {
-//                        Log.e(TAG, "error connecting", e);
-//                        scheduleReconnect();
-//                    } catch (NickAlreadyInUseException e) {
-//                        Log.e(TAG, "username already in use: " + getNick());
-//                        scheduleReconnect();
-//                    } catch (IrcException e) {
-//                        Log.e(TAG, "error connecting", e);
-//                        scheduleReconnect();
-//                    }
-//                }
-//            }, next, TimeUnit.MILLISECONDS);
-//            next *= 2;
-//            Log.d(TAG, "scheduleReconnect in " + next + " milliseconds");
-//        }
-//    }
-
     private void onClickLogout() {
 
     }
@@ -495,29 +533,11 @@ public class ChatFragment extends HappyFragment implements IPrimary {
         }
     }
 
-    private String getAction() {
-        return getActivity().getPackageName() + ".DisconnectChat";
-    }
-
     @Override
     public void onPause() {
         super.onPause();
         if (isConnected()) {
-            if (notification == null) {
-                NotificationCompat.Builder b = new NotificationCompat.Builder(getActivity());
-                b.setContentTitle(getString(us.wmwm.happyschedule.views.R.string.app_name));
-                b.setContentText("Chat is active");
-                Intent i = new Intent(getAction());
-                Intent activity = new Intent(getActivity(), getActivity().getClass());
-                PendingIntent pi = PendingIntent.getBroadcast(getActivity(), 0, i, 0);
-                b.addAction(R.drawable.ic_action_cancel, "Disconnect", pi);
-                b.setOngoing(true);
-                b.setSmallIcon(R.drawable.ic_stat_512);
-                PendingIntent pendingActivity = PendingIntent.getActivity(getActivity(), 0, activity, 0);
-                b.setContentIntent(pendingActivity);
-                notification = b.build();
-            }
-            manager.notify(6000, notification);
+
         }
     }
 
@@ -555,9 +575,6 @@ public class ChatFragment extends HappyFragment implements IPrimary {
     @Override
     public void onDestroy() {
         isDestroying = true;
-        if (notification != null) {
-            manager.cancel(notification.hashCode());
-        }
         getActivity().unregisterReceiver(chatReceiver);
         super.onDestroy();
     }
@@ -577,16 +594,29 @@ public class ChatFragment extends HappyFragment implements IPrimary {
                     ;
                     return;
                 }
-                Message m = new Message();
-                m.type = Type.MESSAGE;
-                m.nick = me.name;
-                m.message = user.getId() + "|" + text.getText().toString();
+                final Message m = new Message();
+                m.type = Type.MESSAGE_PENDING;
+                m.name = me.name;
+                m.id = me.id;
+                m.text = user.getId() + "|" + text.getText().toString();
                 m.timestamp = System.currentTimeMillis();
-                api.sendMessage(m);
                 adapter.addData(m);
-                Log.d(TAG, "message: " + m.message);
+                ThreadHelper.getScheduler().submit(new Runnable() {
+                    @Override
+                    public void run() {
+                        MessageResponse resp = api.sendMessage(m);
+                        if (resp.code == 200) {
+                            m.type = Type.MESSAGE;
+                            adapter.notifyDataSetChanged();
+                        }
+                    }
+                });
+                InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(
+                        Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(text.getWindowToken(), 0);
+                Log.d(TAG, "text: " + m.text);
                 text.setText("");
-
+                list.setSelection(adapter.getCount() - 1);
             }
         });
     }
@@ -598,12 +628,13 @@ public class ChatFragment extends HappyFragment implements IPrimary {
     }
 
     enum Type {
-        MESSAGE, CONNECTED, DISCONNECTED, USER_COUNT
+        MESSAGE, MESSAGE_PENDING, CONNECTED, DISCONNECTED, USER_COUNT
     }
 
     public class Message {
-        public String nick;
-        public String message;
+        public String id;
+        public String name;
+        public String text;
         public long timestamp;
         public Type type;
     }
@@ -687,6 +718,19 @@ public class ChatFragment extends HappyFragment implements IPrimary {
         }
 
         @Override
+        public void notifyDataSetChanged() {
+            if (Looper.myLooper() != Looper.getMainLooper()) {
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        ChatAdapter.super.notifyDataSetChanged();
+                    }
+                });
+            }
+            super.notifyDataSetChanged();
+        }
+
+        @Override
         public Message getItem(int position) {
             return messages.get(position);
         }
@@ -699,7 +743,7 @@ public class ChatFragment extends HappyFragment implements IPrimary {
         @Override
         public int getItemViewType(int position) {
             Message m = messages.get(position);
-            if (m.type == Type.MESSAGE) {
+            if (m.type == Type.MESSAGE || m.type == Type.MESSAGE_PENDING) {
                 return 0;
             }
             return 1;
@@ -723,11 +767,11 @@ public class ChatFragment extends HappyFragment implements IPrimary {
 
                 if (position > 0) {
                     Message prev = getItem(position - 1);
-                    if (prev.type == Type.MESSAGE && prev.nick.equals(m.nick)) {
+                    if ((prev.type == Type.MESSAGE || prev.type == Type.MESSAGE_PENDING) && prev.id.equals(m.id)) {
                         hasPrevious = true;
                     }
                 }
-                t.setData(hasPrevious, m, nickToMessage.get(m.nick));
+                t.setData(hasPrevious, m, nickToMessage.get(m.name));
                 return t;
             }
             TextView t = (TextView) convertView;
@@ -736,7 +780,7 @@ public class ChatFragment extends HappyFragment implements IPrimary {
             } else {
                 t.setGravity(Gravity.CENTER_HORIZONTAL);
                 if (m.type == Type.CONNECTED) {
-                    t.setText(m.message);
+                    t.setText(m.text);
                 }
                 if (m.type == Type.DISCONNECTED) {
                     t.setText("<disconnected>");
@@ -751,13 +795,26 @@ public class ChatFragment extends HappyFragment implements IPrimary {
                 public void run() {
                     messages.add(message);
                     if (message.type == Type.MESSAGE) {
-                        nickToMessage.put(message.nick, message);
+                        nickToMessage.put(message.name, message);
                     }
                     notifyDataSetChanged();
-                    list.setSelection(0);
                 }
             });
 
+        }
+
+        public void addData(final JoinResponse resp) {
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    for (Message m : resp.history) {
+                        m.type = Type.MESSAGE;
+                        messages.add(m);
+                        nickToMessage.put(m.name, m);
+                    }
+                    notifyDataSetChanged();
+                }
+            });
         }
     }
 }

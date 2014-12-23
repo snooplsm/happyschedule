@@ -381,7 +381,7 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
                         intent.putExtra(Intent.EXTRA_TEXT, b.toString());
                         ShareCompat.IntentBuilder builder = ShareCompat.IntentBuilder
                                 .from(getActivity());
-                        builder.setType("message/rfc822");
+                        builder.setType("text/rfc822");
                         builder.addEmailTo("feedback@wmwm.us");
                         builder.setSubject(appName + " Feedback");
                         builder.setChooserTitle("Email");

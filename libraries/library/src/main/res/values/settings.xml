@@ -46,6 +46,8 @@
     <string name="settings_key_push_on">push_notifications_enabled</string>
     <string name="settings_key_push_editorial_on">push_notifications_editorial_enabled</string>
     <string name="settings_key_rail_lines">push_notifications_rail_lines</string>
+    <string name="settings_key_purchase_subscription">purchase_subscription</string>
+
     <string name="settings_summary_rail_lines">Select which rail lines you want to receive alerts on.</string>
 
     <string name="settings_key_push_vibrate">push_notifications_vibrate</string>
