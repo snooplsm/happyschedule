@@ -179,10 +179,14 @@ public class FragmentHappytapAd extends AbstractAdFragment {
 
     @Override
     protected void LoadAd() {
+        Activity activity = getActivity();
+        if(activity==null) {
+            return;
+        }
         Log.d(TAG,"google ads enabled");
         if (nextAdView == null) { // Create and configure a new ad if the next
             // ad doesn't currently exist
-            nextAdView = new AdView(getActivity());
+            nextAdView = new AdView(activity);
             ViewGroup.LayoutParams layoutParams = new FrameLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT,
                     Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL);

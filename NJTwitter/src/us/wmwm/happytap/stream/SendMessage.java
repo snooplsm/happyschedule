@@ -59,7 +59,7 @@ public class SendMessage implements Runnable {
 			data.put("type", "chat_message");
 			Message m = new Message();
 			m.text = message.text;
-			m.id = message.id;
+			m.userId = message.userId;
 			m.name = message.name;
 			data.put("message", gson.toJson(m).toString());
 			while(cursor.hasNext()) {

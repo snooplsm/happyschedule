@@ -1,9 +1,24 @@
 package us.wmwm.happyschedule.fragment;
 
+import android.app.Activity;
+import android.app.PendingIntent;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Bundle;
+import android.os.Handler;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
+import android.support.v4.view.ViewPager;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+
+import com.squareup.timessquare.CalendarPickerView.OnDateSelectedListener;
+
 import java.util.Calendar;
 import java.util.Date;
-
-import org.json.JSONObject;
 
 import us.wmwm.happyschedule.R;
 import us.wmwm.happyschedule.ThreadHelper;
@@ -18,31 +33,8 @@ import us.wmwm.happyschedule.model.DepartureVision;
 import us.wmwm.happyschedule.model.Schedule;
 import us.wmwm.happyschedule.model.Station;
 import us.wmwm.happyschedule.model.StationToStation;
-import us.wmwm.happyschedule.util.PremiumUserHelper;
-import us.wmwm.happyschedule.util.Streams;
 import us.wmwm.happyschedule.views.BackListener;
 import us.wmwm.happyschedule.views.ScheduleControlsView.ScheduleControlListener;
-
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
-import android.content.Intent;
-import android.net.Uri;
-import android.os.Bundle;
-import android.os.Handler;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationManagerCompat;
-import android.support.v4.view.ViewPager;
-import android.view.LayoutInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
-
-import com.flurry.android.FlurryAgent;
-import com.squareup.timessquare.CalendarPickerView.OnDateSelectedListener;
 
 public class FragmentSchedule extends Fragment implements BackListener {
 
@@ -51,6 +43,7 @@ public class FragmentSchedule extends Fragment implements BackListener {
     View loadingContainer;
     Station from;
     Station to;
+
     ScheduleControlListener controlListener = new ScheduleControlListener() {
 
         @Override
@@ -109,7 +102,7 @@ public class FragmentSchedule extends Fragment implements BackListener {
         @Override
         public void onFavorite() {
             DepartureVision dv = new DepartureVision(from.getId(), to.getId());
-            if(FavoriteHelper.hasFavorite(dv)) {
+            if (FavoriteHelper.hasFavorite(dv)) {
                 FavoriteHelper.remove(dv);
             } else {
                 FavoriteHelper.add(dv);
@@ -145,6 +138,7 @@ public class FragmentSchedule extends Fragment implements BackListener {
         }
     };
     OnGetSchedule onGetSchedule;
+    Runnable showUpgradeNotification;
     private long started;
 
     public static FragmentSchedule newInstance(Calendar day, Station from, Station to, boolean showAds) {
@@ -152,14 +146,14 @@ public class FragmentSchedule extends Fragment implements BackListener {
         b.putSerializable("from", from);
         b.putSerializable("to", to);
         b.putSerializable("day", day);
-        b.putBoolean("showAds",showAds && WDb.get().getPreference("rails.monthly")==null);
+        b.putBoolean("showAds", showAds && WDb.get().getPreference("rails.monthly") == null);
         FragmentSchedule s = new FragmentSchedule();
         s.setArguments(b);
         return s;
     }
 
     public static FragmentSchedule newInstance(Calendar day, Station from, Station to) {
-        return newInstance(day,from,to,false);
+        return newInstance(day, from, to, false);
     }
 
     public void setOnGetSchedule(OnGetSchedule onGetSchedule) {
@@ -228,32 +222,48 @@ public class FragmentSchedule extends Fragment implements BackListener {
             }
         });
 
-        if(b.getBoolean("showAds")) {
+        if (b.getBoolean("showAds")) {
             getView().findViewById(R.id.ad).setVisibility(View.VISIBLE);
             getChildFragmentManager().beginTransaction().replace(R.id.ad, new FragmentHappytapAd()).commit();
         }
 
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                NotificationManagerCompat compat = NotificationManagerCompat.from(getActivity());
-                NotificationCompat.Builder b = new NotificationCompat.Builder(getActivity());
-                String title = "Support " + getString(R.string.app_name)+"?";
-                String text = "Subscribe to " + getString(R.string.app_name) + " to remove ads and support the developer.";
-                b.setStyle(new NotificationCompat.BigTextStyle().setBigContentTitle(title).bigText(text));
-                b.setContentTitle(title);
-                b.setContentText(text);
-                int notifyId = 1000;
-                PendingIntent subscribe = PendingIntent.getActivity(getActivity(), 0, new Intent(getActivity(), MainActivity.class).setData(Uri.parse("http://wmwm.us?launchPurchase="+ Boolean.TRUE)), 0);
-                PendingIntent dismiss = PendingIntent.getActivity(getActivity(), 0, new Intent(getActivity(), MainActivity.class).setData(Uri.parse("http://wmwm.us?dismiss="+ notifyId)), 0);
-                b.addAction(0,"Subscribe",subscribe);
-                b.addAction(0,"Never!",dismiss);
-                b.setContentIntent(subscribe);
-                b.setSmallIcon(R.drawable.ic_stat_512);
-                compat.notify(notifyId,b.build());
-            }
-        },1000);
+        int historySize = WDb.get().getHistorySize();
+        if (historySize != 0 && historySize % 10 == 0 && WDb.get().getPreference("rails.monthly") == null) {
 
+            handler.postDelayed(showUpgradeNotification = new Runnable() {
+                @Override
+                public void run() {
+                    Activity activity = getActivity();
+                    if (activity == null) {
+                        return;
+                    }
+                    NotificationManagerCompat compat = NotificationManagerCompat.from(getActivity());
+                    NotificationCompat.Builder b = new NotificationCompat.Builder(getActivity());
+                    String title = "Support " + getString(R.string.app_name) + "?";
+                    String text = "Subscribe to " + getString(R.string.app_name) + " to remove ads and support the developer.";
+                    b.setStyle(new NotificationCompat.BigTextStyle().setBigContentTitle(title).bigText(text));
+                    b.setContentTitle(title);
+                    b.setContentText(text);
+                    int notifyId = 1000;
+                    PendingIntent subscribe = PendingIntent.getActivity(getActivity(), 0, new Intent(getActivity(), MainActivity.class).setData(Uri.parse("http://wmwm.us?launchPurchase=" + Boolean.TRUE)), 0);
+                    PendingIntent dismiss = PendingIntent.getActivity(getActivity(), 0, new Intent(getActivity(), MainActivity.class).setData(Uri.parse("http://wmwm.us?dismiss=" + notifyId)), 0);
+                    b.addAction(0, "Subscribe", subscribe);
+                    b.addAction(0, "Never!", dismiss);
+                    b.setContentIntent(subscribe);
+                    b.setSmallIcon(R.drawable.ic_stat_512);
+                    compat.notify(notifyId, b.build());
+                }
+            }, 5000);
+        }
+
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (showUpgradeNotification != null) {
+            handler.removeCallbacks(showUpgradeNotification);
+        }
     }
 
     @Override

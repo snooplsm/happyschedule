@@ -110,7 +110,7 @@ public class FragmentStationPicker extends HappyFragment {
 				for(int i = 0; i < adapter.getCount(); i++) {
 					String name = adapter.getName(adapter.getItem(i));
 					if(name.startsWith(letter)) {
-						list.setSelectionFromTop(i,(int)-getResources().getDimension(R.dimen.header_height));
+						list.setSelectionFromTop(i,0);
 						break;
 					}
 				}

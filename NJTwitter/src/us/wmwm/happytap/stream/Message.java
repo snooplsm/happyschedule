@@ -6,7 +6,7 @@ public class Message {
 	String text;
 	String to;
 	String type;
-	String id;	
+	String userId;
 	long timestamp;
 	Map<String,Object> facebook;
 	String name;

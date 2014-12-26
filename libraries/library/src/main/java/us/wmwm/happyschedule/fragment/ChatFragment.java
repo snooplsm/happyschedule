@@ -1,7 +1,5 @@
 package us.wmwm.happyschedule.fragment;
 
-import android.app.Notification;
-import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -12,7 +10,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.Nullable;
-import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.widget.SlidingPaneLayout;
 import android.util.Log;
@@ -114,7 +111,7 @@ public class ChatFragment extends HappyFragment implements IPrimary {
                 }
                 Gson gson = new Gson();
                 Message message = gson.fromJson(intent.getStringExtra("message"), Message.class);
-                if (message.id.equals(me.id)) {
+                if (message.userId.equals(me.id)) {
                     //confirmed sent
                     return;
                 }
@@ -597,7 +594,7 @@ public class ChatFragment extends HappyFragment implements IPrimary {
                 final Message m = new Message();
                 m.type = Type.MESSAGE_PENDING;
                 m.name = me.name;
-                m.id = me.id;
+                m.userId = me.id;
                 m.text = user.getId() + "|" + text.getText().toString();
                 m.timestamp = System.currentTimeMillis();
                 adapter.addData(m);
@@ -632,7 +629,7 @@ public class ChatFragment extends HappyFragment implements IPrimary {
     }
 
     public class Message {
-        public String id;
+        public String userId;
         public String name;
         public String text;
         public long timestamp;
@@ -767,7 +764,7 @@ public class ChatFragment extends HappyFragment implements IPrimary {
 
                 if (position > 0) {
                     Message prev = getItem(position - 1);
-                    if ((prev.type == Type.MESSAGE || prev.type == Type.MESSAGE_PENDING) && prev.id.equals(m.id)) {
+                    if ((prev.type == Type.MESSAGE || prev.type == Type.MESSAGE_PENDING) && prev.userId.equals(m.userId)) {
                         hasPrevious = true;
                     }
                 }

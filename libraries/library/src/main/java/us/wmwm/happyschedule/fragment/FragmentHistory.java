@@ -213,6 +213,9 @@ public class FragmentHistory extends HappyFragment implements IPrimary, BackList
 
 		});
 		empty = view.findViewById(R.id.empty);
+        if(WDb.get().getPreference("rails.monthly")!=null) {
+            view.setPadding(0,0,0,0);
+        }
 		return view;
 	}
 
@@ -220,10 +223,6 @@ public class FragmentHistory extends HappyFragment implements IPrimary, BackList
 	public void onActivityCreated(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onActivityCreated(savedInstanceState);
-        if(WDb.get().getPreference("rails.monthly")!=null) {
-            getView().setPadding(0,0,0,0);
-        }
-
 	}
 
 	@Override

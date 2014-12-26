@@ -7,7 +7,7 @@
         <Preference
             android:dependency="@string/settings_key_push_on"
             android:key="@string/settings_key_purchase_subscription"
-            android:summary="You do not have a subscription."
+            android:summary="Can't find subscription status.  Click to check."
             android:title="Subscription" />
     </PreferenceCategory>
 

@@ -89,7 +89,7 @@ public class ChatServlet extends HttpServlet {
 		user.put("updated", new Date());
 		db.getCollection("chat_users").save(user);
 		user = db.getCollection("chat_users").findOne(push);
-		message.id = user.get("_id").toString();
+		message.userId = user.get("_id").toString();
 		message.name = user.get("name").toString();
 		if("join".equals(message.type)) {
 			List<User> users = getLatestUsers();
@@ -121,7 +121,7 @@ public class ChatServlet extends HttpServlet {
             while(messages.hasNext()) {
                 DBObject o = messages.next();
                 Message m = new Message();
-                m.id = (String) o.get("id");
+                m.userId = (String) o.get("userId");
                 m.name = (String) o.get("name");
                 m.text = (String) o.get("text");
                 m.timestamp = ((Date) o.get("timestamp")).getTime();
@@ -136,7 +136,7 @@ public class ChatServlet extends HttpServlet {
 			resp.setStatus(200);
 			resp.getWriter().write(gson.toJson(response));
 		} if("message".equals(message.type)) {
-            BasicDBObject messageObject = new BasicDBObject("id",message.id).append("timestamp",new Date()).append("text",message.text).append("name", user.get("name"));
+            BasicDBObject messageObject = new BasicDBObject("userId",message.userId).append("timestamp",new Date()).append("text",message.text).append("name", user.get("name"));
             db.getCollection("chat_messages").save(messageObject);
 			int count = new SendGcm(db, apiKey, message, gson).send();
 			Response response = new Response();
@@ -173,7 +173,7 @@ public class ChatServlet extends HttpServlet {
 		DBObject facebook = (DBObject) ob.get("facebook");
 		if(facebook!=null) {
 			user.name = facebook.get("first_name") + " " + facebook.get("last_name");
-			user.facebookId = (String)facebook.get("id");
+			user.facebookId = (String)facebook.get("userId");
 		} else {
 			user.name = (String) ob.get("name");
 		}

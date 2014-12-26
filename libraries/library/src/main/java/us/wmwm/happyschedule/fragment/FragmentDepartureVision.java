@@ -270,7 +270,7 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary,
         fal = (FloatingActionLayout) root.findViewById(R.id.fal);
         change = (FloatingActionButton) root.findViewById(R.id.button_floating_action_change);
         if(WDb.get().getPreference("rails.monthly")!=null) {
-            root.setPadding(0,0,0,0);
+            root.setPadding(0, 0, 0, 0);
         }
 		return root;
 	}
@@ -324,7 +324,7 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary,
 		if (item.getItemId() == android.R.id.home) {
 			getActivity().onBackPressed();
 		}
-//		if (item.getItemId() == R.id.menu_refresh) {
+//		if (item.getItemId() == R.userId.menu_refresh) {
 //			// canLoad = true;
 //			if (refresh != null) {
 //				refresh.cancel(true);

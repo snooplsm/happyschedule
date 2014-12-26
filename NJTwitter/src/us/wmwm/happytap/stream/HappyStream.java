@@ -469,7 +469,7 @@ public class HappyStream {
 //			int limit) throws Exception {
 //		PreparedStatement stat = conn
 //				.prepareStatement(String
-//						.format("select u.push_id, u.id from USER u where u.id > ? group by u.id order by u.id asc limit %s",
+//						.format("select u.push_id, u.userId from USER u where u.userId > ? group by u.userId order by u.userId asc limit %s",
 //								limit));
 //		if (afterUserId == null) {
 //			afterUserId = 0L;
