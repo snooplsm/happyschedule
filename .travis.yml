@@ -4,4 +4,4 @@ android:
     - build-tools-21.1.1
     - android-21
     - extra
-script: ./gradlew :libraries:library:assembleNjrailsPostIcsRelease
+script: ./gradlew :libraries:library:assembleNjrailsPostIcsProdRelease
