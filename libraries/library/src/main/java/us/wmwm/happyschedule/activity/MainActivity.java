@@ -185,10 +185,11 @@ public class MainActivity extends HappyActivity {
             if(Boolean.TRUE.toString().equals(intent.getData().getQueryParameter("launchPurchase"))) {
                 onPurchaseClickedListener.onPurchaseClicked();
             }
-            String notifyId = intent.getData().getQueryParameter("dismiss");
+            String notifyId = intent.getData().getQueryParameter("dismissNever");
             if(notifyId!=null) {
                 NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(this);
                 notificationManagerCompat.cancel(Integer.parseInt(notifyId));
+                WDb.get().savePreference("rails.show.upsell",String.valueOf(System.currentTimeMillis()));
             }
         }
     }

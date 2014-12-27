@@ -96,26 +96,7 @@ public class FragmentMain extends Fragment implements BackListener {
             int count = getFragmentManager().getBackStackEntryCount();
             Log.d(FragmentMain.class.getSimpleName(), "onBackStack " + count);
             if (count == 0) {
-                handler.post(new Runnable() {
-                    public void run() {
-                        android.support.v7.app.ActionBar a = ((ActionBarActivity) getActivity()).getSupportActionBar();
-                        if (pager.getCurrentItem() == 0) {
-                            a.setSubtitle("History");
-                        } else if (pager.getCurrentItem() == 2) {
-                            a.setSubtitle("w/ DepartureVision");
-                        } else {
-                            a.setSubtitle(null);
-                        }
 
-                        a.setDisplayHomeAsUpEnabled(false);
-                        a.setHomeButtonEnabled(false);
-                        getActivity().supportInvalidateOptionsMenu();
-//						getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
-//						getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-                    }
-
-                    ;
-                });
             } else {
                 BackStackEntry e = getFragmentManager().getBackStackEntryAt(
                         count - 1);
@@ -129,15 +110,7 @@ public class FragmentMain extends Fragment implements BackListener {
                 } else {
                     title = null;
                 }
-                handler.post(new Runnable() {
-                    public void run() {
-                        ActionBar a = ((ActionBarActivity) getActivity()).getSupportActionBar();
-                        getActivity().supportInvalidateOptionsMenu();
-                        a.setSubtitle(title);
-                    }
 
-                    ;
-                });
             }
         }
     };
@@ -326,10 +299,6 @@ public class FragmentMain extends Fragment implements BackListener {
                                         .setBreadCrumbTitle(
                                                 (from.getName() + " to " + to.getName()))
                                         .commit();
-//								ActionBar a = ((ActionBarActivity)getActivity()).getSupportActionBar();
-//								a.setDisplayHomeAsUpEnabled(true);
-//								a.setHomeButtonEnabled(true);
-//								a.setDisplayUseLogoEnabled(true);
                             }
                         });
 
@@ -389,25 +358,7 @@ public class FragmentMain extends Fragment implements BackListener {
                         pager.setCurrentItem(newPos);
                     }
                 });
-                // fma.setOnStationSelectedListener(new
-                // OnStationSelectedListener() {
-                //
-                // @Override
-                // public void onStation(Station station) {
-                // if(station==null) {
-                // pager.setCurrentItem(pager.getCurrentItem()-1);
-                // return;
-                // }
-                // for(int i = 1; i < fma.getCount(); i++) {
-                // Station s = fma.getDepartureVision(i);
-                // if(s.getId().equals(station.getId())) {
-                // pager.setCurrentItem(i);
-                // break;
-                // }
-                // }
-                // //pager.invalidate();
-                // }
-                // });
+
             }
         });
         ThreadHelper.getScheduler().submit(new Runnable() {

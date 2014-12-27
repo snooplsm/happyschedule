@@ -228,7 +228,7 @@ public class FragmentSchedule extends Fragment implements BackListener {
         }
 
         int historySize = WDb.get().getHistorySize();
-        if (historySize != 0 && historySize % 10 == 0 && WDb.get().getPreference("rails.monthly") == null) {
+        if (historySize != 0 && historySize % 10 == 0 && WDb.get().getPreference("rails.monthly") == null && WDb.get().getPreference("rails.show.upsell")==null) {
 
             handler.postDelayed(showUpgradeNotification = new Runnable() {
                 @Override
@@ -246,14 +246,14 @@ public class FragmentSchedule extends Fragment implements BackListener {
                     b.setContentText(text);
                     int notifyId = 1000;
                     PendingIntent subscribe = PendingIntent.getActivity(getActivity(), 0, new Intent(getActivity(), MainActivity.class).setData(Uri.parse("http://wmwm.us?launchPurchase=" + Boolean.TRUE)), 0);
-                    PendingIntent dismiss = PendingIntent.getActivity(getActivity(), 0, new Intent(getActivity(), MainActivity.class).setData(Uri.parse("http://wmwm.us?dismiss=" + notifyId)), 0);
+                    PendingIntent never = PendingIntent.getActivity(getActivity(), 0, new Intent(getActivity(), MainActivity.class).setData(Uri.parse("http://wmwm.us?dismissNever=" + notifyId)), 0);
                     b.addAction(0, "Subscribe", subscribe);
-                    b.addAction(0, "Never!", dismiss);
+                    b.addAction(0, "Never!", never);
                     b.setContentIntent(subscribe);
                     b.setSmallIcon(R.drawable.ic_stat_512);
                     compat.notify(notifyId, b.build());
                 }
-            }, 5000);
+            }, 500);
         }
 
     }
