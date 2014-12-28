@@ -20,6 +20,7 @@ import us.wmwm.happyschedule.model.ConnectionInterval;
 import us.wmwm.happyschedule.model.Favorite;
 import us.wmwm.happyschedule.model.Schedule;
 import us.wmwm.happyschedule.model.Service;
+import us.wmwm.happyschedule.model.Station;
 import us.wmwm.happyschedule.model.StopTime;
 import us.wmwm.happyschedule.model.TripInfo;
 import android.content.Context;
@@ -100,13 +101,17 @@ public class ScheduleDao {
 			info.stops.add(stop);
 		}
 		c.close();
-		c = Db.get().db.rawQuery(String.format("select stop_id,name from stop where stop_id in (%s)",join(whatis.keySet(),",")),null);
-		while(c.moveToNext()) {
-			String id = c.getString(0);
-			String name =c.getString(1);
-			whatis.get(id).name = name;
-		}
-		c.close();
+        for(String stopId : whatis.keySet()) {
+            Station stop = Db.get().getStop(stopId);
+            whatis.get(stopId).name = stop.getName();
+        }
+//		c = Db.get().db.rawQuery(String.format("select stop_id,name from stop where stop_id in (%s)",join(whatis.keySet(),",")),null);
+//		while(c.moveToNext()) {
+//			String id = c.getString(0);
+//			String name =c.getString(1);
+//			whatis.get(id).name = name;
+//		}
+//		c.close();
 		return info;
 	}
 	
