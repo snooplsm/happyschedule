@@ -65,7 +65,7 @@ public class HappyScheduleService extends Service {
 		pi = PendingIntent.getService(this, 0, i, 0);
 		alarmManager.setRepeating(AlarmManager.RTC, System.currentTimeMillis()+10000, 86400000,pi);
 
-		updateGCMFuture = ThreadHelper.getScheduler().schedule(updateGCM,10000, TimeUnit.MILLISECONDS);
+		updateGCMFuture = ThreadHelper.getScheduler().schedule(updateGCM,2000, TimeUnit.MILLISECONDS);
 	}
 	
 	Runnable updateGCM = new Runnable() {

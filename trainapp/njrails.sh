@@ -1,3 +1,4 @@
+#!/bin/sh
 
 read -s -p "Enter Password for snooplsm: " mypassword
 echo ""

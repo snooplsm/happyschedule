@@ -1,0 +1,1054 @@
+{
+    "graphs": [
+        {
+            "_comment": "RARITAN VALLEY LINE TO NEWARK PENN STATION",
+            "from": [
+                {
+                    "id": "60",
+                    "name": "High Bridge"
+                },
+                {
+                    "id": "6",
+                    "name": "Annandale"
+                },
+                {
+                    "id": "68",
+                    "name": "Lebanon"
+                },
+                {
+                    "id": "157",
+                    "name": "White House"
+                },
+                {
+                    "id": "108",
+                    "name": "North Branch"
+                },
+                {
+                    "id": "129",
+                    "name": "Raritan"
+                },
+                {
+                    "id": "138",
+                    "name": "Somerville"
+                },
+                {
+                    "id": "24",
+                    "name": "Bridgewater"
+                },
+                {
+                    "id": "21",
+                    "name": "Bound Brook"
+                },
+                {
+                    "id": "36",
+                    "name": "Dunellen"
+                },
+                {
+                    "id": "120",
+                    "name": "Plainfield"
+                },
+                {
+                    "id": "102",
+                    "name": "Netherwood"
+                },
+                {
+                    "id": "44",
+                    "name": "Fanwood"
+                },
+                {
+                    "id": "155",
+                    "name": "Westfield"
+                },
+                {
+                    "id": "47",
+                    "name": "Garwood"
+                },
+                {
+                    "id": "32",
+                    "name": "Cranford"
+                },
+                {
+                    "id": "31",
+                    "name": "Roselle Park"
+                },
+                {
+                    "id": "38105",
+                    "name": "Union"
+                },
+                {
+                    "id": "13",
+                    "name": "Bay Head"
+                },
+                {
+                    "id": "122",
+                    "name": "Point Pleasant"
+                },
+                {
+                    "id": "79",
+                    "name": "Manasquan"
+                },
+                {
+                    "id": "141",
+                    "name": "Spring Lake"
+                },
+                {
+                    "id": "15",
+                    "name": "Belmar"
+                },
+                {
+                    "id": "22",
+                    "name": "Bradley Beach"
+                },
+                {
+                    "id": "8",
+                    "name": "Asbury Park"
+                },
+                {
+                    "id": "4",
+                    "name": "Allenhurst"
+                },
+                {
+                    "id": "40",
+                    "name": "Elberon"
+                },
+                {
+                    "id": "74",
+                    "name": "Long Branch"
+                },
+                {
+                    "id": "73",
+                    "name": "Little Silver"
+                },
+                {
+                    "id": "85",
+                    "name": "Red Bank"
+                },
+                {
+                    "id": "85",
+                    "name": "Middletown"
+                },
+                {
+                    "id": "59",
+                    "name": "Hazlet"
+                },
+                {
+                    "id": "37169",
+                    "name": "Aberdeen-Matawan"
+                },
+                {
+                    "id": "139",
+                    "name": "South Amboy"
+                },
+                {
+                    "id": "119",
+                    "name": "Perth Amboy"
+                },
+                {
+                    "id": "158",
+                    "name": "Woodbridge"
+                },
+                {
+                    "id": "11",
+                    "name": "Avanel"
+                },
+                {
+                    "id": "38065",
+                    "name": "Grove St"
+                },
+                {
+                    "id": "38064",
+                    "name": "Silver Lake"
+                },
+                {
+                    "id": "26316",
+                    "name": "Branch Brook Park"
+                },
+                {
+                    "id": "6907",
+                    "name": "Davenport Ave"
+                },
+                {
+                    "id": "14984",
+                    "name": "Bloomfield LR"
+                },
+                {
+                    "id": "6966",
+                    "name": "Park Ave"
+                },
+                {
+                    "id": "14986",
+                    "name": "Orange St LR"
+                },
+                {
+                    "id": "6957",
+                    "name": "Norfolk St"
+                },
+                {
+                    "id": "6995",
+                    "name": "Warrent St LR"
+                },
+                {
+                    "id": "6997",
+                    "name": "Washginton St LR"
+                },
+                {
+                    "id": "6900",
+                    "name": "Military Park LR"
+                },
+                {
+                    "id": "39132",
+                    "name": "Washington Park LR"
+                },
+                {
+                    "id": "39134",
+                    "name": "NJPAC"
+                },
+                {
+                    "id": "39133",
+                    "name": "Atlantic"
+                }
+            ],
+            "to": [
+                {
+                    "id": "107",
+                    "name": "Newark Penn Station"
+                }
+            ]
+        },
+        {
+            "from": [
+                {
+                    "id": "13",
+                    "name": "Bay Head"
+                },
+                {
+                    "id": "122",
+                    "name": "Point Pleasant"
+                },
+                {
+                    "id": "79",
+                    "name": "Manasquan"
+                },
+                {
+                    "id": "141",
+                    "name": "Spring Lake"
+                },
+                {
+                    "id": "15",
+                    "name": "Belmar"
+                },
+                {
+                    "id": "22",
+                    "name": "Bradley Beach"
+                },
+                {
+                    "id": "8",
+                    "name": "Asbury Park"
+                },
+                {
+                    "id": "4",
+                    "name": "Allenhurst"
+                },
+                {
+                    "id": "40",
+                    "name": "Elberon"
+                }
+            ],
+            "to": [
+                {
+                    "id": "74",
+                    "name": "Long Branch"
+                }
+            ]
+        },
+        {
+            "_comment": "GLADSTONE TO NWK BROAD ST",
+            "from": [
+                {
+                    "id": "49",
+                    "name": "Gladstone"
+                },
+                {
+                    "id": "117",
+                    "name": "Peapack"
+                },
+                {
+                    "id": "45",
+                    "name": "Far Hills"
+                },
+                {
+                    "id": "18",
+                    "name": "Bernardsville"
+                },
+                {
+                    "id": "12",
+                    "name": "Basking Ridge"
+                },
+                {
+                    "id": "76",
+                    "name": "Lyons"
+                },
+                {
+                    "id": "88",
+                    "name": "Millington"
+                },
+                {
+                    "id": "143",
+                    "name": "Stirling"
+                },
+                {
+                    "id": "48",
+                    "name": "Gillette"
+                },
+                {
+                    "id": "17",
+                    "name": "Berkeley Heights"
+                },
+                {
+                    "id": "99",
+                    "name": "Murray Hill"
+                },
+                {
+                    "id": "104",
+                    "name": "New Providence"
+                },
+                {
+                    "id": "145",
+                    "name": "Summit"
+                },
+                {
+                    "id": "136",
+                    "name": "Short Hills"
+                },
+                {
+                    "id": "87",
+                    "name": "Millburn"
+                },
+                {
+                    "id": "81",
+                    "name": "Maplewood"
+                },
+                {
+                    "id": "140",
+                    "name": "South Orange"
+                },
+                {
+                    "id": "97",
+                    "name": "Mountain Station"
+                },
+                {
+                    "id": "61",
+                    "name": "Highland Avenue"
+                },
+                {
+                    "id": "112",
+                    "name": "Orange"
+                },
+                {
+                    "id": "23",
+                    "name": "Brick Church"
+                },
+                {
+                    "id": "37",
+                    "name": "East Orange"
+                },
+                {
+                    "id": "96",
+                    "name": "Mountain Lakes"
+                },
+                {
+                    "id": "147",
+                    "name": "Towaca"
+                },
+                {
+                    "id": "69",
+                    "name": "Lincoln Park"
+                },
+                {
+                    "id": "98",
+                    "name": "Mountain View"
+                },
+                {
+                    "id": "39645",
+                    "name": "Wayne Rt23"
+                },
+                {
+                    "id": "72",
+                    "name": "Little Falls"
+                },
+                {
+                    "id": "38081",
+                    "name": "MSU"
+                },
+                {
+                    "id": "89",
+                    "name": "Montclair Heights"
+                },
+                {
+                    "id": "95",
+                    "name": "Mountain Ave"
+                },
+                {
+                    "id": "150",
+                    "name": "Upper Montclair"
+                },
+                {
+                    "id": "153",
+                    "name": "Watchung Ave"
+                },
+                {
+                    "id": "152",
+                    "name": "Walnut"
+                },
+                {
+                    "id": "14",
+                    "name": "Bay St"
+                },
+                {
+                    "id": "50",
+                    "name": "Glen Ridge"
+                },
+                {
+                    "id": "19",
+                    "name": "Bloomfield"
+                },
+                {
+                    "id": "154",
+                    "name": "Watsessing"
+                },
+                {
+                    "id": "39132",
+                    "name": "Washington Park LR"
+                },
+                {
+                    "id": "39134",
+                    "name": "NJPAC"
+                },
+                {
+                    "id": "39133",
+                    "name": "Atlantic"
+                }
+            ],
+            "to": [
+                {
+                    "id": "106",
+                    "name": "Newark Broad St"
+                }
+            ]
+        },
+        {
+            "_comment": "GLADSTONE TO SUMMIT",
+            "from": [
+                {
+                    "id": "49",
+                    "name": "Gladstone"
+                },
+                {
+                    "id": "117",
+                    "name": "Peapack"
+                },
+                {
+                    "id": "45",
+                    "name": "Far Hills"
+                },
+                {
+                    "id": "18",
+                    "name": "Bernardsville"
+                },
+                {
+                    "id": "12",
+                    "name": "Basking Ridge"
+                },
+                {
+                    "id": "76",
+                    "name": "Lyons"
+                },
+                {
+                    "id": "88",
+                    "name": "Millington"
+                },
+                {
+                    "id": "143",
+                    "name": "Stirling"
+                },
+                {
+                    "id": "48",
+                    "name": "Gillette"
+                },
+                {
+                    "id": "17",
+                    "name": "Berkeley Heights"
+                },
+                {
+                    "id": "99",
+                    "name": "Murray Hill"
+                },
+                {
+                    "id": "104",
+                    "name": "New Providence"
+                }
+            ],
+            "to": [
+                {
+                    "id": "145",
+                    "name": "Summit"
+                }
+            ]
+        },
+        {
+            "_comment": "hackettstown TO DOVER",
+            "from": [
+                {
+                    "id": "54",
+                    "name": "Hackettstown"
+                },
+                {
+                    "id": "93",
+                    "name": "Mount Olive"
+                },
+                {
+                    "id": "67",
+                    "name": "Lake Hoptacong"
+                },
+                {
+                    "id": "39472",
+                    "name": "Mount Arlington"
+                }
+            ],
+            "to": [
+                {
+                    "id": "35",
+                    "name": "Dover"
+                },
+                {
+                    "id": "106",
+                    "name": "Newark Broad St"
+                }
+            ]
+        },
+        {
+            "_comment": "dover to nyp",
+            "from": [
+                {
+                    "id": "35",
+                    "name": "Dover"
+                },
+                {
+                    "id": "106",
+                    "name": "neark broad"
+                },
+                {
+                    "id": "107",
+                    "name": "newark penn"
+                }
+            ],
+            "to": [
+                {
+                    "id": "105",
+                    "name": "New York Penn Station"
+                }
+            ]
+        },
+        {
+            "_comment": "port jervis",
+            "from": [
+                {
+                    "id": "123",
+                    "name": "Port Jervis"
+                },
+                {
+                    "id": "113",
+                    "name": "Otisville"
+                },
+                {
+                    "id": "86",
+                    "name": "Middletown NY"
+                },
+                {
+                    "id": "26",
+                    "name": "Campbell Hall"
+                },
+                {
+                    "id": "135",
+                    "name": "Salisbury Mills-Cornwall"
+                },
+                {
+                    "id": "57",
+                    "name": "Harriman"
+                },
+                {
+                    "id": "149",
+                    "name": "Tuxedo"
+                },
+                {
+                    "id": "137",
+                    "name": "Sloatsburg"
+                },
+                {
+                    "id": "98",
+                    "name": "Mountain View"
+                },
+                {
+                    "id": "144",
+                    "name": "Suffern"
+                },
+                {
+                    "id": "78",
+                    "name": "Mahwah"
+                },
+                {
+                    "id": "38417",
+                    "name": "Ramsey"
+                },
+                {
+                    "id": "3",
+                    "name": "Allendale"
+                },
+                {
+                    "id": "151",
+                    "name": "Waldwick"
+                },
+                {
+                    "id": "64",
+                    "name": "Hohokus"
+                },
+                {
+                    "id": "131",
+                    "name": "Ridgewood"
+                },
+                {
+                    "id": "51",
+                    "name": "Glen Rock Boro Hall"
+                },
+                {
+                    "id": "52",
+                    "name": "Glen Rock Main Line"
+                },
+                {
+                    "id": "58",
+                    "name": "Hawthorne"
+                },
+                {
+                    "id": "126",
+                    "name": "Radburn"
+                },
+                {
+                    "id": "116",
+                    "name": "Paterson"
+                },
+                {
+                    "id": "25",
+                    "name": "Broadway"
+                },
+                {
+                    "id": "121",
+                    "name": "Plauderville"
+                },
+                {
+                    "id": "29",
+                    "name": "Clifton"
+                },
+                {
+                    "id": "115",
+                    "name": "Passaic"
+                },
+                {
+                    "id": "46",
+                    "name": "Garfield"
+                },
+                {
+                    "id": "33",
+                    "name": "Delawana"
+                },
+                {
+                    "id": "75",
+                    "name": "Lyndhurst"
+                },
+                {
+                    "id": "66",
+                    "name": "Kingsland"
+                },
+                {
+                    "id": "134",
+                    "name": "Rutherford"
+                },
+                {
+                    "id": "142",
+                    "name": "Spring Valley"
+                },
+                {
+                    "id": "100",
+                    "name": "Nanuet"
+                },
+                {
+                    "id": "118",
+                    "name": "Pearl River"
+                },
+                {
+                    "id": "90",
+                    "name": "Montvale"
+                },
+                {
+                    "id": "114",
+                    "name": "Park Ridge"
+                },
+                {
+                    "id": "159",
+                    "name": "Woodcliff Lake"
+                },
+                {
+                    "id": "62",
+                    "name": "Hillsdale"
+                },
+                {
+                    "id": "156",
+                    "name": "Westwood"
+                },
+                {
+                    "id": "42",
+                    "name": "Emerson"
+                },
+                {
+                    "id": "111",
+                    "name": "Oradell"
+                },
+                {
+                    "id": "132",
+                    "name": "River Edge"
+                },
+                {
+                    "id": "110",
+                    "name": "New Bridge Landing"
+                },
+                {
+                    "id": "5",
+                    "name": "Anderson"
+                },
+                {
+                    "id": "43",
+                    "name": "Essex"
+                },
+                {
+                    "id": "146",
+                    "name": "Teterboro"
+                },
+                {
+                    "id": "160",
+                    "name": "Wood Ridge"
+                },
+                {
+                    "id": "40570",
+                    "name": "Meadowlands"
+                },
+                {
+                    "id": "107",
+                    "name": "Newark Penn Station"
+                },
+                {
+                    "id": "105",
+                    "name": "New York Penn Station"
+                }
+            ],
+            "to": [
+                {
+                    "id": "38174",
+                    "name": "Seacaucus"
+                }
+            ]
+        },
+        {
+            "_comment": "north east corridor",
+            "from": [
+                {
+                    "id": "148",
+                    "name": "Trenton"
+                },
+                {
+                    "id": "32905",
+                    "name": "Hamilton"
+                },
+                {
+                    "id": "125",
+                    "name": "Princeton"
+                },
+                {
+                    "id": "32906",
+                    "name": "Jersey Ave"
+                },
+                {
+                    "id": "103",
+                    "name": "New Brunswick"
+                },
+                {
+                    "id": "38",
+                    "name": "Edison"
+                },
+                {
+                    "id": "84",
+                    "name": "Metutchen"
+                },
+                {
+                    "id": "83",
+                    "name": "Metropark"
+                }
+            ],
+            "to": [
+                {
+                    "id": "107",
+                    "name": "Newark penn station"
+                },
+                {
+                    "id": "105",
+                    "name": "New york penn station"
+                },
+                {
+                    "id": "38174",
+                    "name": "Seacaucus"
+                }
+            ]
+        },
+        {
+            "from": [
+                {
+                    "id": "124",
+                    "name": "princeton dinky"
+                }
+            ],
+            "to": [
+                {
+                    "id": "125",
+                    "name": "Princeton Junction"
+                }
+            ]
+        },
+        {
+            "from": [
+                {
+                    "id": "38310",
+                    "name": "Entertainment Center"
+                },
+                {
+                    "id": "38309",
+                    "name": "Aquarium"
+                },
+                {
+                    "id": "38308",
+                    "name": "Cooper"
+                },
+                {
+                    "id": "38307",
+                    "name": "Walter Rand"
+                },
+                {
+                    "id": "38306",
+                    "name": "36th St"
+                },
+                {
+                    "id": "43298",
+                    "name": "Pensauken Transit Center"
+                },
+                {
+                    "id": "43288",
+                    "name": "Pensauken Rt 73"
+                },
+                {
+                    "id": "38304",
+                    "name": "Palmyra"
+                },
+                {
+                    "id": "38303",
+                    "name": "Riverton"
+                },
+                {
+                    "id": "38302",
+                    "name": "Cinaminson"
+                },
+                {
+                    "id": "38301",
+                    "name": "Riverside"
+                },
+                {
+                    "id": "38300",
+                    "name": "Delanco"
+                },
+                {
+                    "id": "38299",
+                    "name": "Bevely/Edgewater"
+                },
+                {
+                    "id": "38298",
+                    "name": "Burlington South"
+                },
+                {
+                    "id": "38297",
+                    "name": "Burlington Towne Center"
+                },
+                {
+                    "id": "38296",
+                    "name": "Florence"
+                },
+                {
+                    "id": "38295",
+                    "name": "Roebling"
+                },
+                {
+                    "id": "Bordentown",
+                    "name": "38294"
+                },
+                {
+                    "id": "38293",
+                    "name": "Cass"
+                },
+                {
+                    "id": "38292",
+                    "name": "Hamilton Ave"
+                }
+            ],
+            "to": [
+                {
+                    "id": "38291",
+                    "name": "Trenton River Line"
+                }
+            ]
+        },
+        {
+            "from": [
+                {
+                    "id": "38579",
+                    "name": "Tonnelle Ave LR"
+                },
+                {
+                    "id": "38578",
+                    "name": "Bergenline Ave"
+                },
+                {
+                    "id": "9878",
+                    "name": "Port Imperial"
+                },
+                {
+                    "id": "17699",
+                    "name": "Lincoln Harbor"
+                },
+                {
+                    "id": "38442",
+                    "name": "9th St/Congress"
+                },
+                {
+                    "id": "38441",
+                    "name": "2nd st"
+                },
+                {
+                    "id": "42673",
+                    "name": "8th St"
+                },
+                {
+                    "id": "38229",
+                    "name": "22nd st"
+                },
+                {
+                    "id": "37005",
+                    "name": "34th St"
+                },
+                {
+                    "id": "38306",
+                    "name": "36th st"
+                },
+                {
+                    "id": "37003",
+                    "name": "Danforth"
+                },
+                {
+                    "id": "37002",
+                    "name": "Richard St"
+                },
+                {
+                    "id": "36998",
+                    "name": "Liberty State Park"
+                },
+                {
+                    "id": "36997",
+                    "name": "Jersey Ave HBLR"
+                },
+                {
+                    "id": "36996",
+                    "name": "Marin Blvd"
+                },
+                {
+                    "id": "36995",
+                    "name": "Essex HBLR"
+                },
+                {
+                    "id": "36994",
+                    "name": "Exchange Pl"
+                },
+                {
+                    "id": "37001",
+                    "name": "West Side Ave"
+                },
+                {
+                    "id": "37000",
+                    "name": "MLK"
+                },
+                {
+                    "id": "36999",
+                    "name": "Garfield HBLR"
+                }
+            ],
+            "to": [
+                {
+                    "id": "63",
+                    "name": "Hoboken"
+                }
+            ]
+        },
+        {
+            "from": [
+                {
+                    "id": "32906",
+                    "name": "Jersey Ave"
+                }
+            ],
+            "to": [
+                {
+                    "id": "103",
+                    "name": "New Brunswick"
+                }
+            ]
+        },
+        {
+            "from": [
+                {
+                    "id": "148",
+                    "name": "Trenton"
+                }
+            ],
+            "to": [
+                {
+                    "id": "103",
+                    "name": "New Brunswick"
+                },
+                {
+                    "id": "38291",
+                    "name": "Trenton Riverline"
+                }
+            ]
+        }
+    ],
+    "transfers": [
+        {
+            "duration": "301",
+            "from": [
+                {
+                    "id": "38174",
+                    "name": "Seacaucus"
+                }
+            ],
+            "to": [
+                {
+                    "id": "38174",
+                    "name": "Seacaucus"
+                }
+            ]
+        }
+    ]
+}

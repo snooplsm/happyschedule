@@ -48,12 +48,12 @@ public class DeparturePoller implements Poller {
 		for (String v : t) {
 			ss.addAll(getLittleStatuses(config, v));
 		}
-        Map<TrainStatus,Integer> naturalSort = new HashMap<TrainStatus,Integer>();
-        for(int i = 0; i < ss.size(); i++) {
-            TrainStatus s = ss.get(i);
-            naturalSort.put(s,i);
-        }
-		Collections.sort(ss, new TrainComparator(naturalSort));
+//        Map<TrainStatus,Integer> naturalSort = new HashMap<TrainStatus,Integer>();
+//        for(int i = 0; i < ss.size(); i++) {
+//            TrainStatus s = ss.get(i);
+//            naturalSort.put(s,i);
+//        }
+		//Collections.sort(ss, new TrainComparator(naturalSort));
 		return ss;
 	}
 

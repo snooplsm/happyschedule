@@ -4,6 +4,7 @@
     <string name="app_name">NJ Rails</string>
     <string name="activity_name_rail_alerts_name">Alerts</string>
     <string name="config_url">http://ryangravener.com/njrails/config.json</string>
+    <string name="chat_url">http://192.168.0.12:8080/rails/v1.0/chat</string>
     <string name="register_push_url">http://beta.ryangravener.com/njrails/register.php</string>
     <string name="register_service_url">http://beta.ryangravener.com/njrails/register_service.php</string>
     <string name="register_facebook_url">http://beta.ryangravener.com/njrails/user.php</string>

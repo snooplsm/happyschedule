@@ -51,14 +51,16 @@
 
                 <RelativeLayout
                     android:id="@+id/reverse_holder"
-                    android:layout_width="60dp"
-                    android:layout_height="60dp">
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
 
-                    <ImageView
+                    <com.melnykov.fab.FloatingActionButton
                         android:id="@+id/reverse"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:src="@drawable/reverse" />
+                        app:fab_shadow="false"
+                        app:fab_colorNormal="@color/get_schedule_11"
+                        app:fab_colorPressed="@color/get_schedule_1"
+                        android:layout_width="@dimen/fab_size_normal"
+                        android:layout_height="@dimen/fab_size_normal" />
                 </RelativeLayout>
             </LinearLayout>
 

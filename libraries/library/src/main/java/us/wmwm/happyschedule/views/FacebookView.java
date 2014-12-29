@@ -12,7 +12,6 @@ import com.squareup.picasso.Picasso;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import us.wmwm.happyschedule.*;
 import us.wmwm.happyschedule.R;
 import us.wmwm.happyschedule.fragment.ChatFragment;
 
@@ -40,10 +39,10 @@ public class FacebookView extends LinearLayout {
     static SimpleDateFormat time = new SimpleDateFormat("h:mm a");
 
     public void setData(boolean showNick, ChatFragment.Message m, ChatFragment.Message newest) {
-        String[] data = m.message.split("\\|");
+        String[] data = m.text.split("\\|");
         String id = data[0];
         String message = data[1];
-        name.setText(m.nick + (newest==null?"":" "+ time.format(new Date(newest.timestamp)).toLowerCase()));
+        name.setText(m.name + (newest==null?"":" "+ time.format(new Date(newest.timestamp)).toLowerCase()));
         int nameVis = showNick?View.GONE:View.VISIBLE;
         name.setVisibility(nameVis);
         text.setText(message);

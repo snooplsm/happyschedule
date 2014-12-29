@@ -9,12 +9,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Picture;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffColorFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -29,7 +24,6 @@ import android.support.v4.app.ShareCompat;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -43,7 +37,6 @@ import android.widget.BaseExpandableListAdapter;
 import android.widget.RelativeLayout;
 
 import com.flurry.android.FlurryAgent;
-import com.larvalabs.svgandroid.SVGBuilder;
 import com.melnykov.fab.FloatingActionButton;
 import com.melnykov.fab.FloatingActionLayout;
 
@@ -63,8 +56,8 @@ import java.util.UUID;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
 import se.emilsjolander.stickylistheaders.ExpandableStickyListHeadersListView;
+import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
 import us.wmwm.happyschedule.Alarms;
 import us.wmwm.happyschedule.BuildConfig;
 import us.wmwm.happyschedule.R;
@@ -99,21 +92,17 @@ import us.wmwm.happyschedule.views.ScheduleView;
 public class FragmentDaySchedule extends Fragment implements IPrimary,
         ISecondary, BackListener {
 
-    public interface OnDateChange {
-        void onDateChange(Calendar cal);
-    }
-
     private static final String TAG = FragmentDaySchedule.class.getSimpleName();
+    private static final SimpleDateFormat DATE = new SimpleDateFormat("EEEE MMMM dd");
+    private static final SimpleDateFormat DAY = new SimpleDateFormat("EEEE");
+    static SimpleDateFormat HOURMINUTE = new SimpleDateFormat("h:mm");
 
-    public static FragmentDaySchedule newInstance(Station from, Station to,
-                                                  Date date) {
-        FragmentDaySchedule f = new FragmentDaySchedule();
-        Bundle b = new Bundle();
-        b.putSerializable("from", from);
-        b.putSerializable("to", to);
-        b.putSerializable("date", date);
-        f.setArguments(b);
-        return f;
+    static {
+        try {
+            HOURMINUTE.setTimeZone(TimeZone.getTimeZone("America/New_York"));
+        } catch (Exception e) {
+            // not worth it
+        }
     }
 
     boolean activityCreated = false;
@@ -121,35 +110,16 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
     AlarmManager alarmManger;
     boolean canLoad = false;
     DepartureVisionHeader header;
+    ScheduleControlListener controlListener;
+    OnTimerPicked onTimerPicked = new OnTimerPicked() {
 
-    BroadcastReceiver connectionReceiver = new BroadcastReceiver() {
         @Override
-        public void onReceive(Context context, Intent intent) {
-
-            NetworkInfo info = manager.getActiveNetworkInfo();
-            if (info == null || !info.isConnected()) {
-                // erroText.setVisibility(View.VISIBLE);
-            }
-            if (info != null && info.isConnected()) {
-                // erroText.setVisibility(View.GONE);
-                if (poll == null || poll.isCancelled()) {
-                    if (SettingsFragment.getUseDepartureVision() && !TextUtils.isEmpty(from.getDepartureVision())
-                            && DateUtils.isToday(day.getTime()) ) {
-                        poll = ThreadHelper.getScheduler().scheduleAtFixedRate(
-                                departureVisionRunnable, 900, SettingsFragment.getPollMilliseconds(), TimeUnit.MILLISECONDS);
-                    }
-                }
-            } else {
-                if (poll != null) {
-                    poll.cancel(true);
-                }
-            }
-
+        public void onTimer(final Type type,
+                            final Calendar cal,
+                            final StationToStation stationToStation) {
+            ThreadHelper.getScheduler().submit(new TimerRunnable(type, cal, stationToStation));
         }
     };
-
-    ScheduleControlListener controlListener;
-
     ScheduleControlListener innerListener = new ScheduleControlListener() {
 
         @Override
@@ -221,58 +191,6 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
                     "Share"));
         }
     };
-
-    OnTimerPicked onTimerPicked = new OnTimerPicked() {
-
-        @Override
-        public void onTimer(final Type type,
-                            final Calendar cal,
-                            final StationToStation stationToStation) {
-            ThreadHelper.getScheduler().submit(new TimerRunnable(type,cal,stationToStation));
-        }
-    };
-
-    public class TimerRunnable implements Runnable {
-        StationToStation stationToStation;
-        Calendar cal;
-        Type type;
-
-        public TimerRunnable(Type type, Calendar cal, StationToStation stationToStation) {
-            this.type = type;
-            this.cal = cal;
-            this.stationToStation = stationToStation;
-        }
-
-        @Override
-        public void run() {
-            Intent i = AlarmActivity
-                    .from(getActivity(),
-                            stationToStation,
-                            cal,
-                            type,
-                            UUID.randomUUID()
-                                    .toString());
-            Alarm alarm = (Alarm) i
-                    .getSerializableExtra("alarm");
-            addAlarm(alarm);
-            try {
-                Alarms.startAlarm(
-                        getActivity(),
-                        alarm);
-            } catch (Exception e) {
-                Log.e(TAG,"Error with alarm " + alarm,e);
-            }
-            handler.post(new Runnable() {
-                public void run() {
-                    adapter.notifyDataSetChanged();
-                }
-
-                ;
-            });
-        }
-    }
-
-
     Date day;
 
     Station from;
@@ -280,135 +198,8 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
     Handler handler = new Handler();
 
     List<StationToStation> k = null;
-
-    static SimpleDateFormat HOURMINUTE = new SimpleDateFormat("h:mm");
-
-    static {
-        try {
-            HOURMINUTE.setTimeZone(TimeZone.getTimeZone("America/New_York"));
-        } catch (Exception e) {
-            // not worth it
-        }
-    }
-
     List<TrainStatus> lastStatuses;
-
     ExpandableStickyListHeadersListView list;
-
-    Future<?> loadScheduleFuture;
-
-    ConnectivityManager manager;
-
-    NotificationManager notifs;
-
-    List<StationToStation> o = null;
-
-    Map<String, FareType> fareTypes = Collections.emptyMap();
-
-    OnDateChange onDateChange;
-
-    OnDepartureVision onDepartureVision;
-
-    OnGetSchedule onGetSchedule;
-
-    Future<?> poll;
-
-    Runnable populateAdpter = new Runnable() {
-        @Override
-        public void run() {
-            Activity activity = getActivity();
-            if (activity == null) {
-                Log.e(TAG, "ACTIVITY IS NULL");
-                return;
-            }
-            adapter.notifyDataSetInvalidated();
-            o = k;
-            adapter.notifyDataSetChanged();
-            if (DateUtils.isToday(day.getTime())) {
-                Log.d(TAG, "moveToNextTrain");
-                moveToNextTrain(false);
-            } else {
-                Log.d(TAG, "moveToNextTrainFail");
-
-            }
-            if (adapter.getGroupCount() == 0) {
-                list.setVisibility(View.GONE);
-//				if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.KITKAT) {
-//					ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams(LayoutParams.MATCH_PARENT, getResources().getDimension(R.dimen.))
-//					View v = new View(getActivity());
-//					list.addFooterView();
-//				} else {
-//					
-//				}
-
-                View view = LayoutInflater.from(activity).inflate(
-                        R.layout.view_help, null);
-                view.setOnClickListener(new OnClickListener() {
-
-                    @Override
-                    public void onClick(View v) {
-                        Intent intent = new Intent(Intent.ACTION_SENDTO);
-                        intent.setType("text/plain");
-                        intent.putExtra(Intent.EXTRA_EMAIL, "feedback@wmwm.us");
-                        String appName = getString(R.string.app_name);
-                        intent.putExtra(Intent.EXTRA_SUBJECT, appName
-                                + " Feedback");
-                        StringBuilder b = new StringBuilder();
-                        PackageInfo pinfo = null;
-                        try {
-                            pinfo = getActivity().getPackageManager()
-                                    .getPackageInfo(
-                                            getActivity().getPackageName(), 0);
-                        } catch (NameNotFoundException e) {
-                            throw new RuntimeException("no app");
-                        }
-                        b.append(appName).append("\n\n");
-                        b.append("From: ").append(from.getName() + " (")
-                                .append(from.getId()).append(")").append("\n");
-                        b.append("To: ").append(to.getName() + " (")
-                                .append(to.getId()).append(")").append("\n");
-                        b.append("Date: " + day.toString()).append("\n");
-                        b.append("Time: " + Calendar.getInstance().getTime())
-                                .append("\n");
-                        b.append("Version: " + pinfo.versionCode).append(" (")
-                                .append(pinfo.versionName).append(")")
-                                .append("\n");
-                        b.append("OS Version: " + Build.VERSION.SDK_INT)
-                                .append("\n");
-                        b.append("Device: " + Build.DEVICE).append("\n");
-                        b.append("Model: " + Build.MODEL).append("\n");
-                        b.append("Manu: " + Build.MANUFACTURER).append("\n\n");
-                        intent.putExtra(Intent.EXTRA_TEXT, b.toString());
-                        ShareCompat.IntentBuilder builder = ShareCompat.IntentBuilder
-                                .from(getActivity());
-                        builder.setType("message/rfc822");
-                        builder.addEmailTo("feedback@wmwm.us");
-                        builder.setSubject(appName + " Feedback");
-                        builder.setChooserTitle("Email");
-                        builder.setText(b.toString());
-                        builder.startChooser();
-                        // startActivity(Intent.createChooser(intent,
-                        // "Send Email"));
-                    }
-                });
-                RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
-                        LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-                lp.addRule(RelativeLayout.CENTER_IN_PARENT);
-                root.addView(view, lp);
-            }
-        }
-    };
-
-    Runnable hideProgress = new Runnable() {
-        public void run() {
-            progressBar.setVisibility(View.GONE);
-        }
-
-        ;
-    };
-
-    View progressBar;
-
     Runnable departureVisionRunnable = new Runnable() {
         @Override
         public void run() {
@@ -489,15 +280,142 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
             }
         }
     };
+    Future<?> loadScheduleFuture;
+    ConnectivityManager manager;
+    NotificationManager notifs;
+    List<StationToStation> o = null;
+    Runnable populateAdpter = new Runnable() {
+        @Override
+        public void run() {
+            Activity activity = getActivity();
+            if (activity == null) {
+                Log.e(TAG, "ACTIVITY IS NULL");
+                return;
+            }
+            adapter.notifyDataSetInvalidated();
+            o = k;
+            adapter.notifyDataSetChanged();
+            if (DateUtils.isToday(day.getTime())) {
+                Log.d(TAG, "moveToNextTrain");
+                moveToNextTrain(false);
+            } else {
+                Log.d(TAG, "moveToNextTrainFail");
 
+            }
+            if (adapter.getGroupCount() == 0) {
+                list.setVisibility(View.GONE);
+//				if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.KITKAT) {
+//					ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams(LayoutParams.MATCH_PARENT, getResources().getDimension(R.dimen.))
+//					View v = new View(getActivity());
+//					list.addFooterView();
+//				} else {
+//
+//				}
+
+                View view = LayoutInflater.from(activity).inflate(
+                        R.layout.view_help, null);
+                view.setOnClickListener(new OnClickListener() {
+
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(Intent.ACTION_SENDTO);
+                        intent.setType("text/plain");
+                        intent.putExtra(Intent.EXTRA_EMAIL, "feedback@wmwm.us");
+                        String appName = getString(R.string.app_name);
+                        intent.putExtra(Intent.EXTRA_SUBJECT, appName
+                                + " Feedback");
+                        StringBuilder b = new StringBuilder();
+                        PackageInfo pinfo = null;
+                        try {
+                            pinfo = getActivity().getPackageManager()
+                                    .getPackageInfo(
+                                            getActivity().getPackageName(), 0);
+                        } catch (NameNotFoundException e) {
+                            throw new RuntimeException("no app");
+                        }
+                        b.append(appName).append("\n\n");
+                        b.append("From: ").append(from.getName() + " (")
+                                .append(from.getId()).append(")").append("\n");
+                        b.append("To: ").append(to.getName() + " (")
+                                .append(to.getId()).append(")").append("\n");
+                        b.append("Date: " + day.toString()).append("\n");
+                        b.append("Time: " + Calendar.getInstance().getTime())
+                                .append("\n");
+                        b.append("Version: " + pinfo.versionCode).append(" (")
+                                .append(pinfo.versionName).append(")")
+                                .append("\n");
+                        b.append("OS Version: " + Build.VERSION.SDK_INT)
+                                .append("\n");
+                        b.append("Device: " + Build.DEVICE).append("\n");
+                        b.append("Model: " + Build.MODEL).append("\n");
+                        b.append("Manu: " + Build.MANUFACTURER).append("\n\n");
+                        intent.putExtra(Intent.EXTRA_TEXT, b.toString());
+                        ShareCompat.IntentBuilder builder = ShareCompat.IntentBuilder
+                                .from(getActivity());
+                        builder.setType("text/rfc822");
+                        builder.addEmailTo("feedback@wmwm.us");
+                        builder.setSubject(appName + " Feedback");
+                        builder.setChooserTitle("Email");
+                        builder.setText(b.toString());
+                        builder.startChooser();
+                        // startActivity(Intent.createChooser(intent,
+                        // "Send Email"));
+                    }
+                });
+                RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
+                        LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+                lp.addRule(RelativeLayout.CENTER_IN_PARENT);
+                root.addView(view, lp);
+            }
+        }
+    };
+    Map<String, FareType> fareTypes = Collections.emptyMap();
+
+    OnDateChange onDateChange;
+
+    OnDepartureVision onDepartureVision;
+
+    OnGetSchedule onGetSchedule;
+
+    Future<?> poll;
+    BroadcastReceiver connectionReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            NetworkInfo info = manager.getActiveNetworkInfo();
+            if (info == null || !info.isConnected()) {
+                // erroText.setVisibility(View.VISIBLE);
+            }
+            if (info != null && info.isConnected()) {
+                // erroText.setVisibility(View.GONE);
+                if (poll == null || poll.isCancelled()) {
+                    if (SettingsFragment.getUseDepartureVision() && !TextUtils.isEmpty(from.getDepartureVision())
+                            && DateUtils.isToday(day.getTime())) {
+                        poll = ThreadHelper.getScheduler().scheduleAtFixedRate(
+                                departureVisionRunnable, 900, SettingsFragment.getPollMilliseconds(), TimeUnit.MILLISECONDS);
+                    }
+                }
+            } else {
+                if (poll != null) {
+                    poll.cancel(true);
+                }
+            }
+
+        }
+    };
+    Runnable hideProgress = new Runnable() {
+        public void run() {
+            progressBar.setVisibility(View.GONE);
+        }
+
+        ;
+    };
+
+    View progressBar;
     Schedule schedule;
-
     Station to;
-
     Map<StationToStation, List<Alarm>> tripIdToAlarm;
-
     Map<String, TrainStatus> tripIdToTrainStatus = new HashMap<String, TrainStatus>();
-
     Runnable updateEverySixtySeconds = new Runnable() {
         public void run() {
             Map<String, String> args = new HashMap<String, String>();
@@ -519,24 +437,9 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 
         ;
     };
-
     Future<?> updateScheduleFuture;
-
-    private void addAlarm(Alarm alarm) {
-        List<Alarm> alarms = tripIdToAlarm.get(alarm.getStationToStation());
-        if (alarms == null) {
-            alarms = new ArrayList<Alarm>();
-            tripIdToAlarm.put(alarm.getStationToStation(), alarms);
-        }
-        alarms.add(alarm);
-    }
-
-    private String getKey() {
-        return "lastStatuses" + from.getId();
-    }
-
     Future<?> notificationsFuture;
-
+    Future<?> departureVision;
     Runnable loadScheduleRunnable = new Runnable() {
         @Override
         public void run() {
@@ -550,7 +453,7 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
                     addAlarm(a);
                 }
             } catch (Exception e) {
-                Log.e(TAG,"UNABLE TO LOAD ALARMS",e);
+                Log.e(TAG, "UNABLE TO LOAD ALARMS", e);
             }
             Calendar date = Calendar.getInstance();
             date.setTime(day);
@@ -587,7 +490,7 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 
                 // priorLimit.add(Calendar.HOUR_OF_DAY, -2);
                 k = new ArrayList<StationToStation>();
-                Log.d(TAG,"populateItem start: " + day + " to " + tomorrow.getTime());
+                Log.d(TAG, "populateItem start: " + day + " to " + tomorrow.getTime());
                 schedule.inOrderTraversal(new ScheduleTraverser() {
 
                     @Override
@@ -595,26 +498,26 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
                                              StationToStation stationToStation, int total) {
 
                         // k.add(stationToStation);
-                        Log.d(TAG,"populateItem depart: " + stationToStation.departTime.getTime());
+                        Log.d(TAG, "populateItem depart: " + stationToStation.departTime.getTime());
                         if (!isToday) {
-                            Log.d(TAG,"populateItem not today");
+                            Log.d(TAG, "populateItem not today");
                             if (stationToStation.departTime.getTimeInMillis() <= tomorrow.getTimeInMillis()
                                     && stationToStation.departTime
-                                    .getTimeInMillis()>=day.getTime()) {
-                                Log.d(TAG,"populateItem not before " + limit.getTime() + " and not after " + tomorrow.getTime());
+                                    .getTimeInMillis() >= day.getTime()) {
+                                Log.d(TAG, "populateItem not before " + limit.getTime() + " and not after " + tomorrow.getTime());
                                 k.add(stationToStation);
                             } else {
-                                Log.d(TAG,"populateItem not adding "+stationToStation.departTime.getTime()+ " not between ("+day+","+tomorrow.getTime());
+                                Log.d(TAG, "populateItem not adding " + stationToStation.departTime.getTime() + " not between (" + day + "," + tomorrow.getTime());
                             }
                         } else {
-                            Log.d(TAG,"populateItem today");
+                            Log.d(TAG, "populateItem today");
                             if (!stationToStation.departTime.before(priorLimit)
                                     && !stationToStation.departTime
                                     .after(limit)) {
-                                Log.d(TAG,"populateItem not before " + priorLimit.getTime() + " and not after " + limit.getTime());
+                                Log.d(TAG, "populateItem not before " + priorLimit.getTime() + " and not after " + limit.getTime());
                                 k.add(stationToStation);
                             }
-                            Log.d(TAG,"populateItem not adding");
+                            Log.d(TAG, "populateItem not adding");
 
                         }
 
@@ -622,7 +525,7 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
                 });
                 handler.post(populateAdpter);
 
-                if(SettingsFragment.getUseDepartureVision()) {
+                if (SettingsFragment.getUseDepartureVision()) {
                     departureVision = ThreadHelper.getScheduler().submit(departureVisionRunnable);
                 }
 
@@ -705,12 +608,47 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
         }
 
     };
+    Future<?> moveToNext;
+    boolean moving = false;
+    Api api;
+    RelativeLayout root;
+    FloatingActionButton fabReverse;
+    FloatingActionButton fabDate;
+    FloatingActionButton fabBookmark;
+    FloatingActionButton fabGraph;
+    FloatingActionLayout fal;
+    GraphBuilderView graphBuilder;
+    int loadingAttempt = 0;
 
-    Future<?> departureVision;
+    public static FragmentDaySchedule newInstance(Station from, Station to,
+                                                  Date date) {
+        FragmentDaySchedule f = new FragmentDaySchedule();
+        Bundle b = new Bundle();
+        b.putSerializable("from", from);
+        b.putSerializable("to", to);
+        b.putSerializable("date", date);
+        f.setArguments(b);
+        return f;
+    }
+
+    private void addAlarm(Alarm alarm) {
+        List<Alarm> alarms = tripIdToAlarm.get(alarm.getStationToStation());
+        if (alarms == null) {
+            alarms = new ArrayList<Alarm>();
+            tripIdToAlarm.put(alarm.getStationToStation(), alarms);
+        }
+        alarms.add(alarm);
+    }
+
+    private String getKey() {
+        return "lastStatuses" + from.getId();
+    }
+
+    ;
 
     private void loadSchedule() {
         if (loadScheduleFuture != null) {
-            if(loadScheduleFuture.isCancelled() || loadScheduleFuture.isDone()) {
+            if (loadScheduleFuture.isCancelled() || loadScheduleFuture.isDone()) {
                 loadScheduleFuture.cancel(true);
             }
             return;
@@ -719,10 +657,6 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
         loadScheduleFuture = ThreadHelper.getScheduler().schedule(loadScheduleRunnable, 100,
                 TimeUnit.MILLISECONDS);
     }
-
-    Future<?> moveToNext;
-
-    boolean moving = false;
 
     private void moveToNextTrain(boolean post) {
         Calendar now = Calendar.getInstance();
@@ -752,8 +686,6 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 
 
     }
-
-    Api api;
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -797,204 +729,6 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
         setFabBookmarkImage();
     }
 
-    private static final SimpleDateFormat DATE = new SimpleDateFormat("EEEE MMMM dd");
-    private static final SimpleDateFormat DAY = new SimpleDateFormat("EEEE");
-
-    private class ScheduleAdapter extends BaseExpandableListAdapter implements StickyListHeadersAdapter {
-
-        int TYPE_CONTROLS = 0;
-
-        @Override
-        public void notifyDataSetChanged() {
-            super.notifyDataSetChanged();
-        }
-
-        @Override
-        public int getViewTypeCount() {
-            return 1;
-        }
-
-        @Override
-        public int getItemViewType(int i) {
-            return 0;
-        }
-
-        @Override
-        public long getItemId(int i) {
-            return 0;
-        }
-
-        @Override
-        public boolean isEnabled(int i) {
-            return true;
-        }
-
-        @Override
-        public boolean areAllItemsEnabled() {
-            // TODO Auto-generated method stub
-            return false;
-        }
-
-        @Override
-        public Object getChild(int groupPosition, int childPosition) {
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-        @Override
-        public long getChildId(int groupPosition, int childPosition) {
-            // TODO Auto-generated method stub
-            return 0;
-        }
-
-        @Override
-        public int getChildrenCount(int groupPosition) {
-            return 1;
-        }
-
-        @Override
-        public int getChildType(int groupPosition, int childPosition) {
-            return childPosition;
-        }
-
-        @Override
-        public int getChildTypeCount() {
-            return 1;
-        }
-
-
-        @Override
-        public View getHeaderView(int position, View convertView,
-                                  ViewGroup parent) {
-            DepartureVisionHeader h = new DepartureVisionHeader(
-                    parent.getContext(),null);
-            Calendar cal = Calendar.getInstance();
-            StationToStation sts = getItem(position);
-            cal.setTimeInMillis(getItem(position).getDepartTime().getTimeInMillis());
-            cal.set(Calendar.HOUR_OF_DAY, 0);
-            cal.set(Calendar.MINUTE, 0);
-            cal.set(Calendar.SECOND, 0);
-            cal.set(Calendar.MILLISECOND, 0);
-
-            Calendar cal2 = Calendar.getInstance();
-            cal2.setTime(day);
-            cal2.set(Calendar.HOUR_OF_DAY, 0);
-            cal2.set(Calendar.MINUTE, 0);
-            cal2.set(Calendar.SECOND, 0);
-            cal2.set(Calendar.MILLISECOND, 0);
-            if (DateUtils.isToday(cal.getTimeInMillis())) {
-                h.setShapeColor(getResources().getColor(R.color.get_schedule_11));
-                h.setData(from.getShortName() + " \u2192 " + to.getShortName() + "\nToday • " + DAY.format(cal.getTime()));
-            } else {
-                h.setShapeColor(Color.BLACK);
-                h.setData(from.getShortName() + " \u2192 " + to.getShortName() + "\n" + DATE.format(cal.getTime()));
-            }
-            h.setLayoutParams(new ViewGroup.LayoutParams(
-                    LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
-            return h;
-        }
-
-        @Override
-        public long getHeaderId(int position) {
-            StationToStation sts = getItem(position);
-            Calendar cal = Calendar.getInstance();
-            cal.setTimeInMillis(sts.getDepartTime().getTimeInMillis());
-            cal.set(Calendar.HOUR_OF_DAY, 0);
-            cal.set(Calendar.MINUTE, 0);
-            cal.set(Calendar.SECOND, 0);
-            cal.set(Calendar.MILLISECOND, 0);
-            return cal.getTimeInMillis();
-        }
-
-        @Override
-        public View getChildView(final int groupPosition,
-                                 int childPosition, boolean isLastChild, View convertView,
-                                 ViewGroup parent) {
-            return null;
-        }
-
-        @Override
-        public long getCombinedChildId(long groupId, long childId) {
-            // TODO Auto-generated method stub
-            return 0;
-        }
-
-        @Override
-        public long getCombinedGroupId(long groupId) {
-            // TODO Auto-generated method stub
-            return 0;
-        }
-
-        // @Override
-        // public long getItemId(int position) {
-        // // TODO Auto-generated method stub
-        // return 0;
-        // }
-
-        // @Override
-        public int getCount() {
-            if (o == null) {
-                return 0;
-            }
-            return o.size();
-        }
-
-        @Override
-        public StationToStation getGroup(int groupPosition) {
-            return getItem(groupPosition);
-        }
-
-        @Override
-        public int getGroupCount() {
-            return getCount();
-        }
-
-        @Override
-        public long getGroupId(int groupPosition) {
-            // TODO Auto-generated method stub
-            return 0;
-        }
-
-        @Override
-        public View getGroupView(int groupPosition, boolean isExpanded,
-                                 View convertView, ViewGroup parent) {
-            return getView(groupPosition, convertView, parent);
-        }
-
-        // @Override
-        public StationToStation getItem(int position) {
-            return o.get(position);
-        }
-
-        // @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            ScheduleView view;
-            if (convertView == null) {
-                view = new ScheduleView(parent.getContext(), null);
-            } else {
-                view = (ScheduleView) convertView.getTag();
-            }
-            StationToStation sts = getItem(position);
-            view.setData(sts, from, to, innerListener, tripIdToAlarm.get(sts.tripId));
-            view.setAlarm(tripIdToAlarm.get(sts));
-            view.setStatus(tripIdToTrainStatus.get(sts.blockId));
-            return view.getView();
-        }
-
-        @Override
-        public boolean hasStableIds() {
-            // TODO Auto-generated method stub
-            return false;
-        }
-
-        @Override
-        public boolean isChildSelectable(int groupPosition,
-                                         int childPosition) {
-            // TODO Auto-generated method stub
-            return false;
-        }
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -1010,16 +744,6 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
         inflater.inflate(R.menu.menu_schedule_day, menu);
     }
 
-    ;
-
-    RelativeLayout root;
-
-    FloatingActionButton fabReverse;
-    FloatingActionButton fabDate;
-    FloatingActionButton fabBookmark;
-    FloatingActionButton fabGraph;
-    FloatingActionLayout fal;
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -1034,9 +758,9 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
         header = (DepartureVisionHeader) root.findViewById(R.id.dvheader);
         int color = Color.argb(210, 255, 255, 255);
 
-        fabDate.setImageBitmap(ImageUtil.loadBitmapFromSvgWithColorOverride(getActivity(),R.raw.schedule,color));
-        fabBookmark.setImageBitmap(ImageUtil.loadBitmapFromSvgWithColorOverride(getActivity(),R.raw.bookmark,color));
-        fabGraph.setImageBitmap(ImageUtil.loadBitmapFromSvgWithColorOverride(getActivity(),R.raw.graph,color));
+        fabDate.setImageBitmap(ImageUtil.loadBitmapFromSvgWithColorOverride(getActivity(), R.raw.schedule, color));
+        fabBookmark.setImageBitmap(ImageUtil.loadBitmapFromSvgWithColorOverride(getActivity(), R.raw.bookmark, color));
+        fabGraph.setImageBitmap(ImageUtil.loadBitmapFromSvgWithColorOverride(getActivity(), R.raw.graph, color));
         fabGraph.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -1075,11 +799,9 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
             bg = Color.WHITE;
             color = Color.argb(210, Color.red(cc), Color.green(cc), Color.blue(cc));
         }
-        fabBookmark.setImageBitmap(ImageUtil.loadBitmapFromSvgWithColorOverride(getActivity(),R.raw.bookmark,color));
+        fabBookmark.setImageBitmap(ImageUtil.loadBitmapFromSvgWithColorOverride(getActivity(), R.raw.bookmark, color));
         fabBookmark.setColorNormal(bg);
     }
-
-    GraphBuilderView graphBuilder;
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
@@ -1248,8 +970,6 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
         this.onGetSchedule = onGetSchedule;
     }
 
-    int loadingAttempt = 0;
-
     @Override
     public void setPrimaryItem() {
         if (activityCreated && o == null) {
@@ -1313,5 +1033,244 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
             return true;
         }
         return false;
+    }
+
+    public interface OnDateChange {
+        void onDateChange(Calendar cal);
+    }
+
+    public class TimerRunnable implements Runnable {
+        StationToStation stationToStation;
+        Calendar cal;
+        Type type;
+
+        public TimerRunnable(Type type, Calendar cal, StationToStation stationToStation) {
+            this.type = type;
+            this.cal = cal;
+            this.stationToStation = stationToStation;
+        }
+
+        @Override
+        public void run() {
+            Intent i = AlarmActivity
+                    .from(getActivity(),
+                            stationToStation,
+                            cal,
+                            type,
+                            UUID.randomUUID()
+                                    .toString());
+            Alarm alarm = (Alarm) i
+                    .getSerializableExtra("alarm");
+            addAlarm(alarm);
+            try {
+                Alarms.startAlarm(
+                        getActivity(),
+                        alarm);
+            } catch (Exception e) {
+                Log.e(TAG, "Error with alarm " + alarm, e);
+            }
+            handler.post(new Runnable() {
+                public void run() {
+                    adapter.notifyDataSetChanged();
+                }
+
+                ;
+            });
+        }
+    }
+
+    private class ScheduleAdapter extends BaseExpandableListAdapter implements StickyListHeadersAdapter {
+
+        int TYPE_CONTROLS = 0;
+
+        @Override
+        public void notifyDataSetChanged() {
+            super.notifyDataSetChanged();
+        }
+
+        @Override
+        public int getViewTypeCount() {
+            return 1;
+        }
+
+        @Override
+        public int getItemViewType(int i) {
+            return 0;
+        }
+
+        @Override
+        public long getItemId(int i) {
+            return 0;
+        }
+
+        @Override
+        public boolean isEnabled(int i) {
+            return true;
+        }
+
+        @Override
+        public boolean areAllItemsEnabled() {
+            // TODO Auto-generated method stub
+            return false;
+        }
+
+        @Override
+        public Object getChild(int groupPosition, int childPosition) {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public long getChildId(int groupPosition, int childPosition) {
+            // TODO Auto-generated method stub
+            return 0;
+        }
+
+        @Override
+        public int getChildrenCount(int groupPosition) {
+            return 1;
+        }
+
+        @Override
+        public int getChildType(int groupPosition, int childPosition) {
+            return childPosition;
+        }
+
+        @Override
+        public int getChildTypeCount() {
+            return 1;
+        }
+
+
+        @Override
+        public View getHeaderView(int position, View convertView,
+                                  ViewGroup parent) {
+            DepartureVisionHeader h = new DepartureVisionHeader(
+                    parent.getContext(), null);
+            Calendar cal = Calendar.getInstance();
+            StationToStation sts = getItem(position);
+            cal.setTimeInMillis(getItem(position).getDepartTime().getTimeInMillis());
+            cal.set(Calendar.HOUR_OF_DAY, 0);
+            cal.set(Calendar.MINUTE, 0);
+            cal.set(Calendar.SECOND, 0);
+            cal.set(Calendar.MILLISECOND, 0);
+
+            Calendar cal2 = Calendar.getInstance();
+            cal2.setTime(day);
+            cal2.set(Calendar.HOUR_OF_DAY, 0);
+            cal2.set(Calendar.MINUTE, 0);
+            cal2.set(Calendar.SECOND, 0);
+            cal2.set(Calendar.MILLISECOND, 0);
+            if (DateUtils.isToday(cal.getTimeInMillis())) {
+                h.setShapeColor(getResources().getColor(R.color.get_schedule_11));
+                h.setData(from.getShortName() + " \u2192 " + to.getShortName() + "\nToday • " + DAY.format(cal.getTime()));
+            } else {
+                h.setShapeColor(Color.BLACK);
+                h.setData(from.getShortName() + " \u2192 " + to.getShortName() + "\n" + DATE.format(cal.getTime()));
+            }
+            h.setLayoutParams(new ViewGroup.LayoutParams(
+                    LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+            return h;
+        }
+
+        @Override
+        public long getHeaderId(int position) {
+            StationToStation sts = getItem(position);
+            Calendar cal = Calendar.getInstance();
+            cal.setTimeInMillis(sts.getDepartTime().getTimeInMillis());
+            cal.set(Calendar.HOUR_OF_DAY, 0);
+            cal.set(Calendar.MINUTE, 0);
+            cal.set(Calendar.SECOND, 0);
+            cal.set(Calendar.MILLISECOND, 0);
+            return cal.getTimeInMillis();
+        }
+
+        @Override
+        public View getChildView(final int groupPosition,
+                                 int childPosition, boolean isLastChild, View convertView,
+                                 ViewGroup parent) {
+            return null;
+        }
+
+        @Override
+        public long getCombinedChildId(long groupId, long childId) {
+            // TODO Auto-generated method stub
+            return 0;
+        }
+
+        @Override
+        public long getCombinedGroupId(long groupId) {
+            // TODO Auto-generated method stub
+            return 0;
+        }
+
+        // @Override
+        // public long getItemId(int position) {
+        // // TODO Auto-generated method stub
+        // return 0;
+        // }
+
+        // @Override
+        public int getCount() {
+            if (o == null) {
+                return 0;
+            }
+            return o.size();
+        }
+
+        @Override
+        public StationToStation getGroup(int groupPosition) {
+            return getItem(groupPosition);
+        }
+
+        @Override
+        public int getGroupCount() {
+            return getCount();
+        }
+
+        @Override
+        public long getGroupId(int groupPosition) {
+            // TODO Auto-generated method stub
+            return 0;
+        }
+
+        @Override
+        public View getGroupView(int groupPosition, boolean isExpanded,
+                                 View convertView, ViewGroup parent) {
+            return getView(groupPosition, convertView, parent);
+        }
+
+        // @Override
+        public StationToStation getItem(int position) {
+            return o.get(position);
+        }
+
+        // @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            ScheduleView view;
+            if (convertView == null) {
+                view = new ScheduleView(parent.getContext(), null);
+            } else {
+                view = (ScheduleView) convertView.getTag();
+            }
+            StationToStation sts = getItem(position);
+            view.setData(sts, from, to, innerListener, tripIdToAlarm.get(sts.tripId));
+            view.setAlarm(tripIdToAlarm.get(sts));
+            view.setStatus(tripIdToTrainStatus.get(sts.blockId));
+            return view.getView();
+        }
+
+        @Override
+        public boolean hasStableIds() {
+            // TODO Auto-generated method stub
+            return false;
+        }
+
+        @Override
+        public boolean isChildSelectable(int groupPosition,
+                                         int childPosition) {
+            // TODO Auto-generated method stub
+            return false;
+        }
     }
 }

@@ -3,15 +3,22 @@ package us.wmwm.happytap.stream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import org.bson.types.ObjectId;
 
 import twitter4j.internal.org.json.JSONArray;
 import twitter4j.internal.org.json.JSONObject;
 
 import com.google.gson.Gson;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
+import com.mongodb.WriteResult;
 
 public class SendMessage implements Runnable {
 
@@ -23,7 +30,10 @@ public class SendMessage implements Runnable {
 	
 	Gson gson;
 	
-	public SendMessage(DBCursor cursor, Gson gson, String apiKey, Message message) {
+	DBCollection collection;
+	
+	public SendMessage(DBCollection collection, DBCursor cursor, Gson gson, String apiKey, Message message) {
+		this.collection = collection;
 		this.cursor = cursor;
 		this.apiKey = apiKey;
 		this.message = message;
@@ -43,16 +53,19 @@ public class SendMessage implements Runnable {
 			}
 			JSONObject data = new JSONObject();
 			JSONArray registrationids = new JSONArray();
+			List<String> userId = new ArrayList<String>();
 			JSONObject fields = new JSONObject();
 			fields.put("time_to_live", 1800);
 			data.put("type", "chat_message");
 			Message m = new Message();
 			m.text = message.text;
-			m.facebookId = message.facebookId;
-			data.put("message", gson.toJson(m));
+			m.userId = message.userId;
+			m.name = message.name;
+			data.put("message", gson.toJson(m).toString());
 			while(cursor.hasNext()) {
 				DBObject user = cursor.next();
 				registrationids.put(user.get("push_id"));
+				userId.add(user.get("_id").toString());
 			}
 			fields.put("registration_ids", registrationids);
 			fields.put("data", data);
@@ -67,9 +80,25 @@ public class SendMessage implements Runnable {
 				System.out.println(Streams.readFully(conn.getErrorStream()));
 			}
 			System.out.println(code);
-			System.out.println(Streams.readFully(conn.getInputStream()));
+			JSONObject response = new JSONObject(Streams.readFully(conn.getInputStream()));
+			System.out.println(response);
+			List<ObjectId> deleteIds = new ArrayList<ObjectId>();
+			JSONArray results = response.getJSONArray("results");
+			for(int i = 0; i < results.length(); i++) {
+				JSONObject item = results.getJSONObject(i);
+				if(item.has("error") && item.getString("error").equals("InvalidRegistration")) {
+					deleteIds.add(new ObjectId(userId.get(i)));
+				} else
+				if(item.has("registration_id")) {
+					deleteIds.add(new ObjectId(userId.get(i)));
+				}
+			}
+			BasicDBObject doc = new BasicDBObject();
+			doc.put("_id", new BasicDBObject("$in", deleteIds));
+			WriteResult res = collection.remove(
+					doc);
 		} catch (Exception e) {
-			
+			throw new RuntimeException(e);
 		}		
 	}
 

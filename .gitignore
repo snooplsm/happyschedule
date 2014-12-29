@@ -25,3 +25,5 @@ routes.txt
 trainapp/*.zip
 trainapp/gtfs
 gradlew
+cookies.txt
+headers.txt

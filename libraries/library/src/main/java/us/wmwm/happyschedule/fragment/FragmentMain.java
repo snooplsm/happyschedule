@@ -1,33 +1,5 @@
 package us.wmwm.happyschedule.fragment;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-
-import org.json.JSONObject;
-
-import us.wmwm.happyschedule.R;
-import us.wmwm.happyschedule.ThreadHelper;
-import us.wmwm.happyschedule.dao.Db;
-import us.wmwm.happyschedule.dao.ScheduleDao;
-import us.wmwm.happyschedule.dao.WDb;
-import us.wmwm.happyschedule.fragment.FragmentDepartureVision.DepartureVisionListener;
-import us.wmwm.happyschedule.fragment.FragmentHistory.OnHistoryListener;
-import us.wmwm.happyschedule.fragment.FragmentPickStations.OnGetSchedule;
-import us.wmwm.happyschedule.model.AppAd;
-import us.wmwm.happyschedule.model.AppConfig;
-import us.wmwm.happyschedule.model.Station;
-import us.wmwm.happyschedule.model.TripInfo;
-import us.wmwm.happyschedule.util.PremiumUserHelper;
-import us.wmwm.happyschedule.util.Streams;
-import us.wmwm.happyschedule.views.BackListener;
-import us.wmwm.happyschedule.views.FragmentMainAdapter;
-import us.wmwm.happyschedule.views.ImagePagerStrip;
-import us.wmwm.happyschedule.views.OnStationSelectedListener;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -43,212 +15,45 @@ import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.AbsListView;
 
-import com.facebook.Session;
-import com.facebook.SessionState;
 import com.flurry.android.FlurryAgent;
-import com.melnykov.fab.FloatingActionButton;
-import com.viewpagerindicator.IconPageIndicator;
-import com.viewpagerindicator.TabPageIndicator;
+
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
+
+import us.wmwm.happyschedule.R;
+import us.wmwm.happyschedule.ThreadHelper;
+import us.wmwm.happyschedule.dao.Db;
+import us.wmwm.happyschedule.dao.ScheduleDao;
+import us.wmwm.happyschedule.dao.WDb;
+import us.wmwm.happyschedule.fragment.FragmentDepartureVision.DepartureVisionListener;
+import us.wmwm.happyschedule.fragment.FragmentHistory.OnHistoryListener;
+import us.wmwm.happyschedule.fragment.FragmentPickStations.OnGetSchedule;
+import us.wmwm.happyschedule.model.AppAd;
+import us.wmwm.happyschedule.model.AppConfig;
+import us.wmwm.happyschedule.model.Station;
+import us.wmwm.happyschedule.model.TripInfo;
+import us.wmwm.happyschedule.util.PremiumUserHelper;
+import us.wmwm.happyschedule.views.BackListener;
+import us.wmwm.happyschedule.views.FragmentMainAdapter;
+import us.wmwm.happyschedule.views.ImagePagerStrip;
+import us.wmwm.happyschedule.views.OnStationSelectedListener;
 
 public class FragmentMain extends Fragment implements BackListener {
 
     private static final String TAG = FragmentMain.class.getSimpleName();
-
-    ViewPager pager;
-
-    Handler handler = new Handler();
-
-    BackListener currentFragment;
-
-    OnBackStackChangedListener onBackStackListener = new OnBackStackChangedListener() {
-        @Override
-        public void onBackStackChanged() {
-            int count = getFragmentManager().getBackStackEntryCount();
-            Log.d(FragmentMain.class.getSimpleName(), "onBackStack " + count);
-            if (count == 0) {
-                handler.post(new Runnable() {
-                    public void run() {
-                        android.support.v7.app.ActionBar a = ((ActionBarActivity) getActivity()).getSupportActionBar();
-                        if (pager.getCurrentItem() == 0) {
-                            a.setSubtitle("History");
-                        } else if (pager.getCurrentItem() == 2) {
-                            a.setSubtitle("w/ DepartureVision");
-                        } else {
-                            a.setSubtitle(null);
-                        }
-
-                        a.setDisplayHomeAsUpEnabled(false);
-                        a.setHomeButtonEnabled(false);
-                        getActivity().supportInvalidateOptionsMenu();
-//						getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
-//						getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-                    }
-
-                    ;
-                });
-            } else {
-                BackStackEntry e = getFragmentManager().getBackStackEntryAt(
-                        count - 1);
-                if ("schedule".equals(e.getName())) {
-                    //getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
-                    //getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-                }
-                final String title;
-                if (!TextUtils.isEmpty(e.getBreadCrumbTitle())) {
-                    title = e.getBreadCrumbTitle().toString();
-                } else {
-                    title = null;
-                }
-                handler.post(new Runnable() {
-                    public void run() {
-                        ActionBar a = ((ActionBarActivity) getActivity()).getSupportActionBar();
-                        getActivity().supportInvalidateOptionsMenu();
-                        a.setSubtitle(title);
-                    }
-
-                    ;
-                });
-            }
-        }
-    };
-
-    ImagePagerStrip strip;
-
-    @Override
-    public void onViewCreated(final View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        view.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                view.getViewTreeObserver().removeGlobalOnLayoutListener(this);
-                ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) ad.getLayoutParams();
-                lp.topMargin = view.getMeasuredHeight();//-ad.getMeasuredHeight();
-                ad.setLayoutParams(lp);
-            }
-        });
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_main, container, false);
-        pager = (ViewPager) view.findViewById(R.id.pager);
-        ad = view.findViewById(R.id.ad);
-        ad.setVisibility(View.INVISIBLE);
-        //indic = (TabPageIndicator) view.findViewById(R.id.indicator);
-        strip = (ImagePagerStrip) view.findViewById(R.id.indicator);
-        pager.setPageMargin((int) (getResources()
-                .getDimension(R.dimen.activity_horizontal_margin)));
-        return view;
-    }
-
-    OnGetSchedule onGetSchedule;
-
-    View ad;
-
-    PositionAd positionAd = new PositionAd() {
-
-    };
-
-    class PositionAd implements Runnable {
-
-        float v;
-
-        @Override
-        public void run() {
-            int height = getView().getMeasuredHeight();
-            int vis = getVisibility();
-            if(vis== View.VISIBLE) {
-                Log.d(TAG, "setting visibility to visible in run()");
-            }
-            ad.setVisibility(vis);
-            ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) ad.getLayoutParams();
-            float adHeight = (float) lp.height;
-            int newHeight = (int) getResources().getDimension(R.dimen.ad_height);
-            lp.topMargin = height - newHeight;
-            ad.setLayoutParams(lp);
-        }
-
-
-        protected int getVisibility() {
-            return View.VISIBLE;
-        }
-    };
-
-    PositionAd hide = new PositionAd() {
-        @Override
-        public void run() {
-            super.run();
-        }
-
-        @Override
-        protected int getVisibility() {
-            return View.INVISIBLE;
-        }
-    };
-
-
-    ViewPager.OnPageChangeListener onPageChangeListener = new ViewPager.OnPageChangeListener() {
-        @Override
-        public void onPageScrolled(int position, float v, int i2) {
-            if (position == 0) {
-                int height = getView().getMeasuredHeight();
-                Log.d(TAG,"visibility direction " + (strip.getDirection()==ImagePagerStrip.RIGHT ? "left":"right"));
-                if(strip.getNextPosition()==0) {
-
-                } else {
-                    Log.d(TAG,"setting visibility to visible");
-                    ad.setVisibility(View.VISIBLE);
-                }
-                ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) ad.getLayoutParams();
-                float adHeight = (float) lp.height;
-                int newHeight = (int) (adHeight * v);
-                lp.topMargin = height - newHeight;
-                ad.setLayoutParams(lp);
-            }
-        }
-
-        @Override
-        public void onPageSelected(int i) {
-            if(i==0) {
-                handler.removeCallbacks(positionAd);
-            }
-        }
-
-        @Override
-        public void onPageScrollStateChanged(int i) {
-            if(i== ViewPager.SCROLL_STATE_SETTLING) {
-                handler.removeCallbacks(positionAd);
-                handler.removeCallbacks(hide);
-                if(pager.getCurrentItem()==0&&strip.getDirection()==ImagePagerStrip.RIGHT) {
-                    handler.postDelayed(hide,300);
-                } else
-                if(strip.getDirection()==ImagePagerStrip.LEFT && strip.getNextPosition()==0) {
-                    handler.postDelayed(hide,300);
-                } else {
-                    if(pager.getCurrentItem()==0) {
-
-                    } else {
-                        handler.postDelayed(positionAd, 500);
-                    }
-                }
-            }
-        }
-    };
-
     AbsListView.OnScrollListener onScrollListener = new AbsListView.OnScrollListener() {
+        private int mScrollY;
+
         @Override
         public void onScrollStateChanged(AbsListView absListView, int i) {
 
         }
-
-        private int mScrollY;
 
         protected int getListViewScrollY(AbsListView listView) {
             View topChild = listView.getChildAt(0);
@@ -264,7 +69,7 @@ public class FragmentMain extends Fragment implements BackListener {
             if (absListView.getChildCount() == 0) {
                 return;
             }
-            Log.d(TAG,"SCROLLLEEE TOP " + absListView.getChildAt(0).getTop());
+            Log.d(TAG, "SCROLLLEEE TOP " + absListView.getChildAt(0).getTop());
             int newScrollY = getListViewScrollY(absListView);
             if (newScrollY == mScrollY) {
                 return;
@@ -272,26 +77,165 @@ public class FragmentMain extends Fragment implements BackListener {
 
             if (newScrollY > mScrollY) {
                 // Scrolling up
-                Log.d(TAG,"scrolling up: " + newScrollY + " > " + mScrollY);
+                Log.d(TAG, "scrolling up: " + newScrollY + " > " + mScrollY);
                 strip.offsetTopAndBottom(mScrollY - newScrollY);
             } else if (newScrollY < mScrollY) {
                 // Scrolling down
                 strip.offsetTopAndBottom(mScrollY - newScrollY);
-                Log.d(TAG,"scrolling down: " + newScrollY + " < " + mScrollY);
+                Log.d(TAG, "scrolling down: " + newScrollY + " < " + mScrollY);
             }
             mScrollY = newScrollY;
         }
     };
+    ViewPager pager;
+    Handler handler = new Handler();
+    BackListener currentFragment;
+    OnBackStackChangedListener onBackStackListener = new OnBackStackChangedListener() {
+        @Override
+        public void onBackStackChanged() {
+            int count = getFragmentManager().getBackStackEntryCount();
+            Log.d(FragmentMain.class.getSimpleName(), "onBackStack " + count);
+            if (count == 0) {
+
+            } else {
+                BackStackEntry e = getFragmentManager().getBackStackEntryAt(
+                        count - 1);
+                if ("schedule".equals(e.getName())) {
+                    //getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+                    //getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+                }
+                final String title;
+                if (!TextUtils.isEmpty(e.getBreadCrumbTitle())) {
+                    title = e.getBreadCrumbTitle().toString();
+                } else {
+                    title = null;
+                }
+
+            }
+        }
+    };
+    ImagePagerStrip strip;
+    OnGetSchedule onGetSchedule;
+    View ad;
+    PositionAd positionAd = new PositionAd() {
+
+    };
+    PositionAd hide = new PositionAd() {
+        @Override
+        public void run() {
+            super.run();
+        }
+
+        @Override
+        protected int getVisibility() {
+            return View.INVISIBLE;
+        }
+    };
+    ViewPager.OnPageChangeListener onPageChangeListener = new ViewPager.OnPageChangeListener() {
+        @Override
+        public void onPageScrolled(int position, float v, int i2) {
+            if (ad == null) {
+                return;
+            }
+            if (position == 0) {
+                int height = getView().getMeasuredHeight();
+                Log.d(TAG, "visibility direction " + (strip.getDirection() == ImagePagerStrip.RIGHT ? "left" : "right"));
+                if (strip.getNextPosition() == 0) {
+
+                } else {
+                    Log.d(TAG, "setting visibility to visible");
+                    ad.setVisibility(View.VISIBLE);
+                }
+                ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) ad.getLayoutParams();
+                float adHeight = (float) lp.height;
+                int newHeight = (int) (adHeight * v);
+                lp.topMargin = height - newHeight;
+                ad.setLayoutParams(lp);
+            }
+        }
+
+        @Override
+        public void onPageSelected(int i) {
+            if (ad == null) {
+                return;
+            }
+            if (i == 0) {
+                handler.removeCallbacks(positionAd);
+            }
+        }
+
+        @Override
+        public void onPageScrollStateChanged(int i) {
+            if (ad == null) {
+                return;
+            }
+            if (i == ViewPager.SCROLL_STATE_SETTLING) {
+                handler.removeCallbacks(positionAd);
+                handler.removeCallbacks(hide);
+                if (pager.getCurrentItem() == 0 && strip.getDirection() == ImagePagerStrip.RIGHT) {
+                    handler.postDelayed(hide, 300);
+                } else if (strip.getDirection() == ImagePagerStrip.LEFT && strip.getNextPosition() == 0) {
+                    handler.postDelayed(hide, 300);
+                } else {
+                    if (pager.getCurrentItem() == 0) {
+
+                    } else {
+                        handler.postDelayed(positionAd, 500);
+                    }
+                }
+            }
+        }
+    };
+    ;
+    SettingsFragment.OnPurchaseClickedListener onPurchaseClickedListener;
+
+    @Override
+    public void onViewCreated(final View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        if (WDb.get().getPreference("rails.monthly") == null) {
+            view.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+                    view.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+                    ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) ad.getLayoutParams();
+                    lp.topMargin = view.getMeasuredHeight();//-ad.getMeasuredHeight();
+                    ad.setLayoutParams(lp);
+                }
+            });
+        }
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_main, container, false);
+        pager = (ViewPager) view.findViewById(R.id.pager);
+        if (WDb.get().getPreference("rails.monthly") == null) {
+            ad = view.findViewById(R.id.ad);
+            ad.setVisibility(View.INVISIBLE);
+        }
+        //indic = (TabPageIndicator) view.findViewById(R.userId.indicator);
+        strip = (ImagePagerStrip) view.findViewById(R.id.indicator);
+        pager.setPageMargin((int) (getResources()
+                .getDimension(R.dimen.activity_horizontal_margin)));
+        return view;
+    }
+
+    public void setOnPurchaseClickedListener(SettingsFragment.OnPurchaseClickedListener onPurchaseClickedListener) {
+        this.onPurchaseClickedListener = onPurchaseClickedListener;
+    }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         ((ActionBarActivity) getActivity()).getSupportActionBar().hide();
         getFragmentManager().addOnBackStackChangedListener(onBackStackListener);
-        AbstractAdFragment ad = new FragmentHappytapAd();
 
-        getFragmentManager().beginTransaction().replace(R.id.ad, ad)
-                .commit();
+        if (WDb.get().getPreference("rails.monthly") == null) {
+            AbstractAdFragment ad = new FragmentHappytapAd();
+            getFragmentManager().beginTransaction().replace(R.id.ad, ad)
+                    .commit();
+        }
         handler.post(new Runnable() {
             @Override
             public void run() {
@@ -311,12 +255,14 @@ public class FragmentMain extends Fragment implements BackListener {
                         }
                     }
                 };
+                fma.setOnPurchaseClickedListener(onPurchaseClickedListener);
                 pager.setOffscreenPageLimit(fma.getCount());
                 pager.setAdapter(fma);
                 strip.setAdapter(fma);
                 fma.setOnScrollListener(onScrollListener);
                 strip.setOnPageChangeListener(onPageChangeListener);
                 strip.setViewPager(pager);
+
 
                 fma.setOnGetScheduleListener(onGetSchedule = new OnGetSchedule() {
 
@@ -353,10 +299,6 @@ public class FragmentMain extends Fragment implements BackListener {
                                         .setBreadCrumbTitle(
                                                 (from.getName() + " to " + to.getName()))
                                         .commit();
-//								ActionBar a = ((ActionBarActivity)getActivity()).getSupportActionBar();
-//								a.setDisplayHomeAsUpEnabled(true);
-//								a.setHomeButtonEnabled(true);
-//								a.setDisplayUseLogoEnabled(true);
                             }
                         });
 
@@ -416,25 +358,7 @@ public class FragmentMain extends Fragment implements BackListener {
                         pager.setCurrentItem(newPos);
                     }
                 });
-                // fma.setOnStationSelectedListener(new
-                // OnStationSelectedListener() {
-                //
-                // @Override
-                // public void onStation(Station station) {
-                // if(station==null) {
-                // pager.setCurrentItem(pager.getCurrentItem()-1);
-                // return;
-                // }
-                // for(int i = 1; i < fma.getCount(); i++) {
-                // Station s = fma.getDepartureVision(i);
-                // if(s.getId().equals(station.getId())) {
-                // pager.setCurrentItem(i);
-                // break;
-                // }
-                // }
-                // //pager.invalidate();
-                // }
-                // });
+
             }
         });
         ThreadHelper.getScheduler().submit(new Runnable() {
@@ -506,5 +430,30 @@ public class FragmentMain extends Fragment implements BackListener {
             }
         }
         return false;
+    }
+
+    class PositionAd implements Runnable {
+
+        float v;
+
+        @Override
+        public void run() {
+            int height = getView().getMeasuredHeight();
+            int vis = getVisibility();
+            if (vis == View.VISIBLE) {
+                Log.d(TAG, "setting visibility to visible in run()");
+            }
+            ad.setVisibility(vis);
+            ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) ad.getLayoutParams();
+            float adHeight = (float) lp.height;
+            int newHeight = (int) getResources().getDimension(R.dimen.ad_height);
+            lp.topMargin = height - newHeight;
+            ad.setLayoutParams(lp);
+        }
+
+
+        protected int getVisibility() {
+            return View.VISIBLE;
+        }
     }
 }

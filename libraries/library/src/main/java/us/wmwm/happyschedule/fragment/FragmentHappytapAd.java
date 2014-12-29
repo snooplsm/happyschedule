@@ -1,6 +1,8 @@
 package us.wmwm.happyschedule.fragment;
 
 import android.app.Activity;
+import android.app.PendingIntent;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -22,12 +24,14 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 
+import java.util.Date;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import us.wmwm.happyschedule.BuildConfig;
 import us.wmwm.happyschedule.R;
 import us.wmwm.happyschedule.ThreadHelper;
+import us.wmwm.happyschedule.activity.MainActivity;
 
 /**
  * Created by gravener on 11/14/14.
@@ -53,15 +57,41 @@ public class FragmentHappytapAd extends AbstractAdFragment {
     }
 
     @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        adViewContainer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    Bundle buyIntentBundle = MainActivity.BILLING_SERVICE.getBuyIntent(3, getActivity().getPackageName(),
+                            "rails.monthly", "subs", new Date().toString());
+                    PendingIntent pendingIntent = buyIntentBundle.getParcelable("BUY_INTENT");
+                    getActivity().startIntentSenderForResult(pendingIntent.getIntentSender(),
+                            1001, new Intent(), Integer.valueOf(0), Integer.valueOf(0),
+                            Integer.valueOf(0));
+                } catch (Exception e) {
+
+                }
+            }
+        });
+
+    }
+
+    @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         Log.d(TAG,"onActivityCreated");
-        if(BuildConfig.IS_GOOGLE_ADS_ENABLED) {
-            LoadAd();
-        } else
-        if(BuildConfig.IS_AMAZON_ADS_ENABLED) {
-            LoadAmazonAd();
-        }
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if(BuildConfig.IS_GOOGLE_ADS_ENABLED) {
+                    LoadAd();
+                } else
+                if(BuildConfig.IS_AMAZON_ADS_ENABLED) {
+                    LoadAmazonAd();
+                }
+            }
+        },3000);
     }
 
     AdListener adListener = new AdListener() {
@@ -149,10 +179,14 @@ public class FragmentHappytapAd extends AbstractAdFragment {
 
     @Override
     protected void LoadAd() {
+        Activity activity = getActivity();
+        if(activity==null) {
+            return;
+        }
         Log.d(TAG,"google ads enabled");
         if (nextAdView == null) { // Create and configure a new ad if the next
             // ad doesn't currently exist
-            nextAdView = new AdView(getActivity());
+            nextAdView = new AdView(activity);
             ViewGroup.LayoutParams layoutParams = new FrameLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT,
                     Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL);

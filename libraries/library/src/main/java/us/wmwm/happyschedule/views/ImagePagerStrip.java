@@ -238,7 +238,7 @@ public class ImagePagerStrip extends RelativeLayout implements ViewPager.OnPageC
         indicator.setEllipsize(TextUtils.TruncateAt.MARQUEE);
         indicator.setIncludeFontPadding(false);
         RelativeLayout.LayoutParams indicLP = new LayoutParams(27,indicheight);
-
+        indicLP.bottomMargin=1;
 
         int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,51,res.getDisplayMetrics());
         int padding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,12,res.getDisplayMetrics());

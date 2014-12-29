@@ -8,8 +8,7 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@+id/fragment_departurevision_ad" >
+        android:layout_height="match_parent" >
 
         <TextView
             android:id="@+id/no_internet"
@@ -87,12 +86,5 @@
             android:layout_height="match_parent"
             android:visibility="gone" />
     </RelativeLayout>
-
-    <FrameLayout
-        android:id="@id/fragment_departurevision_ad"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true" >
-    </FrameLayout>
 
 </RelativeLayout>

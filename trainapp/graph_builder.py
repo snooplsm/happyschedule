@@ -275,6 +275,7 @@ def buildGraph(agencies):
 
     G = networkx.DiGraph()
     H = networkx.DiGraph()
+    MANUAL_GRAPH = networkx.DiGraph()
     trips = {}
     routeInfo = {}
     alltimes = {}
@@ -565,6 +566,36 @@ def buildGraph(agencies):
                 stops = tripToStops[tripId]
             stops.insert(int(sequence), stop)
     # print stations
+    
+    import json
+    
+    customGraph = json.load(open(override + "/custom_graph.json"))
+    for graph in customGraph["graphs"]:
+        print graph
+        to = graph["to"]
+        froms = graph["from"]
+        for fromNode in froms:
+            for toNode in to:
+                MANUAL_GRAPH.add_edge(fromNode["id"],toNode["id"])
+                MANUAL_GRAPH.add_edge(toNode["id"],fromNode["id"])
+    for transfers in customGraph["transfers"]:
+        to = transfers["to"]
+        froms = transfers["from"]
+        for fromNode in froms:
+            for toNode in to:
+                c.execute("INSERT INTO transfer_edge(source,target,duration) values(?,?,?)",
+                          (fromNode["id"], toNode["id"], transfers["duration"]))
+                c.execute("INSERT INTO transfer_edge(source,target,duration) values(?,?,?)",
+                          (toNode["id"], fromNode["id"], transfers["duration"]))                          
+    conn.commit()
+    # print customGraph
+    
+    # while True:
+#         a = raw_input("select the depart:")
+#         b = raw_input("select the arrive:")
+#         generator = networkx.algorithms.shortest_paths.generic.all_shortest_paths(MANUAL_GRAPH,a,b)
+#         for x in generator:
+#             print x
     sys.path.append(os.path.abspath('.') + "/overrides/" + sys.argv[1])
     try:
         import peak
@@ -583,6 +614,9 @@ def buildGraph(agencies):
         source = None
         day = 1
         lhour = None
+        shouldIgnore = peak.shouldIgnore(route,stops)
+        if shouldIgnore==True:
+            continue
         for position in range(len(stops)):
             target = stops[position]
             if source != None:
@@ -753,7 +787,7 @@ def buildGraph(agencies):
                                     #						G[fromId][toId]["routes"]["walk2"] = round(dist*1.389)
                         walks.append((fromId, toId))
                         c.execute("INSERT INTO transfer_edge(source,target,duration) values(?,?,?)",
-                                  (fromId, toId, int(round(dist / 1.389))))
+                                  (fromId, toId, int(round(dist*1.5 / 1.389))))
             conn.commit()
             metersPerSecond = 1.389
     for a in alltimes:
@@ -783,6 +817,7 @@ def buildGraph(agencies):
                 G[a][b]['weight'] = mintimes[a][b]
             #			G[a][b] = avgtimes[key]
             #			G[a][b] = maxtimes[key]
+            
     for tripId in tripToStops:
         trip = trips[tripId]
         stops = tripToStops[tripId]
@@ -791,6 +826,8 @@ def buildGraph(agencies):
         date = dateDict[service]["dateTime"]
         weight = 0
         lastStop = None
+        if peak.shouldIgnore(route,stops):
+            continue
         for position in range(len(stops)):
             stop = stops[position]
             if lastStop != None:
@@ -897,104 +934,126 @@ def buildGraph(agencies):
             tripId = tripCount[id][ids2]["trip"]
             if count <= 4:
                 print stations[id]["name"], stations[ids2]["name"], count, tripId
-    patharray = [networkx.algorithms.shortest_paths.weighted.all_pairs_dijkstra_path(G),
-                 networkx.algorithms.shortest_paths.unweighted.all_pairs_shortest_path(G)]
+    # patharray = [networkx.algorithms.shortest_paths.weighted.all_pairs_dijkstra_path(G),
+    #              networkx.algorithms.shortest_paths.unweighted.all_pairs_shortest_path(G)]
+                 
+    nodes = networkx.nodes(MANUAL_GRAPH)
+    count = 0;
+    for nodeA in nodes:
+        for nodeB in nodes:
+            if nodeA==nodeB:
+                continue
+            generator = networkx.algorithms.shortest_paths.generic.all_shortest_paths(MANUAL_GRAPH,nodeA,nodeB)        
+            level = 0
+            for x in generator:
+                last = x[0]
+                index = 0
+                for pos in range(1,len(x)):
+                    y = x[pos]
+                    c.execute(
+                        "INSERT INTO schedule_path(source,target,a,b,level,sequence) values(?,?,?,?,?,?)",
+                        (nodeA, nodeB, last, y, level, index))
+                    last = y
+                    index = index+1
+    print count
+    conn.commit()
+                     
 
-    for level in range(0, 1):
-        paths = patharray[level]
-        for stationA in stations:
-            for stationB in stations:
-                if stationA in paths:
-                    if stationB in paths[stationA]:
-                        shortestPath = paths[stationA][stationB]
-                        pathLength = len(shortestPath)
-                        if (pathLength > 1 and stationA in stopRoutes and stationB in stopRoutes):
-                            aRoutes = stopRoutes[stationA]
-                            bRoutes = stopRoutes[stationB]
-                            minRouteLength = sys.maxint
-                            minRoute = None
-                            for aRoute in aRoutes:
-                                for bRoute in bRoutes:
-                                    if aRoute in routePaths and bRoute in routePaths[aRoute]:
-                                        shortestRoutePath = routePaths[aRoute][bRoute]
-                                        if minRouteLength > len(shortestRoutePath):
-                                            minRoute = shortestRoutePath
-                                            minRouteLength = len(minRoute)
-                                            # print minRoute
-                            currRoute = minRoute[0]
-                            currRoutePos = -1
-                            stationsToUse = []
-                            error = False
-                            lastStation = stationA
-                            startStation = lastStation
-                            dirs = []
-                            stationsToUse = []
-                            countAfter = 0
-                            for currStation in shortestPath:
-                                station = currStation
-                                isTransferEdge = lastStation in transferedges and station in transferedges[lastStation]
-                                # print "transfer edge?",isTransferEdge
-                                #							isTransferEdge = hasTransferEdge(c,lastStation["stop_id"],station["stop_id"])
-                                if isTransferEdge:
-                                    stationsToUse.append((startStation, lastStation))
-                                    startStation = station
-                                    countAfter = 0
-                                isOnRoute = currRoute in stopRoutes[station]
-                                #							print "on route?",isOnRoute
-                                #hasEdge = G.has_edge(lastStation,station) and G.has_edge(station,lastStation)
-                                #print hasEdge
-                                #							isOnRoute = onRoute(c,station["stop_id"],currRoute)
-                                #							print station
-                                if isOnRoute == False:
-                                    currRoutePos = currRoutePos + 1
-                                    if currRoutePos > minRouteLength - 1:
-                                        print stations[stationA]["name"], "->", stations[stationB][
-                                            "name"], "\n", minRoute
-                                        error = True
-                                        break;
-                                    currRoute = minRoute[currRoutePos]
-                                    #								print "new route:",currRoute,routes[currRoute]["label"]
-                                    countAfter = 0
-                                    if isTransferEdge == False:
-                                        stationsToUse.append((startStation, lastStation))
-                                        startStation = lastStation
-                                else:
-                                    if lastStation != station:
-                                        if lastStation not in directions or station not in directions[lastStation]:
-                                            print "no directions", stations[lastStation], "to", stations[station]
-                                        else:
-                                            ndirs = directions[lastStation][station]
-                                            intersection = set(ndirs).intersection(set(dirs))
-                                            dirs = ndirs
-                                            #										print intersection,ndirs,"--",dirs
-                                            if len(intersection) == 0 and countAfter > 0:
-                                                stationsToUse.append((startStation, lastStation))
-                                                startStation = lastStation
-                                                countAfter = 0
-                                            else:
-                                                countAfter = countAfter + 1
-                                lastStation = station
-                            if startStation != lastStation:
-                                stationsToUse.append((startStation, lastStation))
-                            if error == False:
-                                for index in range(0, len(stationsToUse)):
-                                    source = stationA
-                                    target = stationB
-                                    a = stationsToUse[index][0]
-                                    b = stationsToUse[index][1]
-                                    c.execute(
-                                        "INSERT INTO schedule_path(source,target,a,b,level,sequence) values(?,?,?,?,?,?)",
-                                        (source, target, a, b, level, index))
-                                # indent = 1
-                                # print stations[stationA]["name"],stations[stationB]["name"]
-                                # for x,y in stationsToUse:
-                                # indents = ""
-                                # 	for k in range(1,indent+1):
-                                # 		indents = indents+"\t"
-                                # 	print indents,stations[x]["name"],"->",stations[y]["name"]
-                                # 	indent = indent+1
-                                # print ""
-            conn.commit()
+    # for level in range(0, 1):
+#         paths = patharray[level]
+#         for stationA in stations:
+#             for stationB in stations:
+#                 if stationA in paths:
+#                     if stationB in paths[stationA]:
+#                         shortestPath = paths[stationA][stationB]
+#                         pathLength = len(shortestPath)
+#                         if (pathLength > 1 and stationA in stopRoutes and stationB in stopRoutes):
+#                             aRoutes = stopRoutes[stationA]
+#                             bRoutes = stopRoutes[stationB]
+#                             minRouteLength = sys.maxint
+#                             minRoute = None
+#                             for aRoute in aRoutes:
+#                                 for bRoute in bRoutes:
+#                                     if aRoute in routePaths and bRoute in routePaths[aRoute]:
+#                                         shortestRoutePath = routePaths[aRoute][bRoute]
+#                                         if minRouteLength > len(shortestRoutePath):
+#                                             minRoute = shortestRoutePath
+#                                             minRouteLength = len(minRoute)
+#                                             # print minRoute
+#                             currRoute = minRoute[0]
+#                             currRoutePos = -1
+#                             stationsToUse = []
+#                             error = False
+#                             lastStation = stationA
+#                             startStation = lastStation
+#                             dirs = []
+#                             stationsToUse = []
+#                             countAfter = 0
+#                             for currStation in shortestPath:
+#                                 station = currStation
+#                                 isTransferEdge = lastStation in transferedges and station in transferedges[lastStation]
+#                                 # print "transfer edge?",isTransferEdge
+#                                 #                            isTransferEdge = hasTransferEdge(c,lastStation["stop_id"],station["stop_id"])
+#                                 if isTransferEdge:
+#                                     stationsToUse.append((startStation, lastStation))
+#                                     startStation = station
+#                                     countAfter = 0
+#                                 isOnRoute = currRoute in stopRoutes[station]
+#                                 #                            print "on route?",isOnRoute
+#                                 #hasEdge = G.has_edge(lastStation,station) and G.has_edge(station,lastStation)
+#                                 #print hasEdge
+#                                 #                            isOnRoute = onRoute(c,station["stop_id"],currRoute)
+#                                 #                            print station
+#                                 if isOnRoute == False:
+#                                     currRoutePos = currRoutePos + 1
+#                                     if currRoutePos > minRouteLength - 1:
+#                                         print stations[stationA]["name"], "->", stations[stationB][
+#                                             "name"], "\n", minRoute
+#                                         error = True
+#                                         break;
+#                                     currRoute = minRoute[currRoutePos]
+#                                     #                                print "new route:",currRoute,routes[currRoute]["label"]
+#                                     countAfter = 0
+#                                     if isTransferEdge == False:
+#                                         stationsToUse.append((startStation, lastStation))
+#                                         startStation = lastStation
+#                                 else:
+#                                     if lastStation != station:
+#                                         if lastStation not in directions or station not in directions[lastStation]:
+#                                             print "no directions", stations[lastStation], "to", stations[station]
+#                                         else:
+#                                             ndirs = directions[lastStation][station]
+#                                             intersection = set(ndirs).intersection(set(dirs))
+#                                             dirs = ndirs
+#                                             #                                        print intersection,ndirs,"--",dirs
+#                                             if len(intersection) == 0 and countAfter > 0:
+#                                                 stationsToUse.append((startStation, lastStation))
+#                                                 startStation = lastStation
+#                                                 countAfter = 0
+#                                             else:
+#                                                 countAfter = countAfter + 1
+#                                 lastStation = station
+#                             if startStation != lastStation:
+#                                 stationsToUse.append((startStation, lastStation))
+#                             if error == False:
+#                                 for index in range(0, len(stationsToUse)):
+#                                     source = stationA
+#                                     target = stationB
+#                                     a = stationsToUse[index][0]
+#                                     b = stationsToUse[index][1]
+#                                     c.execute(
+#                                         "INSERT INTO schedule_path(source,target,a,b,level,sequence) values(?,?,?,?,?,?)",
+#                                         (source, target, a, b, level, index))
+#                                 # indent = 1
+#                                 # print stations[stationA]["name"],stations[stationB]["name"]
+#                                 # for x,y in stationsToUse:
+#                                 # indents = ""
+#                                 #     for k in range(1,indent+1):
+#                                 #         indents = indents+"\t"
+#                                 #     print indents,stations[x]["name"],"->",stations[y]["name"]
+#                                 #     indent = indent+1
+#                                 # print ""
+            # conn.commit()
     removalsReader = csv.reader(open(override + "/removals.csv"))
     connectionsReader = csv.reader(open(override + "/connections.csv"))
     print "processing connections"
@@ -1029,7 +1088,7 @@ def buildGraph(agencies):
     c.execute("vacuum")
     # c.execute("delete from schedule_path where (source=? and target=?) or (target=? and source=?)",("51","105","51","105"))
     #	c.execute("delete from schedule_path where (source=? and target=?) or (target=? and source=?)",("52","105","52","105"))
-    # c.execute("INSERT INTO schedule_path(source,target,a,b,level,sequence) values(?,?,?,?,?,?)",("51","105","51","38174",0,0))
+    # c.execute("schedule_path(source,target,a,b,level,sequence) values(?,?,?,?,?,?)",("51","105","51","38174",0,0))
     # c.execute("INSERT INTO schedule_path(source,target,a,b,level,sequence) values(?,?,?,?,?,?)",("51","105","38174","105",0,1))
     # c.execute("INSERT INTO schedule_path(source,target,a,b,level,sequence) values(?,?,?,?,?,?)",("105","51","105","38174",0,0))
     # c.execute("INSERT INTO schedule_path(source,target,a,b,level,sequence) values(?,?,?,?,?,?)",("105","51","38174","51",0,1))

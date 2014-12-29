@@ -2,6 +2,15 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://robobunny.com" >
 
+    <PreferenceCategory android:title="Purchases" >
+
+        <Preference
+            android:dependency="@string/settings_key_push_on"
+            android:key="@string/settings_key_purchase_subscription"
+            android:summary="Can't find subscription status.  Click to check."
+            android:title="Subscription" />
+    </PreferenceCategory>
+
     <PreferenceCategory android:title="Styling" >
         <us.wmwm.happyschedule.preference.SeekBarPreference
             android:defaultValue="15"

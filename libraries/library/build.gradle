@@ -18,7 +18,7 @@ android {
         abortOnError false
     }
 
-    flavorDimensions "brand", "version"
+    flavorDimensions "brand", "version", "env"
 
     productFlavors {
 
@@ -67,6 +67,15 @@ android {
             minSdkVersion 17
             targetSdkVersion rootProject.ext.targetSdkVersion
             compileSdkVersion rootProject.ext.targetSdkVersion
+        }
+
+        dev {
+            flavorDimension "env"
+            versionCode 2014122302
+        }
+
+        prod {
+            flavorDimension "env"
         }
 
     }
