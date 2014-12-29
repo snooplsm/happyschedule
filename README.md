@@ -4,6 +4,13 @@
        src="https://developer.android.com/images/brand/en_generic_rgb_wo_45.png" />
 </a>
 
+<br/>
+
+<img src="images/a.webp"/>
+<img src="images/b.webp"/>
+<img src="images/c.webp"/>
+<img src="images/d.webp"/>
+
 HappySchedule is a full fledged app for Transit.  Currently the transit agencies supported are NJ Transit, Long Island Rail Road, Metro North, and Septa.
 
 The main components of the app are
