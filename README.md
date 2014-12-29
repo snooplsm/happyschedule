@@ -1,4 +1,8 @@
 <a href="https://travis-ci.org/snooplsm/happyschedule"><img width="90" height="20" src="https://travis-ci.org/snooplsm/happyschedule.svg"></a>
+<a href="https://play.google.com/store/apps/details?id=us.wmwm.njrail">
+  <img alt="Get it on Google Play"
+       src="https://developer.android.com/images/brand/en_generic_rgb_wo_45.png" />
+</a>
 
 HappySchedule is a full fledged app for Transit.  Currently the transit agencies supported are NJ Transit, Long Island Rail Road, Metro North, and Septa.
 
