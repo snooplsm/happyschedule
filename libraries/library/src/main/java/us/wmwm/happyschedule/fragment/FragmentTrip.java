@@ -236,7 +236,7 @@ public class FragmentTrip extends HappyFragment implements OnMapReadyCallback {
         } else {
             map.moveCamera(CameraUpdateFactory.newLatLngBounds(llb,dimen));
         }
-        poly.
+        //poly.
         polyline = map.addPolyline(poly);
     }
 
