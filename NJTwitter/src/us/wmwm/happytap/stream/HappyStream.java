@@ -84,10 +84,16 @@ public class HappyStream {
                 synchronized (this) {
                     saveStatus(status);
                     try {
-                        processStatus(status);
-                        System.out.println("DONE");
+                        processStatus(status,ServiceType.DYNAMIC_SERVICES);
+                        System.out.println("DONE DYNAMIC");
                     } catch (Exception e) {
                         e.printStackTrace();
+                    }
+                    try {
+                        processStatus(status,ServiceType.SERVICES);
+                        System.out.println("DONE SERVICES");
+                    } catch (Exception e) {
+
                     }
                 }
             }
@@ -249,7 +255,7 @@ public class HappyStream {
 		return true;
 	}
 
-	public static void processStatus(Status status) throws Exception {
+	public static void processStatus(Status status,ServiceType serviceType) throws Exception {
 		HttpURLConnection conn = null;
 		InputStream in = null;
 		DBCursor users = null;
@@ -257,7 +263,7 @@ public class HappyStream {
 			Calendar cal = Calendar.getInstance();
 			int hour = cal.get(Calendar.HOUR_OF_DAY);
 			int day = cal.get(Calendar.DAY_OF_WEEK);
-			users = findUsersForService(ServiceType.SERVICES, status, day, hour);
+			users = findUsersForService(serviceType, status, day, hour);
 
 			JSONArray regs = new JSONArray();
 			JSONObject fields = new JSONObject();
