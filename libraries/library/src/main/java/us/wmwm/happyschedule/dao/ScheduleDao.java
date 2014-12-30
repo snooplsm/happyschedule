@@ -149,6 +149,7 @@ public class ScheduleDao {
 		if(cur.moveToNext()) {
 			levels = cur.getInt(0)+1;
 		}
+        levels = levels+1;
 		cur.close();
 		List<String[][]> pairs = new ArrayList<String[][]>(levels);
 //		for(int i = 0; i < levels; i++) {
@@ -181,6 +182,10 @@ public class ScheduleDao {
 			p.add(data[sequence][0]);
 			p.add(data[sequence][1]);
 		}
+        String[][] lastPair = new String[1][2];
+        lastPair[0][0] = departStationId;
+        lastPair[0][1] = arriveStationId;
+        pairs.add(lastPair);
 		cur.close();
         cur = WDb.get().db.rawQuery("select level from schedule_path where source=? and target=? order by level desc", new String[]{departStationId,arriveStationId});
         int levels2 = 0;
