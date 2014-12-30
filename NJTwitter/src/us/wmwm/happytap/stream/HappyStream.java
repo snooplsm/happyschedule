@@ -460,7 +460,7 @@ public class HappyStream {
 	public static DBCursor findUsersForService(ServiceType type, Status status, int day, int hour)
 			throws Exception {
 		BasicDBObject query = new BasicDBObject(type.key+".screenname", status
-				.getUser().getScreenName()).append(type.key+"services.day", day).append(
+				.getUser().getScreenName()).append(type.key+".day", day).append(
 						type.key+".hour", hour);
 		BasicDBObject fields = new BasicDBObject("push_id",1);
 		return db.getCollection("users").find(query,fields);
