@@ -5,7 +5,9 @@
     android:versionCode="1"
     android:versionName="1.0">
 
-    <uses-sdk />
+    <uses-feature
+        android:glEsVersion="0x00020000"
+        android:required="false" />
 
     <application
         android:name="us.wmwm.happyschedule.application.HappyApplication"
@@ -91,8 +93,12 @@
             android:value="@string/app_id" />
 
         <meta-data
-            android:name="com.google.android.gms.version"
-            android:value="@integer/google_play_services_version" />
+            android:name="com.google.android.maps.v2.API_KEY"
+            android:value="@string/maps_api_key" />
+
+        <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version" />
+
+        <uses-permission android:name="us.wmwm.njrail.maps.permission.MAPS_RECEIVE" />
     </application>
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -104,6 +110,8 @@
 
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <uses-permission android:name="us.wmwm.njrail.permission.MAPS_RECEIVE" />
 
     <permission
         android:name="com.example.gcm.permission.C2D_MESSAGE"
