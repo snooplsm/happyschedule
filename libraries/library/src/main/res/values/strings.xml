@@ -21,6 +21,7 @@
     <string name="notif_alarm_dismiss">Dismiss</string>
     <string name="amazon_app_key">3045443539525247434a305056575358</string>
     <string name="admob_app_key">a14cbf2b9d15c90</string>
+    <string name="maps_api_key">AIzaSyAk2RNhSyVnWwhknXhCHQylVAsFi-nBY3U</string>
     <string name="flurry_app_key">4PZTPTTB4BVFXHYVQWWP</string>
     <string name="view_report_error">There was a problem, but maybe you can help.</string>
     <string name="poller">us.wmwm.happyschedule.service.DeparturePoller</string>

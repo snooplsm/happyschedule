@@ -98,7 +98,7 @@ public class TripAdapter extends BaseAdapter {
 			} else {
 				percent = 1.0f - (curr / (float) max);
 			}
-			System.out.println(Math.min((float) 1, percent) + " percent " + curr);
+			Log.d(TAG,Math.min((float) 1, percent) + " percent " + curr);
 			progress.setPercent(Math.min((float) 1, percent));
 		}
 		TextView time = (TextView) v.findViewById(R.id.time);
@@ -120,4 +120,8 @@ public class TripAdapter extends BaseAdapter {
 		// TODO Auto-generated method stub
 		return 0;
 	}
+
+    public List<Stop> getStops() {
+        return this.stops;
+    }
 }
