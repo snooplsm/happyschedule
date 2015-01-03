@@ -84,14 +84,14 @@ public class HappyStream {
                 synchronized (this) {
                     saveStatus(status);
                     try {
-                        processStatus(status,ServiceType.DYNAMIC_SERVICES);
-                        System.out.println("DONE DYNAMIC");
+                        int count = processStatus(status,ServiceType.DYNAMIC_SERVICES);
+                        System.out.println("DONE DYNAMIC " + count);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                     try {
-                        processStatus(status,ServiceType.SERVICES);
-                        System.out.println("DONE SERVICES");
+                        int count = processStatus(status,ServiceType.SERVICES);
+                        System.out.println("DONE SERVICES " + count);
                     } catch (Exception e) {
 
                     }
@@ -235,6 +235,7 @@ public class HappyStream {
 		ServletContextHandler servletContextHandler = new ServletContextHandler();
 		servletContextHandler.setContextPath("/rails/v1.0/");
 		servletContextHandler.addServlet(new ServletHolder(new ChatServlet(client,apiKey)),"/chat/*");
+        servletContextHandler.addServlet(new ServletHolder(new PushServlet(client)),"/push/*");
 		server.setHandler(servletContextHandler);
 		try {
 			server.start();
@@ -255,10 +256,11 @@ public class HappyStream {
 		return true;
 	}
 
-	public static void processStatus(Status status,ServiceType serviceType) throws Exception {
+	public static int processStatus(Status status,ServiceType serviceType) throws Exception {
 		HttpURLConnection conn = null;
 		InputStream in = null;
 		DBCursor users = null;
+        int totalCount = 0;
 		try {
 			Calendar cal = Calendar.getInstance();
 			int hour = cal.get(Calendar.HOUR_OF_DAY);
@@ -330,7 +332,7 @@ public class HappyStream {
 				}		
 				if (regs.length() == 0) {
 					users.close();
-					return;
+					return totalCount;
 				}
 				fields.put("registration_ids", regs);
 				URL u = new URL("https://android.googleapis.com/gcm/send");
@@ -380,9 +382,11 @@ public class HappyStream {
 							}
 						}											
 					}
-					System.out.println("Sent " + successfuls.size());
-					System.out.println("Need to delete " + notRegistered.size());
-					deletePushIds(HappyStream.db, notRegistered);
+                    totalCount+=successfuls.size();
+                    if(!notRegistered.isEmpty()) {
+                        System.out.println("Need to delete " + notRegistered.size());
+                        deletePushIds(HappyStream.db, notRegistered);
+                    }
 					if (!replace.isEmpty()) {
 						System.out.println("Need to replace " + replace.size());
 						fixPushIds(HappyStream.db, replace);
@@ -405,6 +409,7 @@ public class HappyStream {
 				users.close();
 			}
 		}
+        return totalCount;
 	}
 
 	/**
@@ -457,13 +462,16 @@ public class HappyStream {
 		
 	}
 
+    public static DBCursor findUsersForService(ServiceType type, String screenname, int day, int hour) {
+        BasicDBObject query = new BasicDBObject(type.key+".screenname", screenname).append(type.key+".day", day).append(
+                type.key+".hour", hour);
+        BasicDBObject fields = new BasicDBObject("push_id",1);
+        return db.getCollection("users").find(query,fields);
+    }
+
 	public static DBCursor findUsersForService(ServiceType type, Status status, int day, int hour)
 			throws Exception {
-		BasicDBObject query = new BasicDBObject(type.key+".screenname", status
-				.getUser().getScreenName()).append(type.key+".day", day).append(
-						type.key+".hour", hour);
-		BasicDBObject fields = new BasicDBObject("push_id",1);
-		return db.getCollection("users").find(query,fields);
+		return findUsersForService(type,status.getUser().getScreenName(),day,hour);
 	}
 
 	public static DBCursor findAllUsers(Status status) throws Exception {
