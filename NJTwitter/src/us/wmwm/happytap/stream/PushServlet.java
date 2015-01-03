@@ -1,6 +1,7 @@
 package us.wmwm.happytap.stream;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.mongodb.DB;
 import com.mongodb.DBCursor;
 import com.mongodb.MongoClient;
@@ -26,6 +27,7 @@ public class PushServlet extends HttpServlet {
 
     public PushServlet(MongoClient client) {
         this.client = client;
+        gson = new GsonBuilder().setPrettyPrinting().create();
     }
 
     @Override
