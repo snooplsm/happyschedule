@@ -153,8 +153,9 @@ public class GcmIntentService extends IntentService {
 
 		PendingIntent contentIntent = null;
 		String by = " -" + title;
+        Status status = null;
 		try {
-			Status status = DataObjectFactory.createStatus(tweet);
+			status = DataObjectFactory.createStatus(tweet);
             WDb.get().save(status,tweet);
             Intent inserted = new Intent("data_inserted");
             sendBroadcast(inserted);
@@ -168,8 +169,11 @@ public class GcmIntentService extends IntentService {
 			i.setData(Uri.parse("http://wmwm.us").buildUpon().appendQueryParameter("tweet", tweet).build());
 			contentIntent = PendingIntent.getActivity(this,0,i,0);
 		} catch (Exception e) {
-			
+		    return;
 		}
+        if(status==null) {
+            return;
+        }
 		
 		if(contentIntent==null) {
 			contentIntent = PendingIntent.getActivity(this, 0,
@@ -182,9 +186,8 @@ public class GcmIntentService extends IntentService {
 				.setContentTitle(title)
 				.setLargeIcon(
 						((BitmapDrawable)getResources().getDrawable(R.drawable.ic_launcher)).getBitmap())
-				.setStyle(new NotificationCompat.BigTextStyle().bigText(msg))
-				.setContentText(msg);
-        mBuilder.setStyle(new NotificationCompat.BigTextStyle().setBigContentTitle(title).setSummaryText(msg));
+				.setStyle(new NotificationCompat.BigTextStyle().bigText(status.getText()))
+				.setContentText(status.getText());
 		mBuilder.setContentIntent(contentIntent);
 		mBuilder.setPriority(Notification.PRIORITY_DEFAULT);
 		//mBuilder.setFullScreenIntent(contentIntent, false);
@@ -204,9 +207,9 @@ public class GcmIntentService extends IntentService {
 				mBuilder.setSound(alert);
 			}
 		}
+        mBuilder.setTicker(status.getText() + by);
 		Notification notif = mBuilder.build();
-		notif.tickerText = msg + by;
-		mNotificationManager.notify(msg.hashCode(), notif);
+		mNotificationManager.notify((int)status.getId(), notif);
 	}
 
 }

@@ -7,6 +7,7 @@ import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -463,9 +464,14 @@ public class HappyStream {
 	}
 
     public static DBCursor findUsersForService(ServiceType type, String screenname, int day, int hour) {
+
+        BasicDBObject fields = new BasicDBObject("push_id",1);
+        Calendar oneWeekPrior = Calendar.getInstance();
+        oneWeekPrior.add(Calendar.DAY_OF_YEAR,-7);
+        Date oneWeekEarlier = oneWeekPrior.getTime();
         BasicDBObject query = new BasicDBObject(type.key+".screenname", screenname).append(type.key+".day", day).append(
                 type.key+".hour", hour);
-        BasicDBObject fields = new BasicDBObject("push_id",1);
+        query = query.append("updated",new BasicDBObject("$gte",oneWeekEarlier));
         return db.getCollection("users").find(query,fields);
     }
 
