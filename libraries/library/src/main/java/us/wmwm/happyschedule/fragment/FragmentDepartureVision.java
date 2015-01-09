@@ -1,6 +1,7 @@
 package us.wmwm.happyschedule.fragment;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -20,6 +21,7 @@ import us.wmwm.happyschedule.activity.ActivityPickStation;
 import us.wmwm.happyschedule.adapter.DepartureVisionAdapter;
 import us.wmwm.happyschedule.application.HappyApplication;
 import us.wmwm.happyschedule.dao.Db;
+import us.wmwm.happyschedule.dao.ScheduleDao;
 import us.wmwm.happyschedule.dao.WDb;
 import us.wmwm.happyschedule.model.AppConfig;
 import us.wmwm.happyschedule.model.DepartureVision;
@@ -27,8 +29,10 @@ import us.wmwm.happyschedule.model.LineStyle;
 import us.wmwm.happyschedule.model.Station;
 import us.wmwm.happyschedule.model.StationToStation;
 import us.wmwm.happyschedule.model.TrainStatus;
+import us.wmwm.happyschedule.model.TripInfo;
 import us.wmwm.happyschedule.service.Poller;
 import us.wmwm.happyschedule.util.Streams;
+import us.wmwm.happyschedule.views.BackListener;
 import us.wmwm.happyschedule.views.DepartureVisionView;
 import us.wmwm.happyschedule.views.OnStationSelectedListener;
 import us.wmwm.happyschedule.views.OnStationSelectedListener.State;
@@ -43,8 +47,10 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -64,7 +70,7 @@ import com.melnykov.fab.FloatingActionButton;
 import com.melnykov.fab.FloatingActionLayout;
 
 public class FragmentDepartureVision extends HappyFragment implements IPrimary,
-		ISecondary, IScrollingFragment {
+		ISecondary, IScrollingFragment, BackListener {
 
 	private static final String TAG = FragmentDepartureVision.class
 			.getSimpleName();
@@ -442,16 +448,34 @@ public class FragmentDepartureVision extends HappyFragment implements IPrimary,
 
 		activityCreated = true;
 		if (!canLoad && departureVisionListener != null) {
-			list.setOnItemClickListener(new OnItemClickListener() {
-				@Override
-				public void onItemClick(AdapterView<?> arg0, View arg1,
-						int arg2, long arg3) {
-					DepartureVisionView v = (DepartureVisionView) arg1;
-					TrainStatus status = v.getTrainStatus();
-					departureVisionListener.onTrip(status.getTrain());
-				}
-			});
 		}
+
+        list.setOnItemClickListener(new OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> arg0, View arg1,
+                                    int arg2, long arg3) {
+                DepartureVisionView v = (DepartureVisionView) arg1;
+                TrainStatus status = v.getTrainStatus();
+                if(departureVisionListener!=null) {
+                    departureVisionListener.onTrip(status.getTrain());
+                } else {
+                    if(TextUtils.isEmpty(status.getTrain())) {
+                        return;
+                    }
+                    String tripId = ScheduleDao.get().getBlockId(status.getTrain());
+                    if(tripId==null) {
+                        return;
+                    }
+                    TripInfo tinfo = ScheduleDao.get().getStationTimesForTripId(Calendar.getInstance().getTime(),tripId,0,Integer.MAX_VALUE);
+                    if(tinfo==null || tinfo.stops==null || tinfo.stops.isEmpty()) {
+                        return;
+                    }
+                    Station depart = Db.get().getStop(tinfo.stops.get(0).id);
+                    Station arrive = Db.get().getStop(tinfo.stops.get(tinfo.stops.size()-1).id);
+                    getChildFragmentManager().beginTransaction().replace(R.id.fragment_trips,FragmentTrip.newInstance(Calendar.getInstance().getTime(),depart,arrive,tripId)).commit();
+                }
+            }
+        });
 
         pullToRefresh.setOnRefreshListener(onRefreshListener);
         change.setOnClickListener(new OnClickListener() {
@@ -665,7 +689,17 @@ public void onDestroy() {
 		}
 	}
 
-	public interface DepartureVisionListener {
+    @Override
+    public boolean onBack() {
+        Fragment fragment = getChildFragmentManager().findFragmentById(R.id.fragment_trips);
+        if(fragment!=null) {
+            getChildFragmentManager().beginTransaction().remove(fragment).commit();
+            return true;
+        }
+        return false;
+    }
+
+    public interface DepartureVisionListener {
 		void onTrip(String tripId);
 	}
 

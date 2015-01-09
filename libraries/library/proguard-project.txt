@@ -27,7 +27,7 @@
 
 }
 
--keep class twitter4j.**
+-keep class twitter4j.** { *; }
 -keep class org.jsoup.** { *; }
 -keep interface us.wmwm.happyschedule.service.** { *; }
 -keep class us.wmwm.happyschedule.service.** { *; }

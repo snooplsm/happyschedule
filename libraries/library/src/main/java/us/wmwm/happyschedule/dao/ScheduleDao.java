@@ -74,7 +74,7 @@ public class ScheduleDao {
 		return null;
 	}
 	
-	public TripInfo getStationTimesForTripId(String tripId, int departSequence, int arriveSequence) {
+	public TripInfo getStationTimesForTripId(Date date, String tripId, int departSequence, int arriveSequence) {
 		Cursor c = Db.get().db.rawQuery("select stop_id,depart,arrive,route_id,fare_type from nested_trip where trip_id=? and lft between ? and ? order by lft asc", new String[]{tripId, String.valueOf(departSequence), String.valueOf(arriveSequence)});
 		TripInfo info = new TripInfo();
 		info.stops = new ArrayList<TripInfo.Stop>(c.getCount());
@@ -89,12 +89,8 @@ public class ScheduleDao {
 			whatis.put(stopId, stop);
 			stop.id = stopId;
 			try {
-				Calendar cal = Calendar.getInstance();
-				cal.setTime(timeFormat.parse(departure));
-				stop.depart = cal;
-				cal = Calendar.getInstance();
-				cal.setTime(timeFormat.parse(arrive));
-				stop.arrive = cal;
+				stop.depart = Schedule.convert(date,timeFormat.parse(departure));
+				stop.arrive = Schedule.convert(date,timeFormat.parse(arrive));
 			} catch (ParseException e) {
 				throw new RuntimeException(e);
 			}

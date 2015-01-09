@@ -95,6 +95,8 @@ public class GcmIntentService extends IntentService {
         Intent messageIntent = ChatFragment.getMessageReceivedIntent(message);
         sendBroadcast(messageIntent);
 
+
+
     }
 
     private void showUpgradeNotification() {

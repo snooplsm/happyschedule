@@ -7,6 +7,7 @@ import android.util.Log;
 import com.facebook.model.GraphUser;
 import com.flurry.android.FlurryAgent;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.google.android.gms.plus.model.people.Person;
 import com.google.gson.Gson;
 import com.squareup.okhttp.OkHttpClient;
 
@@ -227,6 +228,57 @@ public class Api extends BaseApi {
 //        }
 //
 //    }
+
+    public JoinResponse joinChat(Person person) {
+        String pushId = SettingsFragment.getRegistrationId();
+        if (TextUtils.isEmpty(pushId)) {
+            Log.d(TAG, "no pushid trip notifications");
+            throw new ApiException(500);
+        }
+        Map<String, String> data = new HashMap<String, String>();
+        JSONObject message = new JSONObject();
+        try {
+            message.put("type", "join");
+            message.put("name", person.getName());
+            message.put("facebookId", person.getId());
+            JSONObject fb = new JSONObject(gson.toJson(person));
+            fb.put("first_name",person.getName().getGivenName());
+            fb.put("last_name",person.getName().getFamilyName());
+            message.put("facebook", fb);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        data.put("message", message.toString());
+        data.put("push_id",pushId);
+        Collection<String> all = SettingsFragment.getAllRegistrationIds().values();
+        JSONArray allIds = new JSONArray();
+        for(String s : all) {
+            if(s.equals(pushId)) {
+                continue;
+            }
+            allIds.put(s);
+        }
+        data.put("all_push_ids",allIds.toString());
+        HttpURLConnection conn = null;
+        try {
+            conn = post(data,map(),ctx.getString(R.string.chat_url));
+            int respCode = conn.getResponseCode();
+            if(respCode!=200) {
+                throw new ApiException(respCode);
+            }
+            JoinResponse resp = gson.fromJson(new InputStreamReader(conn.getInputStream()),JoinResponse.class);
+            return resp;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        finally {
+            if(conn!=null) {
+                conn.disconnect();
+            }
+        }
+
+        //post(text)
+    }
 
     public JoinResponse joinChat(GraphUser user) {
         String pushId = SettingsFragment.getRegistrationId();

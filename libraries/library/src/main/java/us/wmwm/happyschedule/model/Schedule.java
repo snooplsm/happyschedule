@@ -389,7 +389,7 @@ public class Schedule implements Serializable {
 		return goodStations.get(tripId);
 	}
 
-	private Calendar convert(Date date, Date dateTime) {
+	public static Calendar convert(Date date, Date dateTime) {
 		Calendar caldate = Calendar.getInstance();
 		caldate.setTime(date);
 		Calendar caldatetime = Calendar.getInstance();

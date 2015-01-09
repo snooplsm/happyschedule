@@ -325,26 +325,26 @@ public class FragmentMain extends Fragment implements BackListener {
                         }.start();
                     }
                 });
-                fma.setDepartureVisionListener(new DepartureVisionListener() {
-                    @Override
-                    public void onTrip(String blockId) {
-                        String tripId = ScheduleDao.get().getBlockId(blockId);
-                        TripInfo tinfo = ScheduleDao.get().getStationTimesForTripId(tripId, 0, Integer.MAX_VALUE);
-                        if (tinfo.stops.isEmpty()) {
-                            return;
-                        }
-                        Station from = Db.get().getStop(tinfo.stops.get(0).id);
-                        Station to = Db.get().getStop(tinfo.stops.get(tinfo.stops.size() - 1).id);
-                        FragmentTrip t = FragmentTrip.newInstance(from, to,
-                                tripId);
-
-
-                        getFragmentManager().beginTransaction()
-                                .replace(R.id.fragment_schedule, t).addToBackStack(null)
-                                .setBreadCrumbTitle(from.getName() + " to " + to.getName())
-                                .commit();
-                    }
-                });
+//                fma.setDepartureVisionListener(new DepartureVisionListener() {
+//                    @Override
+//                    public void onTrip(String blockId) {
+//                        String tripId = ScheduleDao.get().getBlockId(blockId);
+//                        TripInfo tinfo = ScheduleDao.get().getStationTimesForTripId(day, tripId, 0, Integer.MAX_VALUE);
+//                        if (tinfo.stops.isEmpty()) {
+//                            return;
+//                        }
+//                        Station from = Db.get().getStop(tinfo.stops.get(0).id);
+//                        Station to = Db.get().getStop(tinfo.stops.get(tinfo.stops.size() - 1).id);
+//                        FragmentTrip t = FragmentTrip.newInstance(from, to,
+//                                tripId);
+//
+//
+//                        getFragmentManager().beginTransaction()
+//                                .replace(R.id.fragment_schedule, t).addToBackStack(null)
+//                                .setBreadCrumbTitle(from.getName() + " to " + to.getName())
+//                                .commit();
+//                    }
+//                });
                 fma.setOnStationSelectedListener(new OnStationSelectedListener() {
                     @Override
                     public void onStation(Station station, State state) {

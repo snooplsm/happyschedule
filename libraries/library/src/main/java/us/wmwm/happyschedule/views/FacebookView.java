@@ -48,7 +48,7 @@ public class FacebookView extends LinearLayout {
         text.setText(message);
         //ago.setText();
         Picasso.with(getContext())
-                .load(String.format("http://graph.facebook.com/%s/picture", id)).into(avatar);
+                .load(id)   .into(avatar);
     }
 
 }

@@ -3,12 +3,12 @@
     xmlns:fab="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/ad_height"
-    android:background="?android:attr/windowBackground" >
+    android:background="?android:attr/windowBackground"
+    android:paddingBottom="@dimen/ad_height">
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
+        android:layout_height="match_parent">
 
         <TextView
             android:id="@+id/no_internet"
@@ -21,10 +21,10 @@
             android:visibility="gone" />
 
         <android.support.v4.widget.SwipeRefreshLayout
-            android:layout_below="@id/no_internet"
-            android:id="@+id/pull_to_refresh"           
+            android:id="@+id/pull_to_refresh"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" >
+            android:layout_height="match_parent"
+            android:layout_below="@id/no_internet">
 
             <se.emilsjolander.stickylistheaders.StickyListHeadersListView
                 android:id="@+id/list"
@@ -38,34 +38,33 @@
         <com.melnykov.fab.FloatingActionLayout
             android:id="@+id/fal"
             android:layout_width="wrap_content"
-            android:layout_centerHorizontal="true"
             android:layout_height="wrap_content"
             android:layout_alignBottom="@id/pull_to_refresh"
+            android:layout_centerHorizontal="true"
             android:orientation="horizontal">
 
-        <com.melnykov.fab.FloatingActionButton
-            android:id="@+id/button_floating_action_change"
-            android:focusable="true"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="6dp"
-            android:src="@drawable/ic_action_view_as_grid"
-            fab:fab_colorNormal="@color/get_schedule_11"
-            fab:fab_colorPressed="@color/get_schedule_1"
-            />
+            <com.melnykov.fab.FloatingActionButton
+                android:id="@+id/button_floating_action_change"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="6dp"
+                android:focusable="true"
+                android:src="@drawable/ic_action_view_as_grid"
+                fab:fab_colorNormal="@color/get_schedule_11"
+                fab:fab_colorPressed="@color/get_schedule_1" />
         </com.melnykov.fab.FloatingActionLayout>
 
-        <LinearLayout            
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical" >
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/departure"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:focusable="true"
                 android:layout_weight="1"
+                android:focusable="true"
                 android:gravity="center"
                 android:text="Departure Station"
                 android:textSize="25sp" />
@@ -86,5 +85,12 @@
             android:layout_height="match_parent"
             android:visibility="gone" />
     </RelativeLayout>
+
+    <FrameLayout
+        android:id="@+id/fragment_trips"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </FrameLayout>
 
 </RelativeLayout>

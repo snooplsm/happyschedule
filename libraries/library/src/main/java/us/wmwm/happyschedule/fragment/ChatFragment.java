@@ -1,9 +1,11 @@
 package us.wmwm.happyschedule.fragment;
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.IntentSender;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.StateListDrawable;
 import android.os.Bundle;
@@ -35,11 +37,17 @@ import com.facebook.SessionState;
 import com.facebook.Settings;
 import com.facebook.model.GraphUser;
 import com.facebook.widget.LoginButton;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.SignInButton;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.plus.Plus;
+import com.google.android.gms.plus.model.people.Person;
 import com.google.gson.Gson;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -88,6 +96,7 @@ public class ChatFragment extends HappyFragment implements IPrimary {
     View loginContainer;
     ImageView send;
     LoginButton loginButton;
+    SignInButton signInButton;
     SlidingPaneLayout slidingPane;
     View textContainer;
     ImageView usersText;
@@ -98,6 +107,8 @@ public class ChatFragment extends HappyFragment implements IPrimary {
     ChatAdapter adapter;
     UserAdapter userAdapter;
     GraphUser user = null;
+    Person person;
+
     EditText text;
     BroadcastReceiver chatReceiver = new BroadcastReceiver() {
         @Override
@@ -165,32 +176,33 @@ public class ChatFragment extends HappyFragment implements IPrimary {
         reconnect = ThreadHelper.getScheduler().submit(new Runnable() {
             @Override
             public void run() {
-                if (user == null) {
+                if (person == null) {
                     Log.d(TAG, "getting facebook user");
-                    Request.executeAndWait(Request.newMeRequest(Session.getActiveSession(), new Request.GraphUserCallback() {
-
-                        @Override
-                        public void onCompleted(GraphUser u, Response response) {
-                            user = u;
-                            Log.d(TAG, "facebook user received " + u.getName());
-                            ThreadHelper.getScheduler().submit(new Runnable() {
-                                @Override
-                                public void run() {
-                                    try {
-                                        api.registerFacebookUser(user, SettingsFragment.getRegistrationId());
-                                        Log.d(TAG, "saved facebook user on server");
-                                    } catch (Exception e) {
-                                        Log.e(TAG, "erorr saving user", e);
-                                    }
-                                }
-                            });
-                        }
-                    }));
+                    person = Plus.PeopleApi.getCurrentPerson(client);
+//                    Request.executeAndWait(Request.newMeRequest(Session.getActiveSession(), new Request.GraphUserCallback() {
+//
+//                        @Override
+//                        public void onCompleted(GraphUser u, Response response) {
+//                            user = u;
+//                            Log.d(TAG, "facebook user received " + u.getName());
+//                            ThreadHelper.getScheduler().submit(new Runnable() {
+//                                @Override
+//                                public void run() {
+//                                    try {
+//                                        api.registerFacebookUser(user, SettingsFragment.getRegistrationId());
+//                                        Log.d(TAG, "saved facebook user on server");
+//                                    } catch (Exception e) {
+//                                        Log.e(TAG, "erorr saving user", e);
+//                                    }
+//                                }
+//                            });
+//                        }
+//                    }));
                 }
-                if (user != null) {
+                if (person != null) {
                     try {
                         Log.d(TAG, "joining chat ");
-                        JoinResponse resp = api.joinChat(user);
+                        JoinResponse resp = api.joinChat(person);
                         Log.d(TAG, "chat joined " + resp.toString());
                         connected = Calendar.getInstance();
                         me = resp.self;
@@ -205,9 +217,51 @@ public class ChatFragment extends HappyFragment implements IPrimary {
         });
     }
 
+
+
+    GoogleApiClient.ConnectionCallbacks connectionCallbacks = new GoogleApiClient.ConnectionCallbacks() {
+
+        @Override
+        public void onConnected(Bundle bundle) {
+            updateButton();
+            if(!isConnected()) {
+                scheduleReconnect();
+            }
+        }
+
+        @Override
+        public void onConnectionSuspended(int i) {
+            Log.d(TAG,"onConnectionSuspended " + i);
+        }
+    };
+
+    GoogleApiClient.OnConnectionFailedListener connectionFailedListener = new GoogleApiClient.OnConnectionFailedListener() {
+        @Override
+        public void onConnectionFailed(ConnectionResult connectionResult) {
+            Log.d(TAG,"onConnectionFailed " + connectionResult.getErrorCode());
+            if (!mIntentInProgress) {
+                // Store the ConnectionResult so that we can use it later when the user clicks
+                // 'sign-in'.
+                mConnectionResult = connectionResult;
+
+                if (mSignInClicked) {
+                    // The user has already clicked 'sign-in' so we attempt to resolve all
+                    // errors until the user is signed in, or they cancel.
+                    resolveSignInError();
+                }
+            }
+        }
+    };
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        client = new GoogleApiClient.Builder(getActivity())
+                .addConnectionCallbacks(connectionCallbacks)
+                .addOnConnectionFailedListener(connectionFailedListener)
+                .addScope(Plus.SCOPE_PLUS_LOGIN)
+                .addApi(Plus.API)
+                .build();
         if (BuildConfig.DEBUG) {
             Settings.addLoggingBehavior(LoggingBehavior.INCLUDE_ACCESS_TOKENS);
         }
@@ -250,6 +304,7 @@ public class ChatFragment extends HappyFragment implements IPrimary {
         userHeader = (DepartureVisionHeader) view.findViewById(R.id.user_header);
         progress = view.findViewById(R.id.progress);
         progressText = (TextView) view.findViewById(R.id.progressText);
+        signInButton = (SignInButton) view.findViewById(R.id.sign_in_button);
         return view;
     }
 
@@ -440,7 +495,8 @@ public class ChatFragment extends HappyFragment implements IPrimary {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        updateView();
+        client.connect();
+        //updateView();
         list.setAdapter(adapter = new ChatAdapter());
         users.setAdapter(userAdapter = new UserAdapter());
         usersText.setOnClickListener(new View.OnClickListener() {
@@ -488,29 +544,69 @@ public class ChatFragment extends HappyFragment implements IPrimary {
         chatHeader.setData("CHAT");
         userHeader.setData("USERS");
         usersText.setImageDrawable(d);
+        updateButton();
     }
 
-    private void updateView() {
-        Session session = Session.getActiveSession();
-        if (session.isOpened()) {
-            //textInstructionsOrLink.setText(URL_PREFIX_FRIENDS + session.getAccessToken());
-            loginContainer.setVisibility(View.GONE);
-            loginButton.setVisibility(View.GONE);
-            //loginButton.setText("Logout");
-            loginButton.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View view) {
-                    onClickLogout();
+//    private void updateView() {
+//        Session session = Session.getActiveSession();
+//        if (session.isOpened()) {
+//            //textInstructionsOrLink.setText(URL_PREFIX_FRIENDS + session.getAccessToken());
+//            loginContainer.setVisibility(View.GONE);
+//            loginButton.setVisibility(View.GONE);
+//            //loginButton.setText("Logout");
+//            loginButton.setOnClickListener(new View.OnClickListener() {
+//                public void onClick(View view) {
+//                    onClickLogout();
+//                }
+//            });
+//        } else {
+//            loginContainer.setVisibility(View.VISIBLE);
+//            loginButton.setVisibility(View.VISIBLE);
+//            //loginButton.setText("Login");
+//            loginButton.setOnClickListener(new View.OnClickListener() {
+//                public void onClick(View view) {
+//                    onClickLogin();
+//                }
+//            });
+//        }
+//    }
+
+    private boolean mSignInClicked = false;
+
+    public void updateButton() {
+        if(!client.isConnected()) {
+            signInButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (!client.isConnecting()) {
+                        mSignInClicked = true;
+                        resolveSignInError();
+                    }
                 }
             });
         } else {
-            loginContainer.setVisibility(View.VISIBLE);
-            loginButton.setVisibility(View.VISIBLE);
-            //loginButton.setText("Login");
-            loginButton.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View view) {
-                    onClickLogin();
-                }
-            });
+            loginContainer.setVisibility(View.GONE);
+        }
+    }
+
+    private ConnectionResult mConnectionResult;
+
+    private boolean mIntentInProgress = false;
+
+    private int RC_SIGN_IN = 100067;
+
+    private void resolveSignInError() {
+        if (mConnectionResult.hasResolution()) {
+            try {
+                mIntentInProgress = true;
+                getActivity().startIntentSenderForResult(mConnectionResult.getResolution().getIntentSender(),
+                        RC_SIGN_IN, null, 0, 0, 0);
+            } catch (IntentSender.SendIntentException e) {
+                // The intent was canceled before it was sent.  Return to the default
+                // state and attempt to connect to get an updated ConnectionResult.
+                mIntentInProgress = false;
+                client.connect();
+            }
         }
     }
 
@@ -525,7 +621,7 @@ public class ChatFragment extends HappyFragment implements IPrimary {
     @Override
     public void setPrimaryItem() {
         enabled = true;
-        if (!isConnected() && Session.getActiveSession().isOpened()) {
+        if (!isConnected() && client.isConnected()) {
             scheduleReconnect();
         }
     }
@@ -542,10 +638,14 @@ public class ChatFragment extends HappyFragment implements IPrimary {
     public void onResume() {
         super.onResume();
         isDestroying = false;
+        if(!client.isConnected() && !client.isConnecting()) {
+            client.connect();
+        } else
         if (!isConnected()) {
             scheduleReconnect();
         }
-        updateView();
+        //updateView();
+        //updateButton();
     }
 
     @Override
@@ -560,6 +660,9 @@ public class ChatFragment extends HappyFragment implements IPrimary {
     public void onStop() {
         super.onStop();
         Session.getActiveSession().removeCallback(statusCallback);
+        if(client.isConnected()) {
+            client.disconnect();
+        }
     }
 
     @Override
@@ -595,7 +698,7 @@ public class ChatFragment extends HappyFragment implements IPrimary {
                 m.type = Type.MESSAGE_PENDING;
                 m.name = me.name;
                 m.userId = me.id;
-                m.text = user.getId() + "|" + text.getText().toString();
+                m.text = person.getImage().getUrl() + "|" + text.getText().toString();
                 m.timestamp = System.currentTimeMillis();
                 adapter.addData(m);
                 ThreadHelper.getScheduler().submit(new Runnable() {
@@ -622,6 +725,17 @@ public class ChatFragment extends HappyFragment implements IPrimary {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         Session.getActiveSession().onActivityResult(getActivity(), requestCode, resultCode, data);
+        if(requestCode==RC_SIGN_IN) {
+            if (resultCode != Activity.RESULT_OK) {
+                mSignInClicked = false;
+            }
+
+            mIntentInProgress = false;
+
+            if (!client.isConnecting()) {
+                client.connect();
+            }
+        }
     }
 
     enum Type {
@@ -700,6 +814,8 @@ public class ChatFragment extends HappyFragment implements IPrimary {
             });
         }
     }
+
+    GoogleApiClient client;
 
     class ChatAdapter extends BaseAdapter {
 
@@ -804,6 +920,7 @@ public class ChatFragment extends HappyFragment implements IPrimary {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
+                    Collections.reverse(resp.history);
                     for (Message m : resp.history) {
                         m.type = Type.MESSAGE;
                         messages.add(m);

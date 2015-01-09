@@ -48,7 +48,7 @@ public class FragmentSchedule extends Fragment implements BackListener {
 
         @Override
         public void onTrips(Schedule schedule, StationToStation stationToStation) {
-            FragmentTrip t = FragmentTrip.newInstance(from, to,
+            FragmentTrip t = FragmentTrip.newInstance(adapter.getCalendar(pager.getCurrentItem()).getTime(), from, to,
                     stationToStation, schedule);
             getFragmentManager().beginTransaction()
                     .replace(R.id.fragment_date_picker, t).addToBackStack(null)

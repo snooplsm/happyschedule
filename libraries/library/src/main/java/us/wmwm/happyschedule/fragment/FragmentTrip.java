@@ -2,6 +2,7 @@ package us.wmwm.happyschedule.fragment;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +23,8 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -68,9 +71,11 @@ public class FragmentTrip extends HappyFragment implements OnMapReadyCallback {
 		public void run() {
 			adapter.notifyDataSetChanged();
             updateMap();
-			handler.postDelayed(update, 1000);
+			handler.postDelayed(update, 10000);
 		};
 	};
+
+    Date date;
 
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
@@ -80,6 +85,7 @@ public class FragmentTrip extends HappyFragment implements OnMapReadyCallback {
 		Bundle b = getArguments();
 		depart = (Station) b.getSerializable("depart");
 		arrive = (Station) b.getSerializable("arrive");
+        date = (Date) b.getSerializable("date");
 		String id = b.getString("tripId");
 		// loadSchedule();
 		// getSupportActionBar().setTitle("Trip #" + id);
@@ -107,7 +113,7 @@ public class FragmentTrip extends HappyFragment implements OnMapReadyCallback {
 				interval = intervals.pop();
 				if (interval.tripId != null) {
 					TripInfo tripInfo = ScheduleDao.get()
-							.getStationTimesForTripId(interval.tripId,
+							.getStationTimesForTripId(date, interval.tripId,
 									interval.departSequence,
 									interval.arriveSequence);
 					last = tripInfo;
@@ -118,7 +124,7 @@ public class FragmentTrip extends HappyFragment implements OnMapReadyCallback {
 					intervals.push(interval.next());
 				} else {
 				}
-				last = ScheduleDao.get().getStationTimesForTripId(
+				last = ScheduleDao.get().getStationTimesForTripId(date,
 						lastInterval.tripId, interval.arriveSequence - 1,
 						Integer.MAX_VALUE);
 
@@ -131,7 +137,7 @@ public class FragmentTrip extends HappyFragment implements OnMapReadyCallback {
 			}
 		} else {
 			TripInfo tripInfo = ScheduleDao.get()
-					.getStationTimesForTripId(id,
+					.getStationTimesForTripId(date, id,
 							0,
 							Integer.MAX_VALUE);
 			stops.addAll(tripInfo.stops);
@@ -154,9 +160,10 @@ public class FragmentTrip extends HappyFragment implements OnMapReadyCallback {
 		return view;
 	}
 
-	public static FragmentTrip newInstance(Station depart, Station arrive,
+	public static FragmentTrip newInstance(Date date, Station depart, Station arrive,
 			StationToStation sts, Schedule schedule) {
 		Bundle b = new Bundle();
+        b.putSerializable("date",date);
 		b.putSerializable("depart", depart);
 		b.putSerializable("arrive", arrive);
 		b.putLong("start", sts.getDepartTime().getTimeInMillis());
@@ -179,9 +186,10 @@ public class FragmentTrip extends HappyFragment implements OnMapReadyCallback {
 		handler.removeCallbacks(update);
 	}
 
-	public static FragmentTrip newInstance(Station depart, Station arrive,
+	public static FragmentTrip newInstance(Date date, Station depart, Station arrive,
 			String tripId) {
 		Bundle b = new Bundle();
+        b.putSerializable("date",date);
 		b.putSerializable("depart", depart);
 		b.putSerializable("arrive", arrive);
 		b.putString("tripId", tripId);
@@ -193,6 +201,7 @@ public class FragmentTrip extends HappyFragment implements OnMapReadyCallback {
     private static final String TAG = FragmentTrip.class.getSimpleName();
 
     Map<TripInfo.Stop,Marker> markers = new HashMap<TripInfo.Stop,Marker>();
+    Marker me;
     Polyline polyline;
 
     private void updateMap() {
@@ -210,13 +219,46 @@ public class FragmentTrip extends HappyFragment implements OnMapReadyCallback {
         Bitmap bitmap = Bitmap.createBitmap(dimen,dimen, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
         paint.setStyle(Paint.Style.FILL_AND_STROKE);
+        Station stationA = null,stationB = null;
+        Calendar now = Calendar.getInstance();
+
+        TripInfo.Stop previous = null;
+        float percent = 0;
         for (TripInfo.Stop stop : adapter.getStops()) {
+
             canvas.clipRect(0,0,canvas.getWidth(),canvas.getHeight());
+            station = Db.get().getStop(stop.id);
+            Log.d(TAG,station.getName()+ " " + station.getLat()+","+station.getLng() + " " + stop.depart.getTime());
             if(stop.arrive.before(Calendar.getInstance())) {
                 Log.d(TAG,"arrive before");
                 paint.setColor(color);
             } else {
-                paint.setColor(Color.argb((int)(255*.25f),Color.red(color),Color.green(color),Color.blue(color)));
+                //stationA = station;
+                paint.setColor(Color.argb((int) (255 * .25f), Color.red(color), Color.green(color), Color.blue(color)));
+            }
+
+            if(now.after(stop.depart)) {
+                stationA = station;
+                previous = stop;
+            } else {
+                if(stationB==null && stationA!=station) {
+                    stationB = station;
+                    if(previous==null) {
+                        percent = 0;
+                    } else
+                    if(previous.depart==null || stop.arrive==null) {
+
+                    } else {
+                        long max = stop.arrive.getTimeInMillis() - previous.depart.getTimeInMillis();
+                        long curr = stop.arrive.getTimeInMillis() - System.currentTimeMillis();
+
+                        if (curr <= 0) {
+                            percent = 0;
+                        } else {
+                            percent = 1 - (curr / (float) max);
+                        }
+                    }
+                }
             }
             canvas.drawCircle(bitmap.getWidth()/2,bitmap.getHeight()/2,bitmap.getWidth()/2,paint);
             station = Db.get().getStop(stop.id);
@@ -230,7 +272,59 @@ public class FragmentTrip extends HappyFragment implements OnMapReadyCallback {
             markers.put(stop,hamburg);
             poly.add(latLng);
         }
+        if(stationA==null) {
+            return;
+        }
+        if(stationB==null) {
+            stationB = stationA;
+        }
 
+        Location location = new Location(LocationManager.GPS_PROVIDER);
+        location.setLatitude(Double.parseDouble(stationA.getLat()));
+        location.setLongitude(Double.parseDouble(stationA.getLng()));
+
+        Location location2 = new Location(LocationManager.GPS_PROVIDER);
+        location2.setLatitude(Double.parseDouble(stationB.getLat()));
+        location2.setLongitude(Double.parseDouble(stationB.getLng()));
+//        var Î¸ = Number(brng).toRadians();
+//        var Î´ = Number(dist) / this.radius; // angular distance in radians
+//
+//        var Ï†1 = this.lat.toRadians();
+//        var Î»1 = this.lon.toRadians();
+//
+//        var Ï†2 = Math.asin( Math.sin(Ï†1)*Math.cos(Î´) +
+//                Math.cos(Ï†1)*Math.sin(Î´)*Math.cos(Î¸) );
+//        var Î»2 = Î»1 + Math.atan2(Math.sin(Î¸)*Math.sin(Î´)*Math.cos(Ï†1),
+//                Math.cos(Î´)-Math.sin(Ï†1)*Math.sin(Ï†2));
+//        Î»2 = (Î»2+3*Math.PI) % (2*Math.PI) - Math.PI; // normalise to -180..+180Â°
+
+        double totalDist = location.distanceTo(location2);
+
+        Log.d(TAG,"distance is " + totalDist + " percentage is " + percent);
+
+        double dist = (percent * totalDist) / (6371.0*1000.0);
+
+
+        double brng = Math.toRadians(location.bearingTo(location2));
+        double lat1 = Math.toRadians(location.getLatitude());
+        double lon1 = Math.toRadians(location.getLongitude());
+
+        double lat2 = Math.asin( Math.sin(lat1)*Math.cos(dist) + Math.cos(lat1)*Math.sin(dist)*Math.cos(brng) );
+        double a = Math.atan2(Math.sin(brng) * Math.sin(dist) * Math.cos(lat1), Math.cos(dist) - Math.sin(lat1) * Math.sin(lat2));
+        System.out.println("a = " + a);
+        double lon2 = lon1 + a;
+
+        lon2 = (lon2+ 3*Math.PI) % (2*Math.PI) - Math.PI;
+
+        System.out.println("Latitude = "+Math.toDegrees(lat2)+"\nLongitude = "+Math.toDegrees(lon2));
+        MarkerOptions o = new MarkerOptions().anchor(0.5f, 0.5f).icon(BitmapDescriptorFactory.fromResource(R.drawable.new_blue_dot)).position(new LatLng(Math.toDegrees(lat2),Math.toDegrees(lon2)));
+        if(me!=null) {
+            me.remove();
+        }
+        if(stationA!=stationB) {
+            me = map.addMarker(o);
+        }
+        Log.d(TAG,"new coordinates are " + lat2+","+lon2);
         if(polyline!=null) {
             polyline.remove();
         } else {
