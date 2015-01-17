@@ -63,6 +63,7 @@
     <string name="settings_key_debug_push">push_id_key</string>
     <string name="settings_key_debug_version">debug_version_key</string>
     <string name="settings_key_debug_package">debug_package_key</string>
+    <string name="settings_key_debug_promotional_account">debug_package_promotional_account</string>
     <string name="settings_key_debug_names">debug_names_key</string>
     <string name="settings_title_debug_names">Show Station Ids</string>
     <string name="settings_description_debug_names">Puts a number after the station name.</string>

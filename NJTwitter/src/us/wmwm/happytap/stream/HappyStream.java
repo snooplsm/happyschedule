@@ -96,6 +96,7 @@ public class HappyStream {
                     } catch (Exception e) {
 
                     }
+                    System.out.println("\t"+status.getUser().getScreenName()+":"+status.getText().substring(0,Math.min(50,status.getText().length())));
                 }
             }
 

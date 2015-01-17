@@ -229,13 +229,7 @@ public class FragmentTrip extends HappyFragment implements OnMapReadyCallback {
             canvas.clipRect(0,0,canvas.getWidth(),canvas.getHeight());
             station = Db.get().getStop(stop.id);
             Log.d(TAG,station.getName()+ " " + station.getLat()+","+station.getLng() + " " + stop.depart.getTime());
-            if(stop.arrive.before(Calendar.getInstance())) {
-                Log.d(TAG,"arrive before");
-                paint.setColor(color);
-            } else {
-                //stationA = station;
-                paint.setColor(Color.argb((int) (255 * .25f), Color.red(color), Color.green(color), Color.blue(color)));
-            }
+            paint.setColor(color);
 
             if(now.after(stop.depart)) {
                 stationA = station;
@@ -272,6 +266,15 @@ public class FragmentTrip extends HappyFragment implements OnMapReadyCallback {
             markers.put(stop,hamburg);
             poly.add(latLng);
         }
+
+        if(polyline!=null) {
+            polyline.remove();
+        } else {
+            map.moveCamera(CameraUpdateFactory.newLatLngBounds(llb,dimen));
+        }
+        //poly.
+        polyline = map.addPolyline(poly);
+
         if(stationA==null) {
             return;
         }
@@ -325,13 +328,6 @@ public class FragmentTrip extends HappyFragment implements OnMapReadyCallback {
             me = map.addMarker(o);
         }
         Log.d(TAG,"new coordinates are " + lat2+","+lon2);
-        if(polyline!=null) {
-            polyline.remove();
-        } else {
-            map.moveCamera(CameraUpdateFactory.newLatLngBounds(llb,dimen));
-        }
-        //poly.
-        polyline = map.addPolyline(poly);
     }
 
     @Override

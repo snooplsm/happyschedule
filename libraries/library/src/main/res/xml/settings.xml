@@ -94,6 +94,11 @@
         <Preference
             android:key="@string/settings_key_debug_package"
             android:title="Package" />
+        <Preference
+            android:key="@string/settings_key_debug_promotional_account"
+            android:summary="@string/promotional_account"
+            android:title="Promotional Account" />
+
     </PreferenceCategory>
 
 </PreferenceScreen>

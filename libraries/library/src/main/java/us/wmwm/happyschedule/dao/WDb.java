@@ -123,7 +123,7 @@ public class WDb {
 
     private static class OpenHelper extends SQLiteOpenHelper {
 		public OpenHelper(String name) {
-			super(HappyApplication.get(), name, null, 6);
+			super(HappyApplication.get(), name, null, 7);
 		}
 
 		@Override
@@ -134,6 +134,7 @@ public class WDb {
 			db.execSQL("create table if not exists push_notification(created_at integer, created_str varchar(100), id integer, text text, source varchar(100), user_id integer, user_name varchar(100), user_screen_name varchar(100), json text)");
             db.execSQL("CREATE TABLE if not exists schedule_path (source VARCHAR(20) NOT NULL,target VARCHAR(20) NOT NULL,sequence INTEGER,level INTEGER,a VARCHAR(20) NOT NULL,b VARCHAR(20) NOT NULL)");
             db.execSQL("create table if not exists status(id integer, screenName text, created integer, original text, unique(id))");
+            db.execSQL("create table if not exists favorite(trip_id text, block_id text, days text)");
 		}
 
 		@Override
@@ -145,6 +146,7 @@ public class WDb {
                 db.execSQL("drop table if exists status");
             }
             db.execSQL("create table if not exists status(id integer, screenName text, created integer, original text, unique(id))");
+            db.execSQL("create table if not exists favorite(trip_id text, block_id text, days text)");
 		}
 	}
 
