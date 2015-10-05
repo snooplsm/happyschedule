@@ -110,10 +110,10 @@ public class FragmentMainAdapter extends FragmentStatePagerAdapter implements Im
             }
         }
 
-        ChatFragment r = new ChatFragment();
-
-        Option railLines = new Option("Chat", R.raw.chat, r);
-        options.add(railLines);
+//        ChatFragment r = new ChatFragment();
+//
+//        Option railLines = new Option("Chat", R.raw.chat, r);
+//        options.add(railLines);
 
         SettingsFragment f = new SettingsFragment();
         f.setOnPurchaseClickedListener(onPurchaseClickedListener);

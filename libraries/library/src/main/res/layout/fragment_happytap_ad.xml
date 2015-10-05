@@ -1,13 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="55dp">
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+  >
 
-    <TextView
-        android:layout_centerInParent="true"
-        android:gravity="center_horizontal"
-        android:maxLines="2"
-        android:text="Tap here to remove ads."
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+  <FrameLayout
+    android:paddingLeft="4dp"
+    android:id="@+id/playdraft"
+    android:background="#2293D2"
+    android:clipToPadding="false"
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent"
+    >
+
+    <ImageView
+      android:layout_width="40dp"
+      android:layout_height="40dp"
+      android:layout_gravity="center"
+      android:elevation="4dp"
+      android:src="@drawable/playdraft"
+      />
+  </FrameLayout>
+
+
+  <TextView
+    android:id="@+id/upsell"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_toRightOf="@id/playdraft"
+    android:background="#2293D2"
+    android:fontFamily="sans-serif-medium"
+    android:gravity="center"
+    android:maxLines="2"
+    android:text="Install DRAFT and challenge me to remove ads\nfor a month!"
+    android:textColor="@color/white"
+    />
 
 </RelativeLayout>

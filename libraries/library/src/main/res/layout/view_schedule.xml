@@ -5,6 +5,7 @@
     android:layout_marginLeft="6dp"
     android:layout_marginRight="6dp"
     android:paddingBottom="6dp"
+    android:background="?selectableItemBackground"
     android:visibility="gone">
 
     <RelativeLayout

@@ -10,7 +10,6 @@ import android.support.v4.app.FragmentManager.BackStackEntry;
 import android.support.v4.app.FragmentManager.OnBackStackChangedListener;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
 import android.util.Log;
@@ -28,25 +27,21 @@ import java.util.Map;
 
 import us.wmwm.happyschedule.R;
 import us.wmwm.happyschedule.ThreadHelper;
-import us.wmwm.happyschedule.dao.Db;
-import us.wmwm.happyschedule.dao.ScheduleDao;
 import us.wmwm.happyschedule.dao.WDb;
-import us.wmwm.happyschedule.fragment.FragmentDepartureVision.DepartureVisionListener;
 import us.wmwm.happyschedule.fragment.FragmentHistory.OnHistoryListener;
 import us.wmwm.happyschedule.fragment.FragmentPickStations.OnGetSchedule;
 import us.wmwm.happyschedule.model.AppAd;
 import us.wmwm.happyschedule.model.AppConfig;
 import us.wmwm.happyschedule.model.Station;
-import us.wmwm.happyschedule.model.TripInfo;
 import us.wmwm.happyschedule.util.PremiumUserHelper;
 import us.wmwm.happyschedule.views.BackListener;
 import us.wmwm.happyschedule.views.FragmentMainAdapter;
 import us.wmwm.happyschedule.views.ImagePagerStrip;
 import us.wmwm.happyschedule.views.OnStationSelectedListener;
 
-public class FragmentMain extends Fragment implements BackListener {
+public class MainFragment extends Fragment implements BackListener {
 
-    private static final String TAG = FragmentMain.class.getSimpleName();
+    private static final String TAG = MainFragment.class.getSimpleName();
     AbsListView.OnScrollListener onScrollListener = new AbsListView.OnScrollListener() {
         private int mScrollY;
 
@@ -94,7 +89,7 @@ public class FragmentMain extends Fragment implements BackListener {
         @Override
         public void onBackStackChanged() {
             int count = getFragmentManager().getBackStackEntryCount();
-            Log.d(FragmentMain.class.getSimpleName(), "onBackStack " + count);
+            Log.d(MainFragment.class.getSimpleName(), "onBackStack " + count);
             if (count == 0) {
 
             } else {
@@ -367,7 +362,7 @@ public class FragmentMain extends Fragment implements BackListener {
                 try {
                     if (!PremiumUserHelper.isPaidUser()) {
                         AppConfig config = AppConfig.get();
-                        final AppAd ad = config.getBestAd(getActivity(), FragmentMain.class);
+                        final AppAd ad = config.getBestAd(getActivity(), MainFragment.class);
                         if (ad != null) {
                             handler.post(new Runnable() {
                                 @Override

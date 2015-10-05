@@ -14,6 +14,7 @@ import us.wmwm.happyschedule.model.StationToStation;
 import us.wmwm.happyschedule.model.TrainStatus;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.preference.PreferenceManager;
@@ -388,5 +389,13 @@ public class ScheduleView {
             controls.setVisibility(View.GONE);
         }
 
+    }
+
+    public void setFavorite(Boolean b) {
+        if(b) {
+            view.setBackgroundColor(view.getResources().getColor(R.color.favorite_backgorund));
+        } else {
+            view.setBackgroundColor(Color.WHITE);
+        }
     }
 }

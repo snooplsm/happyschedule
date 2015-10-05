@@ -134,26 +134,31 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
 
         @Override
         public void onFavorite() {
-            // TODO Auto-generated method stub
-
         }
 
-        ;
 
         @Override
-        public void onPin(StationToStation sts) {
-            ArrayList<String> blocks = new ArrayList<String>();
-            if (sts instanceof StationInterval) {
-                StationInterval si = (StationInterval) sts;
-                while (si.hasNext()) {
-                    if (si.blockId != null) {
-                        blocks.add(si.blockId);
-                    }
-                }
+        public void onFavorite(StationToStation sts) {
+            if(WDb.get().isFavorite(sts)) {
+                WDb.get().deleteFavorite(sts);
+                adapter.updateFavorite(sts,false);
             } else {
-                blocks.add(sts.blockId);
+                WDb.get().saveFavorite(sts);
+                adapter.updateFavorite(sts,true);
             }
-            WDb.get().addOrDeleteNotification(true, blocks);
+//            ArrayList<String> blocks = new ArrayList<String>();
+//            if (sts instanceof StationInterval) {
+//                StationInterval si = (StationInterval) sts;
+//                while (si.hasNext()) {
+//                    if (si.blockId != null) {
+//                        blocks.add(si.blockId);
+//                    }
+//                }
+//            } else {
+//                blocks.add(sts.blockId);
+//            }
+            //WDb.get().addOrDeleteNotification(true, blocks);
+
         }
 
         @Override
@@ -528,6 +533,23 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
                 if (SettingsFragment.getUseDepartureVision()) {
                     departureVision = ThreadHelper.getScheduler().submit(departureVisionRunnable);
                 }
+
+                ThreadHelper.getScheduler().submit(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        final Map<StationToStation, Boolean> isFavorite = new HashMap<>();
+                        schedule.inOrderTraversal(new ScheduleTraverser() {
+                            @Override
+                            public void populateItem(int index, StationToStation stationToStation, int total) {
+                                isFavorite.put(stationToStation,WDb.get().isFavorite(stationToStation));
+                                System.out.println(isFavorite.get(stationToStation));
+                            }
+                        });
+                        adapter.setFavorites(isFavorite);
+                        System.out.println(isFavorite);
+                    }
+                });
 
                 ThreadHelper.getScheduler().submit(new Runnable() {
                     @Override
@@ -1257,6 +1279,16 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
             view.setData(sts, from, to, innerListener, tripIdToAlarm.get(sts.tripId));
             view.setAlarm(tripIdToAlarm.get(sts));
             view.setStatus(tripIdToTrainStatus.get(sts.blockId));
+            Boolean b = false;
+            if(favorites!=null) {
+                b = favorites.get(sts);
+                if(b==null) {
+                    b = false;
+                }
+            }
+
+            view.setFavorite(b);
+
             return view.getView();
         }
 
@@ -1271,6 +1303,27 @@ public class FragmentDaySchedule extends Fragment implements IPrimary,
                                          int childPosition) {
             // TODO Auto-generated method stub
             return false;
+        }
+
+        Map<StationToStation,Boolean> favorites;
+
+        public void setFavorites(final Map<StationToStation, Boolean> isFavorite) {
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    favorites = isFavorite;
+                    notifyDataSetChanged();
+                }
+            });
+
+
+        }
+
+        public void updateFavorite(StationToStation sts, boolean b) {
+            if(favorites!=null) {
+                favorites.put(sts,b);
+             notifyDataSetChanged();
+            }
         }
     }
 }

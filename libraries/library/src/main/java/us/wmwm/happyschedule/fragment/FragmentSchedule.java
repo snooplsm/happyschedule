@@ -68,7 +68,7 @@ public class FragmentSchedule extends Fragment implements BackListener {
         }
 
         @Override
-        public void onPin(StationToStation sts) {
+        public void onFavorite(StationToStation sts) {
         }
 
         @Override

@@ -33,7 +33,7 @@ import us.wmwm.happyschedule.fragment.FacebookLoginFragment;
 import us.wmwm.happyschedule.fragment.FacebookLoginFragment.PurchaseListener;
 import us.wmwm.happyschedule.fragment.FragmentLoad;
 import us.wmwm.happyschedule.fragment.FragmentLoad.OnLoadListener;
-import us.wmwm.happyschedule.fragment.FragmentMain;
+import us.wmwm.happyschedule.fragment.MainFragment;
 import us.wmwm.happyschedule.fragment.SettingsFragment;
 import us.wmwm.happyschedule.util.PremiumUserHelper;
 import us.wmwm.happyschedule.views.BackListener;
@@ -227,7 +227,7 @@ public class MainActivity extends HappyActivity {
     }
 
     private void showMain() {
-        FragmentMain main = new FragmentMain();
+        MainFragment main = new MainFragment();
         main.setOnPurchaseClickedListener(onPurchaseClickedListener);
         if (PremiumUserHelper.isPremiumUser()) {
             getSupportFragmentManager().beginTransaction()

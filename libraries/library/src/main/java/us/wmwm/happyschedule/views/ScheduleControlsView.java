@@ -9,7 +9,6 @@ import us.wmwm.happyschedule.model.Schedule;
 import us.wmwm.happyschedule.model.StationToStation;
 import us.wmwm.happyschedule.service.FareType;
 import android.content.Context;
-import android.location.Geocoder;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,7 +20,7 @@ public class ScheduleControlsView extends LinearLayout {
 	
 	public interface ScheduleControlListener {
 		void onFavorite();
-		void onPin(StationToStation sts);
+		void onFavorite(StationToStation sts);
 		void onTimer(StationToStation sts);
 		void onTimerCancel(Alarm alarm);
 		void onTrips(Schedule schedule, StationToStation stationToStation);
@@ -37,7 +36,7 @@ public class ScheduleControlsView extends LinearLayout {
 	OnClickListener onClick = new OnClickListener() {
 		public void onClick(View v) {
 			if(v==pin) {
-				listener.onPin(stationToStation);
+				listener.onFavorite(stationToStation);
 			}
 			if(v==trips) {
 				listener.onTrips(schedule, stationToStation);

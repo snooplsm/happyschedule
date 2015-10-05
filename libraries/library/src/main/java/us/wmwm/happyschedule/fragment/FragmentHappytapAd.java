@@ -1,9 +1,14 @@
 package us.wmwm.happyschedule.fragment;
 
 import android.app.Activity;
-import android.app.PendingIntent;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.Gravity;
@@ -13,6 +18,7 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 
 import com.amazon.device.ads.Ad;
 import com.amazon.device.ads.AdError;
@@ -24,14 +30,12 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 
-import java.util.Date;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import us.wmwm.happyschedule.BuildConfig;
 import us.wmwm.happyschedule.R;
 import us.wmwm.happyschedule.ThreadHelper;
-import us.wmwm.happyschedule.activity.MainActivity;
 
 /**
  * Created by gravener on 11/14/14.
@@ -50,6 +54,10 @@ public class FragmentHappytapAd extends AbstractAdFragment {
     // user
     private AdLayout amazonNextAdView; // A placeholder for the next ad so we can keep
 
+    private SharedPreferences sharedPreferences;
+
+    private TextView upsell;
+
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         adViewContainer = (ViewGroup)inflater.inflate(R.layout.fragment_happytap_ad,container,false);
@@ -59,16 +67,39 @@ public class FragmentHappytapAd extends AbstractAdFragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        upsell = (TextView) view.findViewById(R.id.upsell);
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(view.getContext());
+        PackageManager pm = getActivity().getPackageManager();
+        final PackageInfo pinfo;
+        PackageInfo pp = null;
+        try {
+            pp = pm.getPackageInfo("com.playdraft.playdraft", PackageManager.GET_ACTIVITIES);
+            upsell.setText("Challenge rdgravener in DRAFT to get rid of ads!");
+        } catch (PackageManager.NameNotFoundException e) {
+
+        }
+        if(pp!=null) {
+            pinfo = pp;
+        } else {
+            pinfo = null;
+        }
         adViewContainer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 try {
-                    Bundle buyIntentBundle = MainActivity.BILLING_SERVICE.getBuyIntent(3, getActivity().getPackageName(),
-                            "rails.monthly", "subs", new Date().toString());
-                    PendingIntent pendingIntent = buyIntentBundle.getParcelable("BUY_INTENT");
-                    getActivity().startIntentSenderForResult(pendingIntent.getIntentSender(),
-                            1001, new Intent(), Integer.valueOf(0), Integer.valueOf(0),
-                            Integer.valueOf(0));
+                    sharedPreferences.edit().putBoolean("playDraft", true).commit();
+                    if (pinfo != null && pinfo.activities != null) {
+                        ActivityInfo ainfo = pinfo.activities[0];
+                        startActivity(new Intent().setClassName(ainfo.packageName, ainfo.name));
+                    } else {
+                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://playdraft.com/rdgravener")));
+                    }
+//                    Bundle buyIntentBundle = MainActivity.BILLING_SERVICE.getBuyIntent(3, getActivity().getPackageName(),
+//                            "rails.monthly", "subs", new Date().toString());
+//                    PendingIntent pendingIntent = buyIntentBundle.getParcelable("BUY_INTENT");
+//                    getActivity().startIntentSenderForResult(pendingIntent.getIntentSender(),
+//                            1001, new Intent(), Integer.valueOf(0), Integer.valueOf(0),
+//                            Integer.valueOf(0));
                 } catch (Exception e) {
 
                 }
@@ -77,11 +108,16 @@ public class FragmentHappytapAd extends AbstractAdFragment {
 
     }
 
+    Runnable run;
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         Log.d(TAG,"onActivityCreated");
-        handler.postDelayed(new Runnable() {
+        if(sharedPreferences.getBoolean("playDraft",false)) {
+            sharedPreferences.edit().putBoolean("playDraft",false).commit();
+            return;
+        }
+        handler.postDelayed(run =new Runnable() {
             @Override
             public void run() {
                 if(BuildConfig.IS_GOOGLE_ADS_ENABLED) {
@@ -175,6 +211,7 @@ public class FragmentHappytapAd extends AbstractAdFragment {
         if (newAdFuture != null) {
             newAdFuture.cancel(true);
         }
+        handler.removeCallbacks(run);
     }
 
     @Override

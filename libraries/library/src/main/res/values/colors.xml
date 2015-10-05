@@ -18,5 +18,6 @@
     <color name="get_schedule_9">#F0B520</color>
     <color name="get_schedule_10">#F0B515</color>
     <color name="get_schedule_11">#F88D22</color>
+    <color name="favorite_backgorund">@color/get_schedule</color>
     
 </resources>

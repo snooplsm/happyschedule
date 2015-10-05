@@ -31,6 +31,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.animation.TranslateAnimation;
 import android.widget.ListView;
 
 import com.flurry.android.FlurryAgent;
@@ -54,6 +57,7 @@ public class FragmentTrip extends HappyFragment implements OnMapReadyCallback {
 
 	private Station depart;
 	private Station arrive;
+	private View close,mapContainer;
 
 	private Schedule schedule;
 
@@ -66,6 +70,8 @@ public class FragmentTrip extends HappyFragment implements OnMapReadyCallback {
 	Handler handler = new Handler();
 
     GoogleMap map;
+
+    private View holder;
 	
 	Runnable update = new Runnable() {
 		public void run() {
@@ -149,7 +155,17 @@ public class FragmentTrip extends HappyFragment implements OnMapReadyCallback {
 		}
 
 		FlurryAgent.logEvent("ViewTrip", k);
+        close.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                TranslateAnimation a = new TranslateAnimation(TranslateAnimation.RELATIVE_TO_SELF,0,TranslateAnimation.RELATIVE_TO_SELF,0,TranslateAnimation.RELATIVE_TO_PARENT,0,TranslateAnimation.RELATIVE_TO_PARENT,-1);
+                a.setDuration(2500);
 
+                mapContainer.setVisibility(View.GONE);
+                holder.setVisibility(View.GONE);
+
+            }
+        });
 	}
 
 	@Override
@@ -157,6 +173,9 @@ public class FragmentTrip extends HappyFragment implements OnMapReadyCallback {
 			Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.fragment_trips, container, false);
 		list = (ListView) view.findViewById(R.id.list);
+        close = view.findViewById(R.id.close);
+        holder = view.findViewById(R.id.holder);
+        mapContainer = view.findViewById(R.id.map_container);
 		return view;
 	}
 

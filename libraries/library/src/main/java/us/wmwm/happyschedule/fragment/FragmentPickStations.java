@@ -40,6 +40,7 @@ import java.text.DecimalFormat;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import us.wmwm.happyschedule.R;
@@ -136,7 +137,7 @@ public class FragmentPickStations extends Fragment implements IPrimary, ISeconda
                         }
                     }
                 });
-                final String adult = DecimalFormat.getCurrencyInstance()
+                final String adult = DecimalFormat.getCurrencyInstance(Locale.US)
                         .format(fares.get("Adult"));
                 FlurryAgent.logEvent("FareFound", k);
                 handler.post(new Runnable() {

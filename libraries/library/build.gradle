@@ -40,8 +40,8 @@ android {
             flavorDimension "brand"
             applicationId "us.wmwm.njrail"
             buildConfigField "us.wmwm.happyschedule.service.Poller", "POLLER", "new us.wmwm.happyschedule.service.DeparturePoller()"
-            buildConfigField "boolean","IS_AMAZON_ADS_ENABLED","false"
-            buildConfigField "boolean","IS_GOOGLE_ADS_ENABLED","true"
+            buildConfigField "boolean","IS_AMAZON_ADS_ENABLED","true"
+            buildConfigField "boolean","IS_GOOGLE_ADS_ENABLED","false"
             buildConfigField "String","DEFAULT_DEPARTURE_VISION_ID","\"105\""
 
         }

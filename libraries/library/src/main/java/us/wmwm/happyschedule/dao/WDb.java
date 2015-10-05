@@ -10,6 +10,9 @@ import twitter4j.Status;
 import twitter4j.json.DataObjectFactory;
 import us.wmwm.happyschedule.application.HappyApplication;
 import us.wmwm.happyschedule.model.Station;
+import us.wmwm.happyschedule.model.StationInterval;
+import us.wmwm.happyschedule.model.StationToStation;
+
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -101,7 +104,7 @@ public class WDb {
     }
 
     public List<Status> getStatuses() {
-        Cursor c = db.rawQuery("select original from status order by created desc limit 30",null);
+        Cursor c = db.rawQuery("select original from status order by created desc limit 30", null);
         List<Status> statuses = new ArrayList<Status>(30);
         try {
             while (c.moveToNext()) {
@@ -121,9 +124,11 @@ public class WDb {
         return statuses;
     }
 
-    private static class OpenHelper extends SQLiteOpenHelper {
+
+
+	private static class OpenHelper extends SQLiteOpenHelper {
 		public OpenHelper(String name) {
-			super(HappyApplication.get(), name, null, 7);
+			super(HappyApplication.get(), name, null, 8);
 		}
 
 		@Override
@@ -135,6 +140,8 @@ public class WDb {
             db.execSQL("CREATE TABLE if not exists schedule_path (source VARCHAR(20) NOT NULL,target VARCHAR(20) NOT NULL,sequence INTEGER,level INTEGER,a VARCHAR(20) NOT NULL,b VARCHAR(20) NOT NULL)");
             db.execSQL("create table if not exists status(id integer, screenName text, created integer, original text, unique(id))");
             db.execSQL("create table if not exists favorite(trip_id text, block_id text, days text)");
+			db.execSQL("create table if not exists favorite_trip(depart_id text, arrive_id text, trip_id text, block_id text, unique(depart_id,arrive_id,trip_id))");
+
 		}
 
 		@Override
@@ -147,6 +154,7 @@ public class WDb {
             }
             db.execSQL("create table if not exists status(id integer, screenName text, created integer, original text, unique(id))");
             db.execSQL("create table if not exists favorite(trip_id text, block_id text, days text)");
+			db.execSQL("create table if not exists favorite_trip(depart_id text, arrive_id text, trip_id text, block_id text, unique(depart_id,arrive_id,trip_id))");
 		}
 	}
 
@@ -210,6 +218,86 @@ public class WDb {
 
 	public void deleteAllHistory() {
 		db.delete("history", null, null);
+	}
+
+	public boolean isFavorite(StationToStation sts) {
+		boolean fav = true;
+		if (sts instanceof StationInterval) {
+			StationInterval si = (StationInterval) sts;
+			if (si.hasNext()) {
+				while (si.hasNext()) {
+					Cursor c = db.rawQuery("select count(*) from favorite_trip where depart_id=? and arrive_id=? and trip_id=?", new String[]{si.departId,si.arriveId,si.tripId});
+					c.moveToNext();
+					fav = c.getInt(0)==1;
+					c.close();
+					if(!fav) {
+						return false;
+					}
+				}
+			} else {
+				Cursor c = db.rawQuery("select count(*) from favorite_trip where depart_id=? and arrive_id=? and trip_id=?", new String[]{si.departId,si.arriveId,si.tripId});
+				c.moveToNext();
+				fav = c.getInt(0)==1;
+				c.close();
+				if(!fav) {
+					return false;
+				}
+			}
+		} else {
+			Cursor c = db.rawQuery("select count(*) from favorite_trip where depart_id=? and arrive_id=? and trip_id=?", new String[]{sts.departId,sts.arriveId,sts.tripId});
+			c.moveToNext();
+			fav = c.getInt(0)==1;
+			c.close();
+		}
+		return fav;
+	}
+
+	public void deleteFavorite(StationToStation sts) {
+		ContentValues cv = new ContentValues();
+		if (sts instanceof StationInterval) {
+			StationInterval si = (StationInterval) sts;
+			if (si.hasNext()) {
+				while (si.hasNext()) {
+					db.delete("favorite_trip", "depart_id=? and arrive_id=? and trip_id=?", new String[]{si.departId, si.arriveId, si.tripId});
+				}
+			} else {
+				db.delete("favorite_trip", "depart_id=? and arrive_id=? and trip_id=?", new String[]{si.departId, si.arriveId, si.tripId});
+			}
+		} else {
+			db.delete("favorite_trip", "depart_id=? and arrive_id=? and trip_id=?", new String[]{sts.departId, sts.arriveId, sts.tripId});
+		}
+	}
+
+
+
+	public void saveFavorite(StationToStation sts) {
+		ContentValues cv = new ContentValues();
+		if (sts instanceof StationInterval) {
+			StationInterval si = (StationInterval) sts;
+			cv.put("depart_id",si.departId);
+			cv.put("arrive_id",si.arriveId);
+			if(si.hasNext()) {
+				while (si.hasNext()) {
+					if (si.blockId != null) {
+						cv.put("trip_id", si.tripId);
+						cv.put("block_id", si.blockId);
+					}
+					db.insertWithOnConflict("favorite_trip", null, cv, SQLiteDatabase.CONFLICT_REPLACE);
+				}
+			} else {
+				cv.put("trip_id", si.tripId);
+				cv.put("block_id", si.blockId);
+				db.insertWithOnConflict("favorite_trip", null, cv, SQLiteDatabase.CONFLICT_REPLACE);
+			}
+		} else {
+			cv.put("depart_id",sts.departId);
+			cv.put("arrive_id", sts.arriveId);
+			cv.put("trip_id",sts.tripId);
+			cv.put("arrive_id",sts.arriveId);
+			db.insertWithOnConflict("favorite_trip", null,cv,SQLiteDatabase.CONFLICT_REPLACE);
+		}
+
+		//db.delete("favorite_trip","depart_id=? and arrive_id=?",new String[]{});
 	}
 
 }
